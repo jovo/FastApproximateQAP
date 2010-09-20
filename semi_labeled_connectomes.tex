@@ -1,0 +1,50 @@
+\input{/Users/joshyv/Research/misc/latex_paper.tex} 
+
+\lhead{Vogelstein JT, et al}
+\rhead{short title}
+
+\title{Inferring semi-labeled connectomes}
+
+\author{Joshua T.~Vogelstein}
+
+\begin{document}
+
+\maketitle
+% \tableofcontents
+% \begin{abstract}
+% 
+% \end{abstract}
+
+People can now get ``connectomes'' from data.  The typical process is this.  Get a human, put him/her in an MRI scanner, collect both \emph{diffusion} weighted MRI (called DWI) and \emph{structural} MRI (called MPRAGE for Magnetization-Prepared 180 degres Radio frequency pulses And rapid Gradient Echo sampling).  From the DWI, one can define a model $F_{SX}$, where $S$ corresponds to voxel data, and $A$ corresponds to fibers.  Note that there are typically $200\times 200 \times 150$ or so voxels.  $X$, however, has never really been defined properly, as far as i can tell.  Typically, people infer from $S$ the fiber orientation distribution function (fODF or FOD).  Then, given the collection of FOD's, do something called ``tractography'', which entails the following.  Starting at each voxel, generate $n$ particles, propagate them probabilistically according to the FOD's until they terminate by some criteria.  Often $n=1$ and ``probabilistically'' means follow the principal eigenvector.  Regardless, using some method, one obtains $\hx\approx \argmax_x P[x | s]$ for each participant.  This $\hx$ actually defines a graph.  The number of nodes can vary, but is typically $O(10^4)$.  Note that this graph is assumed to be unlabeled.  
+
+Now, given the MPRAGE data, one typically performs some kind of segmentation.  The standard practice goes like this.  There exist some templates, where humans have manually segmented the brain into $50$--$100$ neuroanatomical regions.  There is no general agreement on precisely what those regions are, or even how to define them.  That said, nearly everybody agrees that brains are modular, and that they can therefore by subdivided into regions.  The criteria for subdivision range from spatial statistics (like location of sulci and gyri), to other anatomical criteria (like coloring, or dye uptake), or functional criteria (like fMRI response profile).  Some people even try to define regions based on connectivity, ie, they cluster $\hx$, but that is less common.  The point is, typically, one uses MPRAGE data, morphs each individual brain onto some template, which has labels on the regions.  Then, the labels from the template simply get mapped onto the individual brains.  All edges with an end-point within a region are said to come from that region.  Thus, from an approach like this, we reduce the graph from a 10,000 node unlabeled graph, to a 100 node labeled graph.
+
+The way people have been doing it could be drastically improved, we believe.  Progress is being made, by us, on a few fronts.  First, we are trying to write down $F_{SX}$.  This is not that trivial.  $F_{S|X}$ is fairly straightforward actually, as it is merely typically assumed to be a convolution of some unknown kernel with the underlying FOD, plus noise.  $F_X$ however, is not nearly as clear.  It seems that $X$ is a collection of elements, $X_i$, that can be assumed to be relatively independent.  However, each $X_i$ is a bundle of fibers, not a single fiber.  Thus, where one $X_i$ begins, and another ends, is not well defined, since fibers often travel with others for a while, then diverge, then maybe converge with others, etc.  Perhaps each is best thought of as a tree.  Or, perhaps this notion of distinct fibers is archaic, and should be discarded, for this resolution.  With orders of magnitude higher resolution, fiber becomes a very well defined entity: each neuron has a single axon, that can be described as a tree.  They are clearly individuated, for the most part, and well defined entities.  But, because the resolution of this technology is relatively poor, we get millions of axons per voxel.  Regardless of whether we think of $X$ as a set of fibers, or something else, we can still compute the probability of a fiber starting in any voxel, and ending in any other voxel, by using some particle filtering method.  This gives us some kind of unlabeled graph between voxels.   
+
+Assuming we have this, we could do what everybody else has ever done, which is average edges within blocks to obtain a labeled graph.  However, we could also do much more interesting things, like assume labeled blocks, with unlabeled edges within each block.  We could incorporate the MPRAGE data as priors for estimating blocks. Or, just initialize blocks with MPRAGE.  I'm happy to expand on the details for any of these steps, if you are interested.
+
+
+
+
+
+
+
+% \input{body}
+
+% \paragraph{Acknowledgments}
+
+
+
+
+\appendix
+% \input{appendix}
+\clearpage
+
+\bibliography{/Users/joshyv/Research/misc/biblist}
+\addcontentsline{toc}{section}{References}
+%\bibliographystyle{apalike}
+\bibliographystyle{ieeetr}
+%\bibliographystyle{nature}
+
+
+\end{document}

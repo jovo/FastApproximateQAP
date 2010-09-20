@@ -1,0 +1,985 @@
+
+\documentclass{article}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{verbatim}
+
+\providecommand{\ve}[1]{\boldsymbol{#1}}
+\newcommand{\est}{$\varepsilon$-supervenience theore}
+\newcommand{\es}{$\varepsilon$-supervenien}
+\newcommand{\mbst}{mind-brain supervenience theore}
+\newcommand{\bges}{brain-graph \es}
+\newcommand{\loo}{$L^{(1)}_{h; \mD_n}$}
+\newcommand{\conv}{\rightarrow}
+\newcommand{\Real}{\mathbb{R}}
+\providecommand{\norm}[1]{\left \lVert#1 \right  \rVert}
+\newcommand{\T}{^{\ensuremath{\mathsf{T}}}}           % transpose
+
+\newcommand{\mB}{\mathcal{B}}
+\newcommand{\mD}{\mathcal{D}}
+\newcommand{\mA}{\mathcal{A}}
+\newcommand{\mC}{\mathcal{C}}
+\newcommand{\mM}{\mathcal{M}}
+\newcommand{\mN}{\mathcal{N}}
+\newcommand{\mT}{\mathcal{T}}
+\newcommand{\mI}{\mathcal{I}}
+\newcommand{\mX}{\mathcal{X}}
+\newcommand{\mY}{\mathcal{Y}}
+\newcommand{\mZ}{\mathcal{Z}}
+
+\newcommand{\mcE}{\mathcal{E}}
+\newcommand{\mcT}{\mathcal{T}}
+\newcommand{\mcG}{\mathcal{G}}
+\newcommand{\mcM}{\mathcal{M}}
+\newcommand{\mcL}{\mathcal{L}}
+\newcommand{\hatmcE}{\widehat{\mcE}}
+\newcommand{\hatp}{\widehat{p}}
+\newcommand{\hatP}{\widehat{P}}
+\newcommand{\hatQ}{\widehat{Q}}
+\newcommand{\hatL}{\widehat{L}}
+\newcommand{\tildeA}{\widetilde{A}}
+
+\newcommand{\hL}{\widehat{L}}
+%\newcommand{\MeB}{\mM \overset{\varepsilon}{\sim} \mB}
+%\newcommand{\MnoteB}{\mM \overset{\varepsilon}{\not\sim} \mB}
+\newcommand{\MeB}{\mM \overset{\varepsilon}{{\sim}}_F \mB}
+\newcommand{\MnoteB}{\mM \overset{\varepsilon}{{\not\sim}}_F \mB}
+\newcommand{\bd}{\ve{d}}
+\newcommand{\bE}{\ve{E}}
+\newcommand{\bV}{\ve{V}}
+\newcommand{\bQ}{\ve{Q}}
+\newcommand{\bx}{\ve{x}}
+\newcommand{\bth}{\ve{\theta}}
+
+\newtheorem{defi}{Definition}
+\newcommand{\defa}{\begin{defi}}
+\newcommand{\defb}{\end{defi}}
+\newtheorem{thm}{Theorem}
+\newcommand{\thma}{\begin{thm}}
+\newcommand{\thmb}{\end{thm}}
+
+\lhead{Vogelstein JT, et al}
+\rhead{Neuromental Graph Theory}
+
+\title{Quantitative Horizon Scanning\\for\\Mitigating Technological Surprise:\\Detecting the potential for\\collaboration at the interface}
+
+
+\author{Carey E. Priebe \& Jeffrey L. Solka \& David J. Marchette\\{}}
+%\author{cep@jhu.edu \& Collaborators@Dahlgren}
+
+\begin{document}
+
+
+\begin{center}
+  {\Huge DRAFT}
+
+\vspace*{1.0 in}
+
+{\Large Classification of Unlabeled Connectomes}
+
+\vspace*{0.5 in}
+
+{\Large cep,djm,jmc,jv2}
+% JV1 ; Henry ; \dots
+
+\vspace*{0.5 in}
+
+{\large 03/22/2010}
+
+\vspace*{0.5 in}
+
+\end{center}
+
+
+\section*{abstract}
+
+We consider classification of unlabeled graphs.
+We wish to assess the performance degradation
+due to the application of assignment methods.
+\\
+
+
+This is carey's version -- simplified (perhaps too much?);
+Joshua's connectome (i.e., ``brain graph''?) interpretation will have to come from Joshua.
+\\
+
+NB: alas, note that ``labeled'' is used two different ways herein;
+graphs may be labeled in the sense that the between-graph vertex identification is available,
+and graphs may be labeled in the sense that their class label is available.
+i'm sure you're clever enough to negotiate this issue, in the sequel, for the nonce.
+i solicit constructive approaches to addressing this issue.
+
+NB: i switch willy-nilly twixt graph G and adjacency matrix A.
+complain if you must. but to what end?
+
+NB: i use ``NB'' a lot, too. too much, maybe \dots
+
+
+\section{Introduction}
+
+Consider $(G,Y),\{(G_i,Y_i)\}_{i=1}^s \overset{iid}{\sim} F_{GY}$,
+with class labels $Y:\Omega \rightarrow \{0,1\}$ and
+(labeled) graphs $G:\Omega \rightarrow \mcG_n$,
+where $\mcG_n$ denotes the collection of simple (labeled) graphs on $V=[n]$.
+
+NB:
+We consider simple graphs -- unweighted, undirected, with no loops,
+so the adjacency matrices are binary, symmetric, and hollow;
+our connectome applications
+may involve {directed, loopy, weighted, attributed, multi} graphs \ldots
+(And I use directed loopy graphs in my example Section \ref{Example} \dots
+perhaps we should use directed loopy throughout? or undirected unloopy? what say you, John???)
+
+The collection
+$\mcT \equiv \{(G_i,Y_i)\}_{i=1}^s$ is the training sample
+and $s$ is the training sample size;
+$G$ is the graph to be classified,
+and $Y$ is the true but unobserved class label.
+For simplicity, we will assume that the prior probability of class membership
+$\pi \equiv P[Y=1]$ is known to be $1/2$,
+and the class-conditional sample sizes $S_y \equiv \sum_{i=1}^s I\{Y=y\}$
+are fixed ($s_y$) rather than random variables ($S_y$)
+with $s$ even and $s_0=s_1=s/2$.
+
+We consider the independent edge model (IE),
+so that for $y \in \{0,1\}$ the class-conditional distribution $F_{G|Y=y}$
+is parameterized by a (symmetric, hollow)
+$n \times n$ matrix $P_y$ with entries $p_{y;u,v} \in [0,1]$.
+
+(NB: We will eventually *generalize* the independent edge model to RDPG \ldots and beyond!
+But first, herein, we will *simplify* to independent edge block model (IEBM), for mathematical expediency.)
+
+For this IE model, the Bayes optimal classifier for observed graph $G$
+(equivalently, for observed (symmetric, hollow) $n \times n$ adjacency matrix $A=A(G)=[a_{u,v}]$)
+is given by
+\begin{eqnarray}
+g^*(G) &=& \arg\max_y \prod_{(u,v) \in {V \choose 2}} f(a_{u,v};p_{y;u,v}),
+\end{eqnarray}
+where the Bernoulli probability $f(a;p)$ is given by
+%$f(a;p) = p I\{a=1\} + (1-p) I\{a=0\}$.
+$f(a;p) = p^{a} (1-p)^{1-a}$.
+
+Alas, the graph $G$ is not observed;
+rather, we observe the {\em unlabeled} version.
+(right. we don't observe the class label.
+but here i mean ``unlabeled'' in the ``assignment problem'' sense.
+too.)
+That is, rather than observing the adjacency matrix $A$,
+we observe $\tildeA \equiv QAQ^T$ for some unknown permutation matrix $Q$.
+\\
+(NB: sorry John.  because of all the $P$s, i'm gonna use $Q$ for permutation matrices.  deal with it?)
+
+
+
+
+\section{An Assignment Problem Application}
+
+%``assignment problem'' applications:
+%(1) block assignment;
+%(2) vertex assignment;
+%(3) combination.
+
+(This is Assignment Problem Application \#1.
+E.g., voxels = vertices,
+and voxels have been morphed to anatomical regions as per JV's description.
+If we assume for \#1 that this region assignment is perfect,
+we have the within-region vertex assignment problem.
+This is this \dots
+we disussed adding distance $d(u,u')$ and assuming that true assignment is more likely for smaller distances;
+we discussed relaxing the perfect region assignment to $P[u \in$ correct region$]$;
+we discussed other generalizations?)
+
+
+%Let $d_{\hatP}(\tildeA,A_i) = ||\hatP \tildeA \hatP^T - A_i||_F.$
+%Let $g_{NN}(G;P') = \arg\min_y \min_{i:Y_i=y} d_{P'}(\tildeA,A_i).$
+
+%The {\em nearest assignment neighbor classifier} for
+%the observed $\tildeA \equiv PAP^T$
+%is given by
+%$$g_{NAN}(G) = \arg\min_y \min_{i:Y_i=y} ||\hatP_i \tildeA \hatP_i^T - A_i||_F.$$
+%
+%If $P$ is known,
+%then
+%the nearest neighbor classifier
+%$$g_{NN}(G) = \arg\min_y \min_{i:Y_i=y} ||P \tildeA P^T - A_i||_F$$
+%satisfies
+%$L(g_{NN}) \rightarrow L_{NN}(F_{GY}) \leq 2L^*$ [Cover \& Hart].
+%
+%Let us consider
+%$$g(G) = \arg\min_y \min_{i:Y_i=y} \min_{\hatP} ||\hatP \tildeA \hatP^T - A_i||_{F(\mcE)}.$$
+
+Consider the observed $\tildeA \equiv QAQ^T$.
+For $i \in [s]$, let
+\begin{eqnarray}\label{assignmenteqn}
+\hatQ_i = \arg\min_{Q'} ||Q'^T \tildeA Q' - A_i||_F.
+\end{eqnarray}
+For each pair $(u,v)$, let $\sigma_i(u,v)$ be the reassignment through $Q$ and $\hatQ_i$.
+That is, entries $a_{u,v}$ in $A$ are out of place due to unlabeledness in $\tildeA$,
+and the assignment minimization attempts to put them back into place;
+$\sigma_i(u,v)$ is the result of this attempt -- the assignment provided by
+$\hatQ_i Q A Q^T \hatQ_i^T$.
+
+
+
+
+\defa\label{nac}
+The {\em naive assignment classifier} for the observed $\tildeA$ is given by
+\begin{eqnarray}
+g(G;\mcT) = {\arg\max_y \max_{i:Y_i=y} \prod_{(u,v) \in {V \choose 2}} f(a_{\sigma_i(u,v)};p_{y;u,v})}.
+\end{eqnarray}
+\defb
+
+Note 1:
+The classifier $g(G;\mcT)$ presented in Definition \ref{nac}
+assumes that the class-conditional edge probabilities $p_{y;u,v}$ are known;
+however, these probabilities are not used in the assignment equation \ref{assignmenteqn}.
+(They could be? But they're not!)
+
+Note 2:
+We could employ a plug-in classifier,
+using estimates in both the classifier and the assignment;
+e.g., $\hatp_{y;u,v} = (s_y)^{-1} \sum_{i:Y_i=y} a_{i;u,v}$
+and $\overline{A}_y = (s_y)^{-1} \sum_{i:Y_i=y} A_{i}$.
+However, we would want to use {\em smoothed} estimates in the classifier
+(to avoid degeneracy when $\hatp_{y;u,v}$ equals 0 or 1)
+and {\em unsmoothed} estimates in the assignment.
+This complicates the evaluation analysis;
+we leave this more complicated (and more realistic) investigation for the future.
+
+Note 3:
+The classifier $g(G;\mcT)$ presented in Definition \ref{nac}
+uses only the single probability-maximizing training assignment for each class.
+This could be generalized either in the assignment (using $\overline{A}_y$)
+or by processing the collection
+$\{\prod_{(u,v) \in {V \choose 2}} f(a_{\sigma_i(u,v)};p_{y;u,v})\}_{i:Y_i=y}$
+with methods more elaborate than the simple maximum.
+
+Note 4:
+We could also use nearest neighbor classifier \dots but i think this would be less tractable.
+
+The advantage of the classifier $g(G;\mcT)$ presented in Definition \ref{nac}
+is that the assignment methodology and only the assignment methodology is on trial!
+Better classifiers could be considered,
+but I'm trying to design a tractable investigation of assignment methodologies \dots
+
+%\subsection{A Simpler Model: IEBM$(n,p,\mcE)$}
+
+Under IE,
+the difference between
+$F_{G|Y=1}$ and $F_{G|Y=0}$
+is wholly captured by the collection of marginal ``signal edges'' probabilities
+$$\mcE \equiv \{(u,v) \in {V \choose 2}: p_{0;u,v} \neq p_{1;u,v}\}.$$
+This collection $\mcE$ might be all of ${V \choose 2}$.
+We hereby simplify IE to independent edge block model (IEBM), for mathematical expediency.
+Let $\mcE = {V' \choose 2}$ for a collection $V'$ of $1 \leq m \leq n$ vertices,
+and define
+IEBM$(n,p,m)$ to be the model $F_{GY}$ defined by class-conditional probabilities
+$p_{0;u,v}=p \neq 1/2$ and $p_{1;u,v}=1-p$ for all $(u,v) \in \mcE$
+and $p_{0;u,v}=p_{1;u,v}=1/2$ for all $(u,v) \in {V \choose 2} \setminus \mcE$.
+(In this case, all signal edges are created equally and all noise edges are created equally.)
+Notice that
+IEBM$(n,p,m)$ requires that $\mcE$ is a block --
+the signal edges consist of precisely the potential interconnections between a set of $m$ vertices.
+%so that $\mcE$ can be thought of as an $m \times m$ submatrix 
+
+
+Let $s=2$ (one single training observation from each class).
+%Assume (for evaluation purposes, but not for algorithm development)
+%that $p_{0;u,v}=p \neq 1/2$ and $p_{1;u,v}=1-p$ for all $(u,v) \in \mcE \subset {V \choose 2}$
+%and that $p_{0;u,v}=p_{1;u,v}=1/2$ for all $(u,v) \in {V \choose 2} \setminus \mcE$.
+In this case, since all signal edges are created equally and all noise edges are created equally,
+the performance of the classifier $g(G;\mcT)$
+is monotonic in the number of signal edges recovered by $\sigma_1$ and $\sigma_2$.
+
+%If the estimates $\hatp_{y;u,v}$ are consistent (converge to $\hatp_{y;u,v}$ as $s \rightarrow \infty$),
+%then both of these classifiers are consistent (converge to Bayes optimal);
+%that is, $L(g) \rightarrow L(g^*) \equiv L^*$,
+%where 
+
+Let the random variable $L(g) \equiv P[g(G;\mcT) \neq Y| \mcT]$
+be the probability of misclassification for classifier $g$
+conditioned on the training sample [see DGL 1996].
+Under IEBM$(n,p,m)$ with $s=2$, we have that $L(g)$ depends on only $n,p,m$.
+Define $L^* \equiv L(g^*)$.
+
+\thma
+For $F_{GY} \in$ IEBM$(n,p,m)$,
+$L(g|T=t) < L(g|T=t-1)$ for all $t \in [2m-1]$,
+where
+\begin{eqnarray}
+T_i \equiv |\{(u,v) \in \mcE: \sigma_i(u,v) \in \mcE\}|
+\end{eqnarray}
+and
+$$T \equiv T_1 + T_2.$$
+\thmb
+
+Proof:
+(Proof of this (alleged) monotonicity requires but a simple modification to Henry's proof?)
+
+So, for this simple case,
+we need concern ourselves with only the performance of the assignment algorithm in terms of $T_i$.
+
+\thma
+$T_1 =^{\mcL} T_2$ for this simple case.
+\thmb
+
+Proof:
+(By construction? it's suppose to \dots that's why i set up the class-conditional edge probabilities
+ $p_{y;u,v}$ to be reflective about $1/2$ in $y$.)
+
+
+
+
+\section{Performance Degradation}
+
+What is the performance degradation due to unlabeled-ness?
+
+Case I:
+
+\thma
+$P[\hatQ_i = Q]=1$ for all $i$ implies $L(g)=L^*$.
+\thmb
+
+Proof:
+If $P[\hatQ_i = Q]=1$ for all $i$
+(that is, if the assignment algorithm gets the {\em right} answer --
+not to be confused with the {\em best} answer
+in terms of the optimization)
+then $T_1=T_2=|\mcE|$ and hence $L(g)=L^*$.
+
+
+Case II:
+
+How about when the assignment algorithm gets the {\em best} answer
+in terms of the optimization?
+Perhaps we can work this out -- a theorem/proof?
+
+\thma
+$L_{n,p,\mcE}(g) =$ some *identifiable* function of $n,p,\mcE$?
+\thmb
+
+According to my calculations,
+the only tricky bit is $I\{T_i(g_1,g_2) = t\}$
+given two graphs $g_1,g_2 \in \mcG_n$.
+That is, given two graphs (no randomness),
+$T_i$ either equals $t$ or it doesn't
+(after (arbitrarily?) accounting for non-uniqueness
+of assignment solution $\hatQ$).
+This looks like i could do it for $n=3$.
+But then the combinatorics get silly.
+BUT: maybe this is one of those things for which
+generating function folks
+could derive a {\em generating function} \dots?
+at least for my simple stochastic block model
+class-conditional distributions?
+
+
+After Case I
+(the assignment algorithm gets the {\em right} answer --
+not to be confused with the {\em best} answer in terms of the optimization)
+and Case II
+(the assignment algorithm gets the {\em best} answer in terms of the optimization),
+we will investigate approximation assignment algorithms based on the trade-off between
+(1) computational complexity and
+(2) classification performance
+(either $L(g)$ directly, or in terms of the distribution of $T_i$).
+
+
+The Monte Carlo example presented below (Section \ref{Example})
+demonstrates significant but not complete performance degradation
+due to a particular algorithm
+({\bf lp.assign} in {\bf R} package {\bf lpSolve}).
+
+
+
+
+\section{Example}\label{Example}
+
+A Monte Carlo experiment (20000 paired replications) demonstrates that,
+(using {\bf directed loopy} graphs for simplicity)
+with $n=10, p=0.25$, and $|\mcE|=9$
+(where $\mcE$ is in fact a $3 \times 3$ block)
+the performance degradation due to the application of
+{\bf lp.assign} in {\bf R} package {\bf lpSolve}
+(with $Q=I$ specifying starting point)
+is from
+$\hatL = 0.0476 \approx L^* = 1-F_{Binomial(9,0.25)}(4) = 0.04892731\dots$
+to
+ $\hatL = 0.28855$.
+So better-than-chance classification is achieved for our unlabeled scenario
+using this assignment algorithm,
+but performance is significantly degraded.
+
+NB:
+should also report performance in terms of $T_i$.
+and objective value at solution?
+
+Code for this example is provided in the Appendix.
+
+NB: LAP is not QAP; i'd be happy to have QAP R code \dots
+
+\section{Proposal}
+
+I propose that we investigate,
+via theory, simulation, and experiment,
+the trade-off between computational complexity and performance,
+and also identify the relationship between
+the explicit assignment objective function
+and the exploitation task (classification) objective function.
+
+Except for Cases
+I
+(the assignment algorithm gets the {\em right} answer --
+not to be confused with the {\em best} answer in terms of the optimization)
+and
+II
+(the assignment algorithm gets the {\em best} answer in terms of the optimization),
+I'm not sure what we'll be able to prove.
+Perhaps
+\thma
+LAP is as good as QAP $\iff$ model $\in$ IEBM?
+\thmb
+But we can do simulation analysis:
+first, for my simple scenaro;
+then, generalizing to (perhaps) approach experimental settings?
+\\
+
+NB: perhaps we should be doing hypothesis testing instead???
+
+
+\begin{comment}
+
+Subject:   lp.assign
+From:   cep@jhu.edu
+Date:   Fri, June 5, 2009 1:32 pm
+To:   buttrey@nps.edu
+Cc:   "John Conroy" <conroyjohnm@gmail.com>
+
+hey Sam. long time no hear.
+(i'm officially (if sillily) on the rolls at nps these days!? :-)
+
+i'm using your "lp.assign(lpSolve)" in R ...
+i saw you're name, and thought to thank you.
+
+ cran.r-project.org/web/packages/lpSolve/lpSolve.pdf
+
+cheers,
+carey
+=====
+
+\end{comment}
+
+\section*{Appendix}
+
+Code producing the example results presented in Section \ref{Example}.
+
+\begin{verbatim}
+
+library(lpSolve)
+cuc = function(thisclass,myseed=1)
+# Classification of Unlabeled Connectomes
+{
+set.seed(myseed)
+n=10
+nmc=10000
+# directed, with loops
+P1 = P2 = matrix(0.5,n,n) # class-conditional distribution specification
+P1[1:3,1:3] = 0.25
+P2[1:3,1:3] = 0.75
+label = labeltilde = tie = tietilde = rep(0,nmc)
+Qhat1lpobjval = Qhat2lpobjval = NULL
+for(mc in 1:nmc)
+{
+G1 = matrix(rbinom(n^2,1,P1),n,n)
+G2 = matrix(rbinom(n^2,1,P2),n,n)
+if(thisclass == 1 )
+ G  = matrix(rbinom(n^2,1,P1),n,n)
+if(thisclass == 2 )
+ G  = matrix(rbinom(n^2,1,P2),n,n)
+Q = matrix(0,n,n)
+diag(Q) = 1 # Q == I
+Gtilde = Q %*% G %*% t(Q)
+C1 = C2 = matrix(0,n,n) # cost
+for(i in 1:n) for(j in 1:n)
+ {
+ C1[i,j] = sum(abs(Gtilde[i,]-G1[j,]))
+ C2[i,j] = sum(abs(Gtilde[i,]-G2[j,]))
+ }
+Qhat1lp = lp.assign(C1)
+Qhat2lp = lp.assign(C2)
+Qhat1 = Qhat1lp$solution
+Qhat2 = Qhat2lp$solution
+Qhat1lpobjval[mc] = Qhat1lp$objval
+Qhat2lpobjval[mc] = Qhat2lp$objval
+sigma1 = t(Qhat1) %*% Gtilde
+sigma2 = t(Qhat2) %*% Gtilde
+# now ... classify G and Gtilde
+p1 = prod( (P1^G) * ((1-P1)^(1-G)) )
+p2 = prod( (P2^G) * ((1-P2)^(1-G)) )
+p1tilde = prod( (P1^sigma1) * ((1-P1)^(1-sigma1)) )
+p2tilde = prod( (P2^sigma2) * ((1-P2)^(1-sigma2)) )
+if(p1>p2) label[mc]=1
+if(p1==p2) tie[mc]=1
+if(p1tilde>p2tilde) labeltilde[mc]=1
+if(p1tilde==p2tilde) tietilde[mc]=1
+}
+return(list(label,tie,labeltilde,tietilde))
+}
+
+cuc1 = cuc(1)
+cuc2 = cuc(2)
+
+sum(cuc1[[1]])
+sum(cuc1[[2]])
+sum(cuc1[[3]])
+sum(cuc1[[4]])
+# [1] 9524
+# [1] 0
+# [1] 6986
+# [1] 121
+
+sum(cuc2[[1]])
+sum(cuc2[[2]])
+sum(cuc2[[3]])
+sum(cuc2[[4]])
+# [1] 476
+# [1] 0
+# [1] 2759
+# [1] 117
+
+(10000 - sum(cuc1[[3]]) - .5*sum(cuc1[[4]]) + sum(cuc2[[3]]) + .5*sum(cuc2[[4]]))/20000
+# [1] 0.28855
+
+# L*:
+# > 1-pbinom(4,9,.25)
+# [1] 0.04892731
+
+\end{verbatim}
+
+\newpage
+
+\subsection{move this \dots}
+
+Under IE,
+the difference between
+$F_{G|Y=1}$ and $F_{G|Y=0}$
+is wholly captured by the collection of marginal ``signal edges'' probabilities
+$$\mcE \equiv \{(u,v) \in {V \choose 2}: p_{0;u,v} \neq p_{1;u,v}\}.$$
+\begin{eqnarray}
+g^*(G) &=& \arg\max_y \prod_{(u,v) \in {V \choose 2}} f(a_{u,v};p_{y;u,v}) \\
+       &=& \arg\max_y \prod_{(u,v) \in \mcE} f(a_{u,v};p_{y;u,v}),
+\end{eqnarray}
+
+If we estimate $p_{y;u,v}$ from the training data,
+we may consider classifiers
+\begin{eqnarray}
+g_{NB}(G;\mcT) = \arg\max_y \prod_{(u,v) \in {V \choose 2}} f(a_{u,v};\hatp_{y;u,v})
+\end{eqnarray}
+and
+\begin{eqnarray}
+g_{\mcE}(G;\mcT) = \arg\max_y \prod_{(u,v) \in \mcE} f(a_{u,v};\hatp_{y;u,v}).
+\end{eqnarray}
+NB: requires *smoothed* estimates $\hatp_{y;u,v}$,
+to avoid degeneracy when $\hatp_{y;u,v}$ equals 0 or 1.
+
+The latter classifier, $g_{\mcE}(G;\mcT)$,
+is the best we can hope for -- it considers the signal edges and only the signal edges;
+the former can be swamped by noise from non-signal edges.
+
+If the estimates $\hatp_{y;u,v}$ are consistent (converge to $\hatp_{y;u,v}$ as $s \rightarrow \infty$),
+then both of these classifiers are consistent (converge to Bayes optimal);
+that is, $L(g) \rightarrow L(g^*) \equiv L^*$,
+where the random variable $L(g) \equiv P[g(G) \neq Y| \{(G_i,Y_i)\}_{i=1}^s]$
+is the probability of misclassification for classifier $g$
+conditioned on the training sample [see DGL 1996].
+Note that $g_{\mcE}(G;\mcT)$ should dominate $g_{NB}(G;\mcT)$.
+
+
+\end{document}
+
+
+%Under IE as I have formulated it, with no further assumptions,
+%with $s=2$ (one single training observation from each class),
+%$g_{NN}$ seems to be a reasonable (the *only* reasonable?) classifier.
+%(NB: If $s>2$, nearest neighbor is but one classification option \dots)
+%
+%Consider $s=2$.
+%That is, we have one single training observation from each class.
+%In this case, the nearest neighbor classifier given simplifies to
+%$$g_{NN}(G) = Y_{\arg\min_i \min_{\hatP} ||\hatP \tildeA \hatP^T - A_i||_F}.$$
+
+
+
+\section{unused}
+
+The independent edge homogeneous vs inhomogeneous model
+(IE1), parameterized by $n,p,q,$ and $\mcE \subset V \times V$,
+is given by
+$p_{0;u,v} = p$ for all $(u,v) \in V \times V$
+and
+$p_{1;u,v} = q$ for all $(u,v) \in \mcE$,
+$p_{1;u,v} = p$ for all $(u,v) \in (V \times V) \setminus \mcE$;
+$\mcE$ is the collection of signal edges
+and $\mcE^c = (V \times V) \setminus \mcE$ is the collection of noise edges.
+(Notice that $F_{G|Y=0}$ is Erdos-Renyi ER($n,p$).)
+In this model, all signal edges are created equally,
+and all noise edges are created equally;
+we will see that this property simplifies our analysis.
+
+In IE1, only $\mcE$ is relevant and $g^*$ can be written as
+$$g^*(G) = \arg\max_y \prod_{(u,v) \in \mcE} f(a_{u,v};p_{y;u,v}).$$
+
+If we estimate $p_{y;u,v}$ from the training data,
+we may consider classifiers
+$$g_{NB}(G) = \arg\max_y \prod_{(u,v) \in V \times V} f(a_{u,v};\hatp_{y;u,v})$$
+and
+$$g_{\mcE}(G) = \arg\max_y \prod_{(u,v) \in \mcE} f(a_{u,v};\hatp_{y;u,v}).$$
+The latter is the best we can hope for -- it considers the signal edges and only the signal edges;
+the former can be swamped by noise from non-signal edges.
+
+Our interest is
+canonical subspace identification for this graph classification application;
+that is, estimate the collection of signal edges $\mcE$ via $\hatmcE$
+and consider the classifier
+$$g_{\hatmcE}(G) = \arg\max_y \prod_{(u,v) \in \hatmcE} f(a_{u,v};\hatp_{y;u,v}).$$
+NB: why canonical? feature selection vs feature extraction; simplicity; subsequent coherency manipulation; \ldots
+
+A ``good'' estimate $\hatmcE$ should produce a good classifier \ldots
+that is, we hope that
+$$E[L(g_{\mcE})] \overset{<}{\sim} E[L(g_{\hatmcE})] \ll E[L(g_{NB})],$$
+where $L(g) = P[g(G) \neq Y| \{(G_i,Y_i)\}_{i=1}^s]$
+is the probability of misclassification for classifier $g$
+conditioned on the training sample [see DGL 1996].
+\\
+
+{\bf Priebe's Conjecture \#1}:
+In IE1,
+using $k$ canonical dimensions recovered from training data ($|\hatmcE|=k$),
+the probability of misclassification is monotonically decreasing
+as a function of $T=|\mcE \cap \hatmcE|$; that is,
+$$t_1 > t_2 \implies E[L(g_{\hatmcE})|T=t_1] < E[L(g_{\hatmcE})|T=t_2].$$
+Proof: tis obvious? but it still needs to be proved. enter: Henry \ldots
+\\
+
+\subsubsection{example coherent model: IE1 Kidney \& Egg}
+
+A special ``coherent'' case of IE1
+assumes $|\mcE|=m^2$ for some $m$
+and the $m^2$ signal edges are the edges twixt some set $\mM \subset V$ of $m$ vertices.
+(recall: we are considering directed graphs with loops.)
+[elaborate \ldots]
+[cite Priebe ERvK papers \ldots]
+In this case, $F_{GY}$ is parameterized by $n,p,m,q$ and $\pi$ and $\mM$.
+In this case, the graph structure can inform
+the canonical subspace identification methodology.
+
+\subsubsection{example coherent model: IE1-star}
+
+Coherent model IE1-star,
+for which $F_{GY}$ is parameterized by $n,p,m,q$ and $\pi$ and $v^* \in V$ and $\mM \subset V$,
+specifies that $m$ signal edges are among the $2n-1$ possible edges incident on one (unknown) vertex $v^*$.
+In particular, we will assume that the $m$ signal edges are the edges twixt $v^*$ and some set $\mM$ of $m/2$ vertices.
+(recall: we are considering directed graphs with loops.)
+
+\subsection{relative efficiency}
+
+Recall that the ratio $N_t/N_W$ is a measure of the {\em relative efficiency}
+of the Wilcoxon test versus the $t$ test,
+where $N_t$ and $N_W$ are minimum sample sizes required to achieve some specified power
+at some specified size.
+[cite B\&D 1977 page 352]
+[cite Priebe gwmw papers \ldots?]
+
+We will derive relative efficiency results for coherent vs incoherent $\mcE$ \dots\\
+first: model IE1-star!
+
+Since we are in the case for which
+all signal edges are created equally
+and all noise edges are created equally,
+if we constrain all canonical subspace identification methods
+so that $|\hatmcE|=k$ for some $k$,
+then Priebe's Conjecture \#1 above
+implies that comparing the number of signal dimensions recovered
+for two canonical subspace identification methods
+allows comparison of classification performance.
+
+Toward that end, for canonical subspace identification method $x$ define
+$$T_x(k,s,F_{GY}) = |\mcE \cap \hatmcE_x|$$
+to be the number of signal dimensions recovered
+with training sample size $s$
+using method $x$.
+\\
+NB: $T$ is a random variable; we'll use $E[T]$ aot $T$ below, for simplicity \ldots\\
+i suggest that this is {\em not} without loss of generality!?!
+
+We will consider two methods:
+``agnostic'' which does not assume coherent signal
+and hence does not consider the graph structure at all,
+and
+``coherent'' which does assume coherent signal
+and hence does consider the graph structure.
+[NB: the agnostic method is what would be used if no assumption of coherency could be profitably made.]
+\\
+NB: consider stochastic ordering of $T_{coherent}$ vs $T_{agnostic}$ \ldots?\\
+
+Let
+$$s_x(t) = min\{s:E[T_x(k,s,F_{GY})] \geq t].$$
+
+The ratio $r(t) = s_{coherent}(t) / s_{agnostic}(t)$
+is the relative efficiency.
+If $r(t) \ll 1$ for all $t \in \{1,\cdots,k\}$,
+then it requires way more training samples to achieve in the incoherent case
+the same level of performance that can be achieved with way fewer training samples
+in the coherent case.
+
+Thus, for a particular problem of interest,
+$r(t) \ll 1$ implies that
+it might be practically impossible to perform the desired inference with desired accuracy
+without coherency while success is practically possible with coherency.
+Such a result may
+motivate research into genomic manipulation to produce {\em coherence} of signals of interest in the connectome \ldots and a Nobel Prize!
+
+
+\subsection{methods}
+
+Assume IE1.
+Let $\hatp_{y;u,v} = (s_y)^{-1} \sum_{i:Y_i=y} a_{i;u,v}$.
+NB: for IE1, better estimates are available; let's use these, as they apply to general IE as well \dots
+Let $\delta_{u,v} = \hatp_{1;u,v} - \hatp_{0;u,v}$.
+NB: if we don't assume that $q>p$ is known, then perhaps use $\delta^{\prime}_{u,v} = |\delta_{u,v}|$.
+NB: we will eventually generalize delta to arbitrary ``distance'' --
+eg studentization, p-value from KS test, etc --
+once we consider the general independent edge model as opposed to the simpler $p,q$ model
+considered for the nonce.
+
+\subsubsection{agnostic}
+
+A simple agnostic method for IE1 with $q>p$ known:
+let $\hatmcE$ be the collection of edges associated with the largest $k$ out of $n^2$
+of the $\delta_{u,v}$.
+NB: allows order statistic analysis!
+
+\subsubsection{coherent-scan}
+
+appropriate for IE1-Kidney\&Egg with $q>p$ known
+(but way tough to analyze!):
+consider the weighted graph given by $\delta_{u,v} I\{\delta_{u,v} > \beta\}$
+for some $\beta$;
+choose the $\sqrt{k}$ vertices associated with the largest
+$\sqrt{k}$ of the scan locality statistics $\Psi(v)$,
+and let $\hatmcE$ be the $k$ edges twixt these vertices.
+
+\subsubsection{coherent-maxdegree}
+
+appropriate for IE1-star with $q>p$ known
+(and amenable to analysis!):
+let $\widehat{v}^*$ be the arg max (weighted) degree vertex
+in the weighted graph given by $\delta_{u,v}$,
+ % $\delta_{u,v} I\{\delta_{u,v} > 0\}$,
+and let $\hatmcE$ be the
+collection of edges associated with the largest $k$ of the $2n-1$ $\delta_{u,v}$
+incident to $\widehat{v}^*$.
+NB: allows order statistic analysis!
+NB: should work great, as long as $\widehat{v}^* = v^*$; terrible otherwise.
+so as long as $P[\widehat{v}^* = v^*]$ is large, maxdegree should out-perform agnostic for IE1-star with $q>p$.
+note that (for fixed $n$) $P[\widehat{v}^* = v^*] \rightarrow 1$ as $s \rightarrow \infty$. :-)
+
+%(Note that $P[v^* \in \mM] \rightarrow 1$
+%as $n \rightarrow \infty$
+%for $m = \Omega(\sqrt{n \log n})$ [Rukhin];
+%this should allow theory based on
+%order statistic analysis on just the $n-1$ edges
+%from an arbitrary egg vertex \ldots)
+
+\subsection{simulation}
+
+See Figure 1 \dots results from ***one*** Monte Carlo replicate.
+We can: run more replicates; investigate other parameters; investigate $\widehat{L}$ and $T$ as function of $s$.
+The latter will provide relative efficiency simulation results \dots
+
+\section{next}
+Henry:
+please see attached, section 1.
+ next step
+ (after, ***or while***, proving Priebe's Conjecture \#1, in four parts ...):
+  determine the distribution
+  (or at least the expected value)
+  of $T_{agnositic}(k,s,F_{GY})$
+  under the model IE1-star with $q>p$ known.
+---cep
+
+\begin{figure}[H]
+\centering \includegraphics[width=.9\linewidth]{subspacerecoveryEI1star.pdf}
+\caption{A simulation \ldots IE1-star with $q>p$ known,
+using methods {\it agnostic} and {\it coherent-maxdegree}.
+  We consider classification
+  of labeled graphs (directed, with loops)
+  on $n=279$ vertices.
+  Class-conditional distributions $F_{G|Y=y}$
+  are specified via $p_{y;u,v}$.
+  Class-conditional distribution $F_{G|Y=0}$
+  is specified via $p_{0;u,v} = p = 0.1$ for all $n^2$ edges $(u,v)$.
+  Class-conditional distribution $F_{G|Y=1}$
+  is specified via $p_{1;u,v} = q = 0.5$ for $m=36$ edges $(u,v) \in \mcE$
+  and $p_{1;u,v} = p = 0.1$ for the remaining $n^2-m$ edges.
+  Coherent model IE1-star specifies that all $m$ signal edges are incident on one (unknown) vertex $v^*$;
+  method {\it coherent-maxdegree} should work great \dots
+ We have $s/2=10$ training observations from each class.
+ We use $\hatp_{y;u,v}$ and $\delta_{u,v}$ as described above.
+ Results from ***one*** Monte Carlo replicate.
+ The top panel depicts results using {\em agnostic} method, ignoring graph structure --
+ appropriate for ``incoherent'' signal.
+ We show the ordered $\delta_{vu}$ -- largest 36 of $n^2$.
+ 15 of the 36 signal edges are found amongst the largest 36.
+ The bottom panel depicts results using {\em coherent-maxdegree} method,
+ considering individual vertices
+ via degree -- appropriate for model IE1-star.
+ We show the ordered $\delta_{vu}$ -- largest 36 of $2n-1$ incident to the max degree vertex $\widehat{v}^*$.
+ In this case, $\widehat{v}^* = v^*$;
+ 27 of the 36 signal edges are found amongst the largest 36.
+ $\widehat{L}(g_{\mcE}) = 0.004 <
+   \widehat{L}(g_{\hatmcE_{maxdegree}}) = 0.012 <
+   \widehat{L}(g_{\hatmcE_{agnostic}}) = 0.299 <
+   \widehat{L}(g_{NB}) = 0.422;$
+   differences are statistically significant, with 1000 holdout test observations.
+ NB: $\widehat{L}$-ordering agrees with (inverse) $T$-ordering, as in Priebe's Conjecture \#1.
+% ---cep 01/23/10
+} \label{fig1}
+\end{figure}
+
+\begin{verbatim}
+
+# Henry-sim-EI1-star.txt
+
+set.seed(12345)
+tstn = 500 ## NB: L=0.1 & 1000 test observations => stdev(Lhat) \approx 0.01
+maxn = 10  ## maximum number of training observations per class
+           ## NB: we condition on class-cond'l sample size n_0=n_1
+           ##     for both training and testing ...
+# model EI1-star: signal is a star, with m signal edges,
+# appropriate for method coherent-maxdegree ...
+n = 279
+p=0.1
+q=0.5
+m=36
+thism = 1
+thesem = 2:((m/2)+1)
+P0 = matrix(p,nrow=n,ncol=n)
+P1=P0
+mi = matrix(1:n^2,ncol=n,nrow=n,byrow=F)
+sigdims = c(mi[thism,thesem],mi[thesem,thism])
+P1[thism,thesem] = P1[thesem,thism] = q
+
+Amatlist = Bmatlist = NULL
+for(i in 1:maxn)
+ Amatlist[[i]] = matrix(rbinom(n^2,1,P0),nrow=n,ncol=n)
+for(i in (maxn+1):(2*maxn))
+ Amatlist[[i]] = matrix(rbinom(n^2,1,P1),nrow=n,ncol=n)
+for(i in 1:tstn)
+ Bmatlist[[i]] = matrix(rbinom(n^2,1,P0),nrow=n,ncol=n)
+for(i in (tstn+1):(2*tstn))
+ Bmatlist[[i]] = matrix(rbinom(n^2,1,P1),nrow=n,ncol=n)
+
+trainn=maxn
+phat0 = matrix(0,nrow=n,ncol=n)
+for(i in 1:trainn) phat0 = phat0 + Amatlist[[i]]
+phat0 = phat0 / trainn
+phat1 = matrix(0,nrow=n,ncol=n)
+for(i in (maxn+1):(maxn+trainn)) phat1 = phat1 + Amatlist[[i]]
+phat1 = phat1 / trainn
+ # smoothing! irrelevant for k<<n^2 (except for NaiveBayes)
+ for(i in 1:length(phat0)) if(phat0[i]==0) phat0[i]=1/(2*trainn)
+ for(i in 1:length(phat1)) if(phat1[i]==0) phat1[i]=1/(2*trainn)
+deltahat = (phat1-phat0)
+
+# classify, using all m true sigdims
+ trueclasslabel=c(rep(0,tstn),rep(1,tstn))
+ iclasslabel=rep(1,(2*tstn))
+ for(i in 1:(2*tstn))
+  if (  sum(log(dbinom(c(Bmatlist[[i]])[sigdims],1,c(phat0)[sigdims])))
+      > sum(log(dbinom(c(Bmatlist[[i]])[sigdims],1,c(phat1)[sigdims]))) )
+     iclasslabel[i]=0
+ LhatE = sum(trueclasslabel != iclasslabel)/(2*tstn)
+print(paste("Lhat-E",LhatE))
+
+# classify, using k dimensions recovered via ...
+## agnostic
+k=m
+Ehatagnostic = order(deltahat,decreasing=T)[1:k]
+numsigagnostic = sum(Ehatagnostic %in% sigdims)
+ trueclasslabel=c(rep(0,tstn),rep(1,tstn))
+ iclasslabel=rep(1,(2*tstn))
+ for(i in 1:(2*tstn))
+  if(  sum(log(dbinom(c(Bmatlist[[i]])[Ehatagnostic],1,c(phat0)[Ehatagnostic])))
+     > sum(log(dbinom(c(Bmatlist[[i]])[Ehatagnostic],1,c(phat1)[Ehatagnostic]))) )
+    iclasslabel[i]=0
+ Lhati = sum(trueclasslabel != iclasslabel)/(2*tstn)
+print(paste("Lhat-agnostic",Lhati))
+
+# classify, using k dimensions recovered via ...
+## maxdegree
+deg = apply(deltahat,1,sum) + apply(deltahat,2,sum)
+for(i in 1:n) deg[i]=deg[i]-deltahat[i,i]
+maxdeg = order(deg,decreasing=T)[1:1]
+possiblesigdimest = union(mi[,maxdeg] , mi[maxdeg,])
+x = order(deltahat,decreasing=T)
+Ehatmaxdegree = x[x %in% possiblesigdimest][1:k]
+numsigmaxdegree = sum(Ehatmaxdegree %in% sigdims)
+ trueclasslabel=c(rep(0,tstn),rep(1,tstn))
+ classlabel=rep(1,(2*tstn))
+ for(i in 1:(2*tstn))
+  if(  sum(log(dbinom(c(Bmatlist[[i]])[Ehatmaxdegree],1,c(phat0)[Ehatmaxdegree])))
+     > sum(log(dbinom(c(Bmatlist[[i]])[Ehatmaxdegree],1,c(phat1)[Ehatmaxdegree]))) )
+    classlabel[i]=0
+ Lhatc = sum(trueclasslabel != classlabel)/(2*tstn)
+print(paste("Lhat-maxdegree",Lhatc))
+
+# classify, using all n^2 dimensions:
+ trueclasslabel=c(rep(0,tstn),rep(1,tstn))
+ iclasslabel=rep(1,(2*tstn))
+ for(i in 1:(2*tstn))
+  if (  sum(log(dbinom(c(Bmatlist[[i]]),1,c(phat0))))
+      > sum(log(dbinom(c(Bmatlist[[i]]),1,c(phat1)))) )
+     iclasslabel[i]=0
+ LhatNB = sum(trueclasslabel != iclasslabel)/(2*tstn)
+print(paste("Lhat-NB",LhatNB))
+
+par(mfrow=c(2,1))
+
+plot(rev(sort(deltahat))[1:m],ylim=c(0.2,0.8),
+     xlab=paste("dimensions recovered (red => signal dimension: T =",numsigagnostic,"recovered)"),
+     ylab="estimated signal")
+title(paste("agnostic method (k=",k,") => Lhat=",Lhati,sep=""))
+wwwi = which(order(deltahat,decreasing=T) %in% sigdims)
+points( wwwi,rev(sort(deltahat))[wwwi],col=2,pch=19)
+
+plot(rev(sort(deltahat[Ehatmaxdegree])),ylim=c(0.2,0.8),
+     xlab=paste("dimensions recovered (red => signal dimension: T =",numsigmaxdegree,"recovered)"),
+     ylab="estimated signal")
+title(paste("maxdegree method (k=",k,") => Lhat=",Lhatc,sep=""))
+wwws = which(Ehatmaxdegree %in% sigdims)
+points( wwws,rev(sort(deltahat[Ehatmaxdegree]))[wwws],col=2,pch=19)
+
+# [1] "Lhat-E 0.004"
+# [1] "Lhat-maxdegree 0.012"
+# [1] "Lhat-agnostic 0.299"
+# [1] "Lhat-NB 0.422"
+# NB: McNemar's test => statistical significance for NB>agnostic>maxdegree>E improvement
+
+\end{verbatim}
+
+\end{document}
+
+As a first test case, we'd like to use the brain of a species whose nervous system consists of the same (small) number of labeled neurons for each organism.   \emph{Caenorhabditis elegans} is currently believed to be such an example \cite{Durbin87}. The hermaphroditic c. elegans somatic nervous systems 279 interconnected neurons.  While the graph consisting of chemical synapses between each of these neurons is not identical across individuals, it is highly repeatable \cite{Durbin87}.  Furthermore, these animals exhibit a rich behavioral repertoire that depend on circuit properties \cite{deBonoMaricq05}.  Thus, we can design an experiment, by describing $\{F_{B|M}, \, F_M\}$ for $M=m_0$ and $m_1$, where $m_1$ ($m_0$) corresponds to the c elegans (not) exhibiting a particular behavior (eg, a thermal preference), and $F_{B|M}$ is the distribution of the c elegans brain-graph, given $M$.  Figure \ref{fig1} demonstrates that we can build a classifier that demonstrates \es ce with
+ reasonable choices about $\varepsilon$, $\alpha$, and the above distributions.
+
+Importantly, conducting this experiment \emph{in actuo} (as opposed to \emph{in silico}) is not beyond current technological limitations.  3D superresolution imaging \cite{VaziriShank08} combined with neurite tracing algorithms \cite{HelmstaedterDenk08,Mishchenko09,LuLichtman09} suffice to obtain a brain-graph for each brain within about a day.  Genetic manipulations, laser ablations, and training paradigms can each be used to obtain a non-wild type population \cite{deBonoMaricq05}, and determining the class of each neuron may also be automated \cite{BuckinghamSattelle08}.
+
+\begin{figure}[H]
+\centering \includegraphics[width=.9\linewidth]{../figs/super1}
+\caption{A simulation showing the putative results of an experimental verification of \es ce.  Note that $\widehat{L}_F^{n'}(g_n)$ approaches $L_F(g^\ast)$ as $n'$ increases.  See supplemental stuff for more information.} \label{fig1}
+\end{figure}
