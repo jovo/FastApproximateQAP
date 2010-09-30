@@ -2,4 +2,4 @@
 *.log
 *.blg
 *.gz
-
+.graph_class*

@@ -1,5 +1,5 @@
-\input{/Users/jovo/Research/projects/meta/latex_paper.tex} 
-
+\input{/Users/jovo/Research/papers/meta/latex_paper.tex} 
+\usepackage{url}
 \lhead{Vogelstein JT, et al}
 \rhead{short title}
 
@@ -13,13 +13,14 @@
 \newcommand{\hatP}{\widehat{P}}
 \newcommand{\hatQ}{\widehat{Q}}
 \newcommand{\hatL}{\widehat{L}}
+\newcommand{\mhP}{\widehat{\PP}}
 \newcommand{\tildeA}{\widetilde{A}}
 
 \newcommand{\defa}{\begin{defi}}
 \newcommand{\defb}{\end{defi}}
 
 
-\title{PRE-DRAFT: Unlabeled graph classification}
+\title{PRE-DRAFT: On unlabeled graph classification}
 
 \author{cep,djm,jmc,jv2}
 % JV1 ; Henry ; \dots
@@ -29,6 +30,21 @@
 \maketitle
 % \tableofcontents
 \begin{abstract}
+	
+	
+	
+	Much data are collections of unlabeled graphs.
+	
+	Inference on these collections of graphs is desirable, with the dual-purpose goal of: (1) predicting properties of new graphs, and (2) understanding the relationship between structure and function.
+	
+	When graphs are unlabeled, invariants work, or solving GIP and then building classifiers on $\PP[G,Y]$.
+	
+	Solving GIP is hard, but fast approximate solutions are possible.
+	
+	Sometimes, fast approximations are sufficient.
+	
+	
+	
 	We consider classification of unlabeled graphs.
 	We wish to assess the performance degradation
 	due to the application of assignment methods.
@@ -54,8 +70,141 @@
 
 \section{Introduction}
 
-Consider $(G,Y),\{(G_i,Y_i)\}_{i=1}^s \overset{iid}{\sim} F_{GY}$,
-with class labels $Y:\Omega \rightarrow \{0,1\}$ and
+In the current digital age, swaths of data are collected in myriad diverse fields ranging from astronomy to zoology.  While these data are well characterized by networks, or graphs, the vast majority of statistical inference techniques, including the recent advances in machine learning, tend to assume the data live in finite dimensional Euclidean space.  Thus, inference techniques designed to specifically to address collections or graphs could potentially yield fruitful results across domains.  Furthermore, these collections of graphs often lack vertex labels, meaning no known mapping from vertices in any one graph to any other graph, is available.  In such scenarios, the graphs are called ``unlabeled,'' and this is the scenario of interest for this manuscript.  Consider, for example, two food networks in different jungles.  Both might have lions and tigers and bears (oh my), so it is easy to compare across the jungles.  On the contrary, if one jungle only has the birds and the bees, one might still be interested in comparing the food networks, but a bird might play the same role in the second jungle as the lion does in the first, making the problem more complicated.
+
+
+
+The exploitation task of investigation for this manuscript is that of unlabeled graph classification.  More specifically, we assume that we have observed some number of unlabeled graph/class pairs, and we want to classify a novel unlabeled graph into its appropriate class. Unfortunately, because we do not directly observe the graphs, rather, only the unlabeled version of each graph, our classifiers must somehow deal with this additional complication.
+
+We consider two general approaches.  First, one can compute a large number of statistics on unlabeled graphs that are invariant to isomorphisms.  That is, if $g$ is a graph, and $\mt{g}$ is another graph isomorphic to $g$, then any function that satisfies $f(g)=f(\mt{g})$ is called a ``graph invariant.''  For example, the number of edges or triangles in a graph is invariant to isomorphisms.  By computing a large number of these graph invariants, one effectively projects the graph into finite Euclidean space, at which time one can apply standard machine learning tools.  A second approach under consideration involves first (approximately) solving GIP for each test graph, and then applying \emph{labeled} graph classification algorithms, such as those developed in \cite{??}.
+
+Neither of these approaches are likely to dominate the other in general, as both have rather severe limitations.  The graph invariant approach lacks much rigorous theoretical support.  For instance, it remains an open question for which distributions can the graph invariant approach achieve the Bayes optimal classification rate (except in trivial cases for which the generative model is a function of the particular graph invariants being used). However, many graph invariants can be computed quite quickly.  Further, graph invariants have both local and global properties, that is, they capture some aspect of the whole graph, by recursively considering local functions.  Finally, for certain exploitation tasks, one might desire to understand the relationship between certain graph invariants and the class (for instance, are transportation grids more efficient when more triangles exist?).  
+
+On the other hand, if one first (approximately) solves GIP, then limiting results for many classifiers are readily available (upon stacking each adjacency matrix to project it onto finite Euclidean space).  Unfortunately, solving GIP is known to be NP incomplete \cite{??} (not known to be NP complete nor P).   This means that solving GIP remains quite computationally expensive, especially as $n$, the number of vertices in the graphs, gets large.
+
+Several questions therefore arise for us, as a first investigation into unlabeled graph classification.  Are there distributions for which approximate GIP solutions yield good classification results? If so, can we establish any general rules under which approximating GIP is expected to perform relatively well?  Alternately, are there distributions for which the graph invariant approach outperforms the GIP approach?  How do the computations and performances for these two approaches scale with respect to one another?  In this study, we first describe precisely how one might proceed upon using either of the above two approaches.  Then, we conduct a number of in simulu experiments that we believe are informative with regard to some of these questions.  We conclude with some discussion and outlines for possible future work and applications.
+
+\section{Methods} % (fold)
+\label{sec:methods}
+
+\subsection{Preliminaries} % (fold)
+\label{sub:nomenclature}
+
+% subsection nomenclature (end)
+
+Let $G$ be a graph-valued random variable, $G: \Omega \mapsto \mc{G}$, where $\mc{G}$ is the set of all possible graphs, $g \in \mc{G}$ (and $\Omega$ is the universal sample space). A graph is assumed to be a triple, $(V,A,Q)$, where $V=\{V_i\}=V_i \, \forall i \in [n]$, where $[n]=\{1,\ldots,n\}$, $A=\{A_{ij}\}$ is the adjacency matrix, where each edge is binary (an easily relaxed assumption), and $Q$ is a permutation matrix (a matrix with a single one in each column and row, and zeros otherwise). Let $\mc{Q}$ denote the set of permutation matrices.
+
+Further, let $Y$ be a binary-valued random variable, $Y: \Omega \mapsto \mc{Y} = \{0,1\}$, which can be easily generalized to any multinomial space (or continuous spaces with a bit more work).  Graphs and classes are sampled jointly and exchangeably from some unknown but true distribution, $\PP[G,Y; \theta] \in \mc{P}$, where $\mc{P}$ is the family of distributions under consideration, $\mc{P} = \{\PP[G,Y; \theta] : \theta \in \Theta\}$, where $\theta$ is the parameter of the distribution, and $\Theta$ is the set of all possible parameters (in the sequel, we often drop the $\theta$ from $\PP[G,Y; \theta]$).  
+
+Formally, we assume that  $(G,Y), \{(G_l,Y_l)\} \sim \PP[G,Y; \theta]$, where $(G,Y)$ is the graph/class test sample pair, and $\mc{T}_s=\{G_l,Y_l\}=\{(G_1,Y_1),\ldots, (G_s,Y_s)\}$ is the training sample set, where $s$ is the total number of training samples.  The goal is to impute the latent test sample class, $Y=y$, given the training data.  While we do not believe that $\PP[G,Y; \theta]$ is in fact true, we do believe that the true distribution (if one exists) can be approximated reasonably well by some distributions in $\mc{P}$, such that we have hope to achieve misclassification rates better than chance on at least some data sets.  
+
+Unfortunately, we do not observe the graphs in their entirety, but rather, we only see the adjacency matrices, and not the permutation matrices.  That is, instead of observing $G_l=(A_l,Q_l)$, we observe only $A_l$.  Throughout, we will use the notation that $\mt{A}_l = Q_l A_l Q_l\T$, so, had we observed $\mt{A}_l$'s, then we would have observed all there is to perform the classification.  
+
+Graph invariants can therefore be defined as functions on $A$, not requiring $Q$ for computing their values.
+
+
+\subsection{Graph invariant based classifiers} % (fold)
+\label{sub:graph_invariant_based_classifiers}
+
+Many graph invariants are available from the literature (see 
+\url{http://en.wikipedia.org/wiki/Graph_invariant}
+for a list of some of the most popular ones).   A subfield of random graph models, collectively called exponential family random graph models (ERGMs), typically models a graph by its triangles, $k$-stars, and the like \cite{??}.  Recent work from Pao et al. analyzed the power of various graph invariants for a special case of hypothesis testing \cite{??}.  Because of the close relationship between hypothesis testing and classification (see B\&D, pg. XXX \cite{??}), we consider the same set of graph invariants here.  In particular, we consider:
+\begin{enumerate}
+	\item size:  $\#(A)$ = the number of edges in the graph
+	\item  maximum degree: $\del(G)= \max_{i \in [n]} d(V_i)$, where $d(V_i)$ indicates degree of vertex $i$, that is, the number of edges incident to $V_i$.
+	\item maximum average degree: 	$MAD(G)=\max_{\Omega_G} \bar{d}(\Omega_G)$, where $\bar{d}(G)$ is the average degree of a graph, and $\Omega_G$ is all subgraphs of $G$.  Because computing $MAD(G)$ exactly is computationally taxing (how much???), we instead compute the maximum eigenvalue $MAD$ \cite{PaoPriebe10}.
+	\item scan statistics: the $k$-th scan statistic is the maximum number of edges over all $k$-th order neighborhoods, $S_k(G) = \max_{i \in [n]} \#(\Omega_{N_k[i;G]})$, where $N_k[i;G]=\{j \in [n] : l(V_i,V_j) \leq k\}$, and $l(V_i,V_j)$ is the distance between any two vertices, that is, the minimum number of edges traversals between them.  We assume that $l(V_i,V_i)=0 \, \forall i$, and $l(V_i,V_j)=\infty$ if no path exists between $V_i$ and $V_j$.
+	\item number of triangles:  a triangle exists whenever there is an edge from $V_i$ to $V_j$, one from $V_j$ to $V_k$, and one from $V_k$ back to $V_i$
+	\item clustering coefficient: a measure that captures the degree to which nodes tend to cluster together
+	\item average path length: typically defined by $\sum_{i,j} l(V_i,V_j)/(n^2-n)$, but to exclude the infinities, we let $\infty \mapsto 2 \max l(V_i,V_j)$.
+\end{enumerate}
+
+Let $\mb{f}(\cdot): \mc{G} \mapsto \Real^k$ be the function that takes a graph as input, and outputs a set of $k$ graph invariants.  Having defined such a function, one can then use standard machine learning algorithms to perform classification.  We plug the results into a ``standard'' suite of machine learning tools: (i) a linear classifier---linear discriminant analysis (LDA), (ii) a quadratic classifier---quadratic discriminant analysis (QDA), (iii) a support vector machine (SVM), (iv) random forests (RF), and (v) $k_n$ nearest neighbor classifier.  Note that the dimensionality of the data is quite large ($\mc{O}(n^2)$), we first reduce the dimensionality of the data using principal components analysis (PCA).  The dimensionality of the data to keep is chosen using the method of \cite{??}.
+
+\subsection{Latent permutation matrix approach} % (fold)
+\label{sub:latent_permutation_matrix_approach}
+
+The Bayes optimal classifier is:
+\begin{align}
+	\mh{y} = \argmax_{y \in \{0,1\}} \PP[G,Y] = \argmax_{y \in \{0,1\}} \PP[G | Y] \PP[Y]
+\end{align}
+where $\PP[G|Y]$ is the \emph{likelihood} of observing a graph given its class, and $\PP[Y]$ is the prior probability of each class.  By obtaining estimates of these two terms, one can build a plugin classifier:
+\begin{align}
+	\mh{y} = \argmax_{y \in \{0,1\}} \mhP[G | Y] \mhP[Y]	
+\end{align}
+where $\mhP[G|Y]$ and $\mhP[Y]$ are the plugin estimates of the likelihood and prior, respectively.  Estimating the prior is trivial, one can simply use the maximum likelihood estimator, $\mh{\pi}=\mhP[Y=1]$ and $1-\mh{\pi}=\mhP[Y=0]$.  The likelihood term, however, is more complex.  It can be expanded:
+\begin{align}
+	\PP[G|Y] = \PP[A,Q | Y] = \PP[A | Y] \PP[Q]
+\end{align}
+as the adjacency matrix, $A$, and permutation matrix $Q$, are conditionally independent given the class label, $Y$.  Further, the permutation matrix is assumed to be independent of the class label.  Thus, if $Q$ were observed, then estimating $\PP[A|Y]$ would be all there is to it; unfortunately, $Q$ is latent, and thus must be imputed for each example.  
+
+To proceed, we define an explicit likelihood model, which we will use in the sequel.  The likelihood of a new graph, $G'=(A',Q')$ is therefore defined as follows. For the adjacency matrix, we assume here the independent edge model, that is:
+\begin{align}
+\PP[A'|Y] = \prod_{ij} \PP[A_{ij}'| Y]	= \prod_{ij} \text{Bernoulli}(a_{ij}^l; \eta_{ij}^y) = \prod_{ij} \big(\eta_{ij}^y\big)^{a_{ij}'}\big(1-\eta_{ij}^y\big)^{1-a_{ij}'}.
+\end{align}
+The permutation matrix has the following distribution:
+\begin{align}
+	\PP[Q'] = \sum_{Q \in \mc{Q}} \delta_Q w_{Q}'
+\end{align}
+where $\delta_Q$ is an indicator function taking unity value whenever $Q'=Q$ and zero otherwise, and $w_Q'$ is the likelihood of any particular permutation matrix, where $w_Q'\leq 0$ and $\sum_{Q}w_Q'=1$.  The simplest assumption is that each permutation matrix is equally likely, that is: $w_Q'=1/n!$, because $n!$ is the number of $n\times n$ element permutation matrices.  
+
+
+
+
+The maximum likelihood estimator for each $\eta_{ij}^y$ is readily available (as are more robust estimators, see \cite{??} for details).  Na\"ively, one can define $\PP[Q]=\sum_{Q' \in \mc{Q}} \delta_{Q'} w_{Q'}$
+
+In the sequel, we will assume that $P[A|Y]$ is known, and $\PP[Y]$ is known, therefore, we must only estimate $\PP[Q]$.  Importantly, $\PP[Q]$ is different for each sample.  
+
+
+% subsection latent_permutation_matrix_approach (end)
+
+
+
+
+
+% subsection graph_invariant_based_classifiers (end)
+
+% section methods (end)
+
+
+\section{other} % (fold)
+\label{sec:other}
+
+% section other (end)
+
+
+
+
+Finding the best alignment of vertices has been called the graph isomorphism problem (GIP) \cite{??}, and is known to be computationally equivalent to the quadratic alignment problem (QAP) \cite{??}.  Given to graphs, $A$ and $B$, the QAP can be formalized as follows:
+\begin{align}
+	\mh{P} = \argmin_{P \in \Pi} \norm{PAP\T - B}
+\end{align}
+where $\Pi$ is the set of all permutation matrices, that is, all matrices with a single one in each row and column, and zeros otherwise.  
+
+
+We therefore investigate building classifiers on the space of collections of unlabeled graphs.  Specifically, we consider two distinct approaches. First, we build classifiers using ``graph invariants,'' that is, statistics of the graphs that are invariant to isomorphic translations.  Second, we first approximately solve the graph isomorphism problem,  
+
+
+
+
+
+Data today are unlabeled graphs.  examples (mostly brain-graph examples)....
+
+Previous work classifying unlabeled graphs..... Problem: consistency for what model?
+
+Previous work classifying labeled graphs.... Problem: graph isomorphism
+
+Previous work solving graph isomorphism problem.
+
+Paper organization...
+
+\section{Preliminaries} % (fold)
+\label{sec:preliminaries}
+
+
+
+Consider $(G,Y),\{(G_i,Y_i)\}_{i=1}^s \overset{iid}{\sim} \PP_{GY}$,
+with classes $Y:\Omega \rightarrow \{0,1\}$ and
 (labeled) graphs $G:\Omega \rightarrow \mcG_n$,
 where $\mcG_n$ denotes the collection of simple (labeled) graphs on $V=[n]$.
 
@@ -106,6 +255,7 @@ we observe $\tildeA \equiv QAQ^T$ for some unknown permutation matrix $Q$.
 \\
 (NB: sorry John.  because of all the $P$s, i'm gonna use $Q$ for permutation matrices.  deal with it?)
 
+% section preliminaries (end)
 
 
 
@@ -140,7 +290,7 @@ we discussed other generalizations?)
 %the nearest neighbor classifier
 %$$g_{NN}(G) = \arg\min_y \min_{i:Y_i=y} ||P \tildeA P^T - A_i||_F$$
 %satisfies
-%$L(g_{NN}) \rightarrow L_{NN}(F_{GY}) \leq 2L^*$ [Cover \& Hart].
+%$L(g_{NN}) \rightarrow L_{NN}(\PP_{GY}) \leq 2L^*$ [Cover \& Hart].
 %
 %Let us consider
 %$$g(G) = \arg\min_y \min_{i:Y_i=y} \min_{\hatP} ||\hatP \tildeA \hatP^T - A_i||_{F(\mcE)}.$$
@@ -210,7 +360,7 @@ This collection $\mcE$ might be all of ${V \choose 2}$.
 We hereby simplify IE to independent edge block model (IEBM), for mathematical expediency.
 Let $\mcE = {V' \choose 2}$ for a collection $V'$ of $1 \leq m \leq n$ vertices,
 and define
-IEBM$(n,p,m)$ to be the model $F_{GY}$ defined by class-conditional probabilities
+IEBM$(n,p,m)$ to be the model $\PP_{GY}$ defined by class-conditional probabilities
 $p_{0;u,v}=p \neq 1/2$ and $p_{1;u,v}=1-p$ for all $(u,v) \in \mcE$
 and $p_{0;u,v}=p_{1;u,v}=1/2$ for all $(u,v) \in {V \choose 2} \setminus \mcE$.
 (In this case, all signal edges are created equally and all noise edges are created equally.)
@@ -240,7 +390,7 @@ Under IEBM$(n,p,m)$ with $s=2$, we have that $L(g)$ depends on only $n,p,m$.
 Define $L^* \equiv L(g^*)$.
 
 \thma
-For $F_{GY} \in$ IEBM$(n,p,m)$,
+For $\PP_{GY} \in$ IEBM$(n,p,m)$,
 $L(g|T=t) < L(g|T=t-1)$ for all $t \in [2m-1]$,
 where
 \begin{eqnarray}
@@ -701,12 +851,12 @@ For each of the 100 test samples, we first tried to solve GIP with respect to ea
 \label{fig:sim1_params}
 \end{figure}
 
-\begin{figure}[!ht]
-\centering \includegraphics[width=.9\linewidth]{/Users/jovo/Research/figs/sims/unlabeled/block_error}
-\caption{Misclassification rate as a function of max iteration.  Note that iteration 0 means did not try to solve GIP.  Iteration 31 is assumes that GIP was solved exactly (that is, the algorithm used vertex labels).  Lhat between those should be between the bounds, and it is. ``Tru'' means only classify using the signal subgraph, ``nb'' means classify using the entire graph. I do not fully understand why ``tru'' behaves as it does.  Note that running this code multiple times gives quantitatively quite different results, but the bounds are always basically respected, suggesting it is bug free.  
-}
-\label{fig:sim1_error}
-\end{figure}
+% \begin{figure}[!ht]
+% \centering \includegraphics[width=.9\linewidth]{/Users/jovo/Research/figs/sims/unlabeled/block_error}
+% \caption{Misclassification rate as a function of max iteration.  Note that iteration 0 means did not try to solve GIP.  Iteration 31 is assumes that GIP was solved exactly (that is, the algorithm used vertex labels).  Lhat between those should be between the bounds, and it is. ``Tru'' means only classify using the signal subgraph, ``nb'' means classify using the entire graph. I do not fully understand why ``tru'' behaves as it does.  Note that running this code multiple times gives quantitatively quite different results, but the bounds are always basically respected, suggesting it is bug free.  
+% }
+% \label{fig:sim1_error}
+% \end{figure}
 
 
 
@@ -760,7 +910,7 @@ In the kidney-egg classification problem, $n-m$ of the vertices can be arbitrari
 % \input{appendix}
 \clearpage
 
-\bibliography{/Users/joshyv/Research/projects/meta/biblist}
+\bibliography{/Users/joshyv/Research/papers/meta/biblist}
 \addcontentsline{toc}{section}{References}
 %\bibliographystyle{apalike}
 \bibliographystyle{ieeetr}
