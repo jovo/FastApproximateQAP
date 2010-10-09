@@ -19,6 +19,15 @@
 \newcommand{\defa}{\begin{defi}}
 \newcommand{\defb}{\end{defi}}
 
+\newtheorem{Rem}{Remark}%[section]
+\newtheorem{Alg}{Algorithm}%[section]
+\newtheorem{Thm}{Theorem}[section]
+%\theoremstyle{marginbreak}
+\newtheorem{Lem}{Lemma}[section]
+%\newtheorem{Lem}[Cor]{Lemma}
+%\theoremstyle{change}
+%\theorembodyfont{\itshape}
+\newtheorem{Def}{Definition}[section]
 
 \title{PRE-DRAFT: On unlabeled graph classification}
 
@@ -121,8 +130,8 @@ for a list of some of the most popular ones).   A subfield of random graph model
 
 Let $\mb{f}(\cdot): \mc{G} \mapsto \Real^k$ be the function that takes a graph as input, and outputs a set of $k$ graph invariants.  Having defined such a function, one can then use standard machine learning algorithms to perform classification.  We plug the results into a ``standard'' suite of machine learning tools: (i) a linear classifier---linear discriminant analysis (LDA), (ii) a quadratic classifier---quadratic discriminant analysis (QDA), (iii) a support vector machine (SVM), (iv) random forests (RF), and (v) $k_n$ nearest neighbor classifier.  Note that the dimensionality of the data is quite large ($\mc{O}(n^2)$), we first reduce the dimensionality of the data using principal components analysis (PCA).  The dimensionality of the data to keep is chosen using the method of \cite{??}.
 
-\subsection{Latent permutation matrix approach} % (fold)
-\label{sub:latent_permutation_matrix_approach}
+\subsection{Likelihood based approach} % (fold)
+\label{sec:lik}
 
 The Bayes optimal classifier is:
 \begin{align}
@@ -138,22 +147,125 @@ where $\mhP[G|Y]$ and $\mhP[Y]$ are the plugin estimates of the likelihood and p
 \end{align}
 as the adjacency matrix, $A$, and permutation matrix $Q$, are conditionally independent given the class label, $Y$.  Further, the permutation matrix is assumed to be independent of the class label.  Thus, if $Q$ were observed, then estimating $\PP[A|Y]$ would be all there is to it; unfortunately, $Q$ is latent, and thus must be imputed for each example.  
 
-To proceed, we define an explicit likelihood model, which we will use in the sequel.  The likelihood of a new graph, $G'=(A',Q')$ is therefore defined as follows. For the adjacency matrix, we assume here the independent edge model, that is:
+To proceed, we define an explicit likelihood model, which we will use in the sequel.  Because each element of the adjacency matrix is Binary, edges are Bernoulli random variables.  We assume that each edge is independent, but not identical.  If the permutation matrix was known to be the identity matrix, we would have:
 \begin{align}
-\PP[A'|Y] = \prod_{ij} \PP[A_{ij}'| Y]	= \prod_{ij} \text{Bernoulli}(a_{ij}^l; \eta_{ij}^y) = \prod_{ij} \big(\eta_{ij}^y\big)^{a_{ij}'}\big(1-\eta_{ij}^y\big)^{1-a_{ij}'}.
+\PP[A,Q|Y] = \prod_{ij} \text{Bernoulli}(a_{ij}; \eta_{ij}^y)
+\end{align}
+However, because the permutation matrix is in general, not the identity, we instead have:
+% , yielding the following model:
+% The likelihood of a new graph, $G=(A,Q)$ is therefore a prod defined as follows: %. For the adjacency matrix, we assume here the independent edge model, that is:
+\begin{align}
+\PP[A,Q|Y] = \prod_{ij} \text{Bernoulli}\bigg(\sum_{ij} q_{ij} q_{ji} a_{ij}; \eta_{ij}^y\bigg) \PP[Q]
+% \eta_{ij}^{\sum_{ij} q_{ij} q_{ji} a_{ij}}
+ % \prod_{ij} \PP[A_{ij}, Q | Y]	= \prod_{ij} \text{Bernoulli}(a_{ij}; \eta_{ij}^y) = \prod_{ij} \big(\eta_{ij}^y\big)^{a_{ij}'}\big(1-\eta_{ij}^y\big)^{1-a_{ij}'}.
 \end{align}
 The permutation matrix has the following distribution:
 \begin{align}
-	\PP[Q'] = \sum_{Q \in \mc{Q}} \delta_Q w_{Q}'
+	\PP[Q] = \sum_{Q \in \mc{Q}} \delta_Q w_{Q}
 \end{align}
-where $\delta_Q$ is an indicator function taking unity value whenever $Q'=Q$ and zero otherwise, and $w_Q'$ is the likelihood of any particular permutation matrix, where $w_Q'\leq 0$ and $\sum_{Q}w_Q'=1$.  The simplest assumption is that each permutation matrix is equally likely, that is: $w_Q'=1/n!$, because $n!$ is the number of $n\times n$ element permutation matrices.  
+where $\delta_Q$ is an indicator function taking unity value whenever $Q'=Q$ and zero otherwise, and $w_Q$ is the likelihood of any particular permutation matrix, where $w_Q\leq 0$ and $\sum_{Q}w_Q'=1$.  The simplest assumption is that each permutation matrix is equally likely, that is: $w_Q'=1/n!$, because $n!$ is the number of $n\times n$ element permutation matrices.  
+
+The log-likelihood of $\PP[A,Q|Y]$, ignoring the $\PP[Q]$ term is:
+\begin{align}
+	\mc{L}(\mb{\eta},Q)  = \sum_{ij} \bigg\{\Big[\sum_{ij} q_{ij} q_{ji} a_{ij} \ln \eta_{ij}\Big] + \Big[ \Big(1+\sum_{ij} q_{ij} q_{ji} a_{ij}\Big) \ln (1-\eta_{ij})\Big]\bigg\}
+\end{align}
+The goal is then to maximize the log-likelihood with respect to both $\mb{\eta}$ and $Q$:
+\begin{align}
+	(\mh{\eta},\mh{Q}) = \argmax_{\mb{\eta} \in (0,1)^{n\times n} ,Q \in \mc{Q}} \mc{L}(\mb{\eta},Q),
+\end{align}
+which is difficult in part due to the constraint on $Q$.  But one can relax that constraint to allow $Q$ to be any doubly-stochastic matrix, which is a natural relaxation, given that permutation matrices are the extreme points of the set of doubly stochastic matrices.  A matrix is said to be doubly stochastic if both all the rows and all the columns sum to unity.  Thus, to maximize the log-likelihood, we have:
+\begin{align}
+	(\mh{\eta},\mh{Q}) \approx \argmax_{\eta \in  (0,1)^{n\times n}, Q \in \mc{D}} \mc{L}(\mb{\eta},Q),
+\end{align}
+where $\mc{D}$ is the set of doubly stochastic matrices.  Using Lagrange multipliers, we can rewrite \label{eq:mle}:
+\begin{align}
+	(\mh{\eta},\mh{Q}) \approx \argmax_{\eta \in  (0,1)^{n\times n}} \mc{L}(\mb{\eta},Q) - \lambda (1 - \tfrac{1}{n}\mb{1}\T Q) - \lambda (1 - \tfrac{1}{n}\mb{1}\T Q\T),
+\end{align}
+where the additional terms impose the constraint that the columns and rows sum to one, respectively.  Now, the likelihood term is concave in $\eta$, and the constraints are linear, and therefore concave in $Q$, thus, one can use a coordinate ascend strategy, optimizing $Q$ followed by optimizing $\eta$, until convergence. This ignores the $Q$ terms in the likelihood.  Perhaps somebody (else) could figure out how to (at least approximately) account for those.  Regardless, this is an approximate solution to finding the most likely permutation matrix for each sample, as well as the independent edge probabilities.   
+
+\subsection{Assignment problem approach} % (fold)
+\label{sub:graph_isomorphism_approach}
+
+
+Instead of the likelihood based approach outlined above, one could consider the permutation matrices, $Q^l$, ``nuisance parameters,'' and construct \emph{some} way to estimate them, and plug that value in, assuming it is ``correct.'' Note that the disadvantage of this approach relative to the likelihood based approach is that it is less ``natural'' from a statistical point of view, modeling averaging is not quite as obvious, incorporating prior information might also be less obvious.  The advantage, however, is that much work as already been devoted to solving assignment problems, and we can therefore piggyback on the shoulders of giants.  %In this case, we piggyback on the shoulders of Marguerite Frank and Phil Wolfe, who developed the Frank-Wolfe (FW) algorithm for solving quadratic programming problems with linear constraints.  
+
+More specifically, assume we have the same model assumed above in Section \label{sec:lik}, and assume that $\eta$ is known, such that we must only estimate the permutation matrix.  This problem is closely related to the graph isomorphism problem (GIP), in which, given any pair of graphs, one searches for the permutation matrix that makes them as similar as possible:
+\begin{align}
+	\mh{Q} = \argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}
+\end{align}
+where $A$ and $B$ are two arbitrary adjacency matrices.  Unfortunately, because the set of permutation matrices, $\mc{Q}$ is discrete, optimizing over them is difficult.  In fact, solving GIP is known to be $NP$ incomplete (meaning it is not known to be in either $P$ or $NP$) \cite{??}.  Therefore, instead of trying to solve this exactly, we make approximations to make it easier.  
+
+First, as mentioned above, a natural relaxation of the set of permutation matrices is the set of doubly stochastic matrices, of which the permutation matrices are a proper subset (the extreme points, in fact).  Thus, QIP can be relaxed:
+\begin{align} \label{eq:D}
+	\mh{Q} = \argmin_{Q \in \mc{D}} \mc{L}(Q) = \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}
+\end{align}
+While less studied, it is clear that this is not a convex problem, because the Hessian of $\norm{QAQ\T -B}$ is given by:
+\begin{align}
+	\nabla_Q^2 \mc{L} =  B \otimes A + B\T \otimes A\T,
+\end{align}
+where $\otimes$ indicates the Kronecker product
+which is not positive definite (in general), meaning that gradient ascent is not guaranteed to yield a global optimum, rather only a local optimum.  The Frank-Wolfe (FW) algorithm is a successive linear programming algorithm specifically designed to solve quadratic programming problems with linear constraints \cite{??}.  Here, the problem is not quadratic in $Q$, rather, it is a 4th order polynomial function of $Q$.  Thus, FW will not (in general) achieve the global optimal.  Regardless, it proceeds as follows:
+\begin{Alg}[Frank-Wolfe Algorithm (FW)]
+Given $ Q^{(1)} \in \mathcal D_m $.
+%\roster \widestnumber\item{xxxxxxxx} \raggedright
+\item {Step 0:} Let $k$ = 1.
+
+\item {Step 1:} Let $\nabla_Q^{(k-1)} = A Q^{(k-1)} B\T + A\T Q^{(k-1)} B$.  
+
+\item {Step 2:} Compute $W^{(k)}$  by solving the
+linear assignment problem:
+% $$
+\begin{align}
+	W^{(k)} = \argmin_{W^{(k)} \in \mc{D}} %{\text{\rm arg }} \min_{W^{(k)}}
+	% \lbrace { 
+	\sum_{i,j=1}^m 
+	\left( 
+	\nabla_Q^{(k-1)}\circ W^{(k)}
+	 \right)_{ij}
+	% }\rbrace	
+\end{align}
+% $$
+\item {Step 3:} Let $d^{(k)} = W^{(k)} - Q^{(k-1)}. $
+\item {Step 4:} Find $\alpha^{(k)} \in [0,1]$ such that
+$$\alpha^{(k)}=\argmin_{\alpha^{(k)}}
+\mc{L} (Q^{(k)} + \alpha^{(k)} d^{(k)}).
+$$
+\item {Step 5:} Let
+
+$$ Q^{(k+1)} = Q^{(k)} + \alpha^{(k)} d^{(k)}. $$
+\item {Step 6:} 
+If $\norm d^{(k)}_{P} \norm \le \epsilon$ or $\alpha^{(k)}=0$ or $k=k_{\max}$
+then stop; else $k$ = $k$ + 1 and go to step 1.
+\end{Alg}
+
+The above algorithm is merely Netwon's method, applied to the this problem, with linear constraints.  With each step, $Q^{(k)}$ is not (in general) a permutation matrix.  One can project $Q^{(k)}$ into the space of permutation matrices at each step, or one can merely project the final $Q^{(k_{max})}$
+
+\begin{Rem}
+%\item This implementation is based upon a stop rule that uses the
+%norm of the gradient projected onto the doubly stochastic constraint set;
+%consequently, any solution produced by the above algorithm satisfies
+%the first-order necessary optimality conditions.
+%Other stop rules can be used that require less work than the projection and
+%will be considered when the general QAP is solved later in the paper.
+%\begin{enumerate}
+\item At each iteration, $Q^{(k)}$ is an extreme point of the
+constraint set, a permutation matrix.
+However, in general, the iterates $Q^{(k)}$ remain in the
+interior of the constraint set. ((XXX: i'm confused by this.  $Q^{(k)}$ \emph{should} be an extreme point, not is an extreme point, yes?))
+\item Step 3 is a ``line search;'' however, as the objective function is linear (XXX: right?)
+the optimum $\alpha$ can be found exactly.
+\item The above algorithm is simply Newton's method, applied to some non-convex objective function, with linear constraints.
+\item Once FW has terminated the nearest permutation to the double stochastic matrix, $X^{(k)}$ can be found as given by the following Lemma.
+%\item It is well-known that the algorithm is quadratically
+%convergent when in the neighborhood of a KKT point.
+%\end{enumerate}
+\end{Rem}
 
 
 
+% subsection graph_isomorphism_approach (end)
 
-The maximum likelihood estimator for each $\eta_{ij}^y$ is readily available (as are more robust estimators, see \cite{??} for details).  Na\"ively, one can define $\PP[Q]=\sum_{Q' \in \mc{Q}} \delta_{Q'} w_{Q'}$
 
-In the sequel, we will assume that $P[A|Y]$ is known, and $\PP[Y]$ is known, therefore, we must only estimate $\PP[Q]$.  Importantly, $\PP[Q]$ is different for each sample.  
 
 
 % subsection latent_permutation_matrix_approach (end)
@@ -672,14 +784,16 @@ NB: perhaps we should be doing hypothesis testing instead???
 
 	 1.  Indeed, the subproblem
 	FW solves is a linearization of the quadratic function, a Taylor series about $X^{(k)}$.  
-	This sub-problem's solution then produces a vertex which give a search direction for the "exact line search."   
+	This sub-problem's solution then produces a vertex which give a 
+	search direction for the "exact line search."   
 	2.  Furthermore, I am convinced that the
 	relaxed QAP is NOT in general a convex optimization problem.  The Hessian is 
 	kron(A,B)+kron(A',B') and in general this will not be a positive definite matrix.
 	(A sufficient condition is for A and B to be symmetric positive definite or for them
 	both to be symmetric negative definite.)
 
-	I sent a copy of this draft to Lou and Steve as well with some background where we intend to
+	I sent a copy of this draft to Lou and Steve as well
+	 with some background where we intend to
 	go next.
 
 	Best regards,
