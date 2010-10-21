@@ -40,50 +40,17 @@
 % \tableofcontents
 \begin{abstract}
 	
-	
-	
-	Much data are collections of unlabeled graphs.
-	
-	Inference on these collections of graphs is desirable, with the dual-purpose goal of: (1) predicting properties of new graphs, and (2) understanding the relationship between structure and function.
-	
-	When graphs are unlabeled, invariants work, or solving GIP and then building classifiers on $\PP[G,Y]$.
-	
-	Solving GIP is hard, but fast approximate solutions are possible.
-	
-	Sometimes, fast approximations are sufficient.
-	
-	
-	
-	We consider classification of unlabeled graphs.
-	We wish to assess the performance degradation
-	due to the application of assignment methods.
-	\\
-
-
-	This is carey's version -- simplified (perhaps too much?);
-	Joshua's connectome (i.e., ``brain graph''?) interpretation will have to come from Joshua.
-	\\
-
-	NB: alas, note that ``labeled'' is used two different ways herein;
-	graphs may be labeled in the sense that the between-graph vertex identification is available,
-	and graphs may be labeled in the sense that their class label is available.
-	i'm sure you're clever enough to negotiate this issue, in the sequel, for the nonce.
-	i solicit constructive approaches to addressing this issue.
-
-	NB: i switch willy-nilly twixt graph G and adjacency matrix A.
-	complain if you must. but to what end?
-
-	NB: i use ``NB'' a lot, too. too much, maybe \dots
+Many kinds of data are better characterized by graphs than vectors, including social networks, telecommunication grids, and brains.  It is often desirable to compare two or more of these graphs with one another.  Unfortunately, sometimes these graphs are unlabeled, meaning there is no known correspondence between vertices on one graph and vertices on another graph. In such scenarios, making comparisons is relatively difficult, although two general strategies are possible.  First, one can compute a number of ``graph invariants,'' that is, scalar measures of graphs that are invariant to vertex permutations.  Second, one can solve the graph isomorphism problem (GIP), effectively aligned graphs with one another, as close as can be aligned.  Because no known algorithm can solve GIP in polynomial time, one is often forced to use approximate solutions.  We provide several approximations to GIP, and show how performance scales with computational time.  We compare various approaches, using somewhat idealized simulations, as well as simulations based on real brain-graph data, and finally real human brain-graph data.
 
 \end{abstract}
 
 \section{Introduction}
 
-In the current digital age, swaths of data are collected in myriad diverse fields ranging from astronomy to zoology.  While these data are well characterized by networks, or graphs, the vast majority of statistical inference techniques, including the recent advances in machine learning, tend to assume the data live in finite dimensional Euclidean space.  Thus, inference techniques designed to specifically to address collections or graphs could potentially yield fruitful results across domains.  Furthermore, these collections of graphs often lack vertex labels, meaning no known mapping from vertices in any one graph to any other graph, is available.  In such scenarios, the graphs are called ``unlabeled,'' and this is the scenario of interest for this manuscript.  Consider, for example, two food networks in different jungles.  Both might have lions and tigers and bears (oh my), so it is easy to compare across the jungles.  On the contrary, if one jungle only has the birds and the bees, one might still be interested in comparing the food networks, but a bird might play the same role in the second jungle as the lion does in the first, making the problem more complicated.
+In the current digital age, swaths of data are collected in myriad diverse fields ranging from astronomy to zoology.  While these data are well characterized by networks, or graphs, the vast majority of statistical inference techniques, including the recent advances in machine learning, tend to assume the data live in finite dimensional Euclidean space.  Thus, inference techniques designed to specifically to address collections of graphs could potentially yield fruitful results across many domains.  Furthermore, these collections of graphs often lack vertex labels, meaning no known mapping from vertices in any one graph to any other graph, is available.  In such scenarios, the graphs are called ``unlabeled,'' and this is the scenario of interest for this manuscript.  Consider, for example, two food networks in different jungles.  Both might have lions and tigers and bears (oh my), so it is easy to compare across the jungles.  On the contrary, if one jungle only has the birds and the bees, one might still be interested in comparing the food networks, but a bird might play the same role in the second jungle as the lion does in the first, making comparisons across jungles more complicated.
 
 
 
-The exploitation task of investigation for this manuscript is that of unlabeled graph classification.  More specifically, we assume that we have observed some number of unlabeled graph/class pairs, and we want to classify a novel unlabeled graph into its appropriate class. Unfortunately, because we do not directly observe the graphs, rather, only the unlabeled version of each graph, our classifiers must somehow deal with this additional complication.
+The exploitation task of investigation for this manuscript is that of unlabeled graph classification.  More specifically, we assume that we have observed some number of unlabeled graph/class pairs, and we want to classify a novel unlabeled graph into its appropriate class. Unfortunately, because we do not directly observe the complete graphs, rather, only the unlabeled version of each graph, our classifiers must somehow deal with this additional complication.
 
 We consider two general approaches.  First, one can compute a large number of statistics on unlabeled graphs that are invariant to isomorphisms.  That is, if $g$ is a graph, and $\mt{g}$ is another graph isomorphic to $g$, then any function that satisfies $f(g)=f(\mt{g})$ is called a ``graph invariant.''  For example, the number of edges or triangles in a graph is invariant to isomorphisms.  By computing a large number of these graph invariants, one effectively projects the graph into finite Euclidean space, at which time one can apply standard machine learning tools.  A second approach under consideration involves first (approximately) solving GIP for each test graph, and then applying \emph{labeled} graph classification algorithms, such as those developed in \cite{??}.
 
@@ -101,15 +68,13 @@ Several questions therefore arise for us, as a first investigation into unlabele
 
 % subsection nomenclature (end)
 
-Let $G$ be a graph-valued random variable, $G: \Omega \mapsto \mc{G}$, where $\mc{G}$ is the set of all possible graphs, $g \in \mc{G}$ (and $\Omega$ is the universal sample space). A graph is assumed to be a triple, $(V,A,Q)$, where $V=\{V_i\}=V_i \, \forall i \in [n]$, where $[n]=\{1,\ldots,n\}$, $A=\{A_{ij}\}$ is the adjacency matrix, where each edge is binary (an easily relaxed assumption), and $Q$ is a permutation matrix (a matrix with a single one in each column and row, and zeros otherwise). Let $\mc{Q}$ denote the set of permutation matrices.
+Let $G$ be a graph-valued random variable, $G: \Omega \mapsto \mc{G}$, where $\mc{G}$ is the set of all possible graphs, $g \in \mc{G}$ (and $\Omega$ is the universal sample space). A graph is assumed to be a triple, $(V,A,Q)$, where $V=\{V_i\}=V_i \, \forall i \in [n]=\{1,\ldots,n\}$ is the set of vertices, $A=\{A_{ij}\}$ is the adjacency matrix, each edge is binary (an easily relaxed assumption), and $Q$ is a permutation matrix (a matrix with a single one in each column and row, and zeros otherwise). Let $\mc{A}=\{0,1\}^{n \times n}$ be the space of all possible adjacency matrices, and $\mc{Q}$ denote the set of permutation matrices.
 
-Further, let $Y$ be a binary-valued random variable, $Y: \Omega \mapsto \mc{Y} = \{0,1\}$, which can be easily generalized to any multinomial space (or continuous spaces with a bit more work).  Graphs and classes are sampled jointly and exchangeably from some unknown but true distribution, $\PP[G,Y; \theta] \in \mc{P}$, where $\mc{P}$ is the family of distributions under consideration, $\mc{P} = \{\PP[G,Y; \theta] : \theta \in \Theta\}$, where $\theta$ is the parameter of the distribution, and $\Theta$ is the set of all possible parameters (in the sequel, we often drop the $\theta$ from $\PP[G,Y; \theta]$).  
+Further, let $Y$ be a binary-valued random variable, $Y: \Omega \mapsto \mc{Y} = \{0,1\}$, which can be easily generalized to any multinomial space (or continuous spaces with a bit more work).  Graphs and classes are sampled jointly and exchangeably from some unknown but true distribution, $\PP[G,Y; \theta] \in \mc{P}$, where $\mc{P}$ is the family of distributions under consideration, $\mc{P} = \{\PP[G,Y; \theta] : \theta \in \Theta\}$, $\theta$ is the parameter of the distribution, and $\Theta$ is the set of all possible parameters (in the sequel, we often drop the $\theta$ from $\PP[G,Y; \theta]$).  
 
-Formally, we assume that  $(G,Y), \{(G_l,Y_l)\} \sim \PP[G,Y; \theta]$, where $(G,Y)$ is the graph/class test sample pair, and $\mc{T}_s=\{G_l,Y_l\}=\{(G_1,Y_1),\ldots, (G_s,Y_s)\}$ is the training sample set, where $s$ is the total number of training samples.  The goal is to impute the latent test sample class, $Y=y$, given the training data.  While we do not believe that $\PP[G,Y; \theta]$ is in fact true, we do believe that the true distribution (if one exists) can be approximated reasonably well by some distributions in $\mc{P}$, such that we have hope to achieve misclassification rates better than chance on at least some data sets.  
+Formally, we assume that  $(G,Y), \{(G_s,Y_s)\} \sim \PP[G,Y; \theta]$, where $(G,Y)$ is the graph/class test sample pair, and $\mc{T}_S=\{G_s,Y_s\}=\{(G_1,Y_1),\ldots, (G_S,Y_S)\}$ is the training sample set, where $S$ is the total number of training samples.  The goal is to impute the latent test sample class, $Y=y$, given the training data.  While we do not believe that $\PP[G,Y; \theta]$ is in fact true, we do believe that the true distribution (if one exists) can be approximated reasonably well by some distributions in $\mc{P}$, such that we have hope to achieve misclassification rates better than chance on at least some data sets.  
 
-Unfortunately, we do not observe the graphs in their entirety, but rather, we only see the adjacency matrices, and not the permutation matrices.  That is, instead of observing $G_l=(A_l,Q_l)$, we observe only $A_l$.  Throughout, we will use the notation that $\mt{A}_l = Q_l A_l Q_l\T$, so, had we observed $\mt{A}_l$'s, then we would have observed all there is to perform the classification.  
-
-Graph invariants can therefore be defined as functions on $A$, not requiring $Q$ for computing their values.
+Unfortunately, we do not observe the graphs in their entirety, but rather, the permutation matrices are latent (we will often implicitly assume that vertices are observed or not, it is confusing).  That is, instead of observing $G_s=(A_s,Q_s)$, we observe only $A_s$.  Throughout, we will use the notation that $\mt{A}_s = Q_s A_s Q_s\T$, so, had we observed $\mt{A}_s$'s, then we would have observed all there is to perform the classification.  Note that graph invariants can therefore be defined as functions on $A$, not requiring $Q$ for computing their values.
 
 
 \subsection{Graph invariant based classifiers} % (fold)
@@ -183,28 +148,70 @@ where $\mc{D}$ is the set of doubly stochastic matrices.  Using Lagrange multipl
 \end{align}
 where the additional terms impose the constraint that the columns and rows sum to one, respectively.  Now, the likelihood term is concave in $\eta$, and the constraints are linear, and therefore concave in $Q$, thus, one can use a coordinate ascend strategy, optimizing $Q$ followed by optimizing $\eta$, until convergence. This ignores the $Q$ terms in the likelihood.  Perhaps somebody (else) could figure out how to (at least approximately) account for those.  Regardless, this is an approximate solution to finding the most likely permutation matrix for each sample, as well as the independent edge probabilities.   
 
+
 \subsection{Assignment problem approach} % (fold)
 \label{sub:graph_isomorphism_approach}
 
 
-Instead of the likelihood based approach outlined above, one could consider the permutation matrices, $Q^l$, ``nuisance parameters,'' and construct \emph{some} way to estimate them, and plug that value in, assuming it is ``correct.'' Note that the disadvantage of this approach relative to the likelihood based approach is that it is less ``natural'' from a statistical point of view, modeling averaging is not quite as obvious, incorporating prior information might also be less obvious.  The advantage, however, is that much work as already been devoted to solving assignment problems, and we can therefore piggyback on the shoulders of giants.  %In this case, we piggyback on the shoulders of Marguerite Frank and Phil Wolfe, who developed the Frank-Wolfe (FW) algorithm for solving quadratic programming problems with linear constraints.  
+Instead of the likelihood based approach outlined above, one could consider the permutation matrices ``nuisance parameters,'' and construct \emph{some} way to estimate them, and plug that value in, assuming it is ``correct.'' Note that the disadvantage of this approach relative to the likelihood based approach is that it is less ``natural'' from a statistical point of view, for example, modeling averaging is not quite as obvious, and incorporating prior information might also be less obvious.  The advantage, however, is that much work as already been devoted to solving assignment problems, and we can therefore piggyback on the shoulders of giants.  %In this case, we piggyback on the shoulders of Marguerite Frank and Phil Wolfe, who developed the Frank-Wolfe (FW) algorithm for solving quadratic programming problems with linear constraints.  
 
-More specifically, assume we have the same model assumed above in Section \label{sec:lik}, and assume that $\eta$ is known, such that we must only estimate the permutation matrix.  This problem is closely related to the graph isomorphism problem (GIP), in which, given any pair of graphs, one searches for the permutation matrix that makes them as similar as possible:
-\begin{align}
-	\mh{Q} = \argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}
+More specifically, assume we have the same model assumed above in Section \ref{sec:lik}, and assume that $\eta$ is known, such that we must only estimate the permutation matrix.  This problem is closely related to the graph isomorphism problem (GIP), in which, given any pair of graphs, one searches for the permutation matrix that makes them as similar as possible:
+\begin{align} \label{eq:a}
+	\mh{Q} = \argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F
 \end{align}
-where $A$ and $B$ are two arbitrary adjacency matrices.  Unfortunately, because the set of permutation matrices, $\mc{Q}$ is discrete, optimizing over them is difficult.  In fact, solving GIP is known to be $NP$ incomplete (meaning it is not known to be in either $P$ or $NP$) \cite{??}.  Therefore, instead of trying to solve this exactly, we make approximations to make it easier.  
+where $A$ and $B$ are two arbitrary adjacency matrices, $\norm{\cdot}_{F}$ indicates the Froebenius norm, $\norm{x}_F=\sum_{ij} \sqrt{x_{ij}^2}$.  Unfortunately, because the set of permutation matrices, $\mc{Q}$, is discrete, optimizing over them is difficult.  In fact, solving GIP is known to be $NP$ incomplete (meaning it is not known to be in either $P$ or $NP$) \cite{??}.  Therefore, instead of trying to solve this exactly, we make approximations to make it easier.  
 
-First, as mentioned above, a natural relaxation of the set of permutation matrices is the set of doubly stochastic matrices, of which the permutation matrices are a proper subset (the extreme points, in fact).  Thus, QIP can be relaxed:
-\begin{align} \label{eq:D}
-	\mh{Q} = \argmin_{Q \in \mc{D}} \mc{L}(Q) = \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}
-\end{align}
-While less studied, it is clear that this is not a convex problem, because the Hessian of $\norm{QAQ\T -B}$ is given by:
+\subsubsection{Linear assignment problem solution} % (fold)
+\label{ssub:linear_assignment_problem_solution}
+
+Solving \eqref{eq:a} is difficult for two reasons: (i) the objective function is not necessarily convex, and (ii) the constraints are nonlinear.  That the objective function is not necessarily convex is clear by virtue of computing the Hessian of the argument in \eqref{eq:a} with respect to $Q$:
 \begin{align}
 	\nabla_Q^2 \mc{L} =  B \otimes A + B\T \otimes A\T,
 \end{align}
-where $\otimes$ indicates the Kronecker product
-which is not positive definite (in general), meaning that gradient ascent is not guaranteed to yield a global optimum, rather only a local optimum.  The Frank-Wolfe (FW) algorithm is a successive linear programming algorithm specifically designed to solve quadratic programming problems with linear constraints \cite{??}.  Here, the problem is not quadratic in $Q$, rather, it is a 4th order polynomial function of $Q$.  Thus, FW will not (in general) achieve the global optimal.  Regardless, it proceeds as follows:
+where $\otimes$ indicates the Kronecker product, which is not positive definite (in general).  To resolve non-convexity, we can simply drop one of the $Q$'s from \eqref{eq:a}.  The implication of this is that instead of permuting both rows and columns, we only permute one or the other.  While this may seem like a totally ridiculous thing to do, crazier things have worked.  Given this simplification, the argument is not merely convex, but it is quadratic in $Q$, making solving it exactly feasible (independent of the constraints).  
+
+To deal with the nonlinear of the constraints, we relax them to require that $Q$ merely be a doubly stochastic matrix.  A matrix is doubly stochastic if both its rows and columns sum to unity.  This is a ``natural'' relaxation in the sense that permutation matrices are doubly stochastic matrices, in fact, permutation matrices are the extreme points of the set of all doubly stochastic matrices, which we denote by $\mc{D}$.  
+
+Given the above two relaxations, we instead try to solve:
+\begin{align} \label{eq:a}
+	\mh{Q} = \argmin_{Q \in \mc{D}} \norm{A Q\T - B}_F^2 = \argmin_{Q} \norm{A Q\T - B}_F^2 - \lambda (1 - \tfrac{1}{n}\mb{1}\T Q) - \lambda (1 - \tfrac{1}{n}\mb{1}\T Q\T),
+\end{align}
+where the second equality follows from replacing the linear constraint with its equivalent Lagrange multipliers.  If $\mh{Q}$ is not a permutation matrix, then projecting it onto its nearest permutation matrix is linear assignment problem:
+\begin{align}
+	\mh{Q}_{LAP} = \argmin_{Y \in \mc{Q}} \norm{\mh{Q} - Y}_F^2 = \argmin_{Y \in \mc{Q}} Y\T \mh{Q}
+\end{align}
+which can be solved using the Hungarian algorithm in $\mc{O}(n^3)$, as shown in the below lemma. XXX: do we need this additional step? seems like we should not need it, but i don't see how.
+
+\begin{Lem}
+  Given $Y \in \Real^{n \times n}$, the projection of $Y$ onto $\mc{Q}_n$ can
+  be obtained by solving the linear assignment problem:
+  $$ 
+  \mh{W}= \argmin_{W \in \Pi_n} \norm{ W-Y}_F = \argmax_{W \in \mc{D}_n}  tr(YW\T)
+  %   \Pi_n }\rbrace \equiv {\text{\rm arg }} \max_W \lbrace{ tr(YW^t)
+  %   \mid W \in \mathcal D_n }\rbrace .
+  $$
+  Proof: Since $W \in \Pi_n \subset \mathcal O$, we have
+  \begin{align}
+  \norm{W-Y}_F^2 &= tr( (W-Y)\T (W-Y)) \\
+  &= (\norm{Y}_F^2 + \norm{I}_F^2) - 2tr( Y W\T ). \qed
+  \end{align}
+\end{Lem}
+
+(XXX: I don't know the trace rule.  perhaps somebody can prove that to me, or point it out?)
+
+
+% subsubsection linear_assignment_problem_solution (end)
+
+
+\subsubsection{Bilinear assignment problem solution} % (fold)
+\label{ssub:bilinear_assignment_problem_solution}
+
+
+A different strategy is to simply neglect the non-convexity of the argument, and merely relax the constraints to be linear.  This results in finding a local maximum, but if the initial conditions are chosen wisely, then this local maximum might be better than the global maximum found in the linear assignment approach.  Furthermore, it is desirable to permute both the rows and columns together, and the linear assignment approach only permutes one or the other.  Thus, making only the constraint relaxation, we have:
+\begin{align} \label{eq:D}
+	\mh{Q} = \argmin_{Q \in \mc{D}} \mc{L}(Q) = \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}_F^2 
+\end{align}
+The Frank-Wolfe (FW) algorithm is a successive linear programming algorithm specifically designed to solve quadratic programming problems with linear constraints \cite{??}.  Here, the problem is not quadratic in $Q$, rather, it is a 4th order polynomial function of $Q$.  Thus, FW will not (in general) achieve the global optimal.  Regardless, it proceeds as follows:
 \begin{Alg}[Frank-Wolfe Algorithm (FW)]
 Given $ Q^{(1)} \in \mathcal D_m $.
 %\roster \widestnumber\item{xxxxxxxx} \raggedright
@@ -258,26 +265,44 @@ then stop; else $k$ = $k$ + 1 and go to step 1.
 \end{enumerate}
 \end{Rem}
 
-\begin{Lem}
-  Given $Y \in \Real^{n \times n}$, the projection of $Y$ onto $\mc{Q}_n$ can
-  be obtained by solving the linear assignment problem:
-  $$ 
-  \mh{W}= \argmin_{W \in \Pi_n} \norm{ W-Y}_F = \argmax_{W \in \mc{D}_n}  tr(YW\T)
-  %   \Pi_n }\rbrace \equiv {\text{\rm arg }} \max_W \lbrace{ tr(YW^t)
-  %   \mid W \in \mathcal D_n }\rbrace .
-  $$
-  Proof: Since $W \in \Pi_n \subset \mathcal O$, we have
-  \begin{align}
-  \norm{W-Y}_F^2 &= tr( (W-Y)\T (W-Y)) \\
-  &= (\norm{Y}_F^2 + \norm{I}_F^2) - 2tr( Y W\T ). \qed
-  \end{align}
-\end{Lem}
 
-(XXX: I don't know the trace rule.  perhaps somebody can prove that to me, or point it out?)
+% subsubsection bilinear_assignment_problem_solution (end)
+
 % subsection graph_isomorphism_approach (end)
+
 
 \subsection{Simulations} % (fold)
 \label{sub:simulations}
+
+In all the below simulations, as mentioned above, we assume the data is sampled exchangeably, that is: $(G,Y), \{(G_s,Y_s)\} \overset{exch.}{\sim} \PP[G,Y; \eta]$, where $G=(V,A,Q)$.  Further, we assume an independent edge model
+\begin{align}
+\PP[A,Q | Y] &= \PP[A|Q,Y] \PP[Q] = \prod_{i,j \in [n]} \text{Bernoulli}\left(\sum_{ij} q_{ij} q_{ji} a_{ij}; \eta_{ij}^y\right) \sum_{Q\in \mc{Q}} \delta_Q/n! \\
+&=  \prod_{i,j \in [n]} \text{Bernoulli}\left(\mt{a}_{ij}; \eta_{ij}^y\right) \sum_{Q\in \mc{Q}} \delta_Q/n!
+\end{align}
+where $\mt{a}_{ij} = \sum_{ij} q_{ij} q_{ji} a_{ij}$.  This means that the class conditional distributions are just the matrices $\eta^0$ and $\eta^1$, where $\eta^y=\{\eta_{ij}^y\}$. Moreover, the class conditional difference is therefore also a matrix, $\delta=\{\delta_{ij}\}$, where
+\begin{align}
+	\delta_{ij} = | \eta_{ij}^1\eta_{ij}^0|.
+\end{align}
+We also define the relative class-conditional differences
+\begin{align}
+	\delta_{ij}^r = \left| \frac{\eta_{ij}^1}{\eta_{ij}^1 (1-\eta_{ij}^1)} - \frac{\eta_{ij}^0}{\eta_{ij}^0 (1-\eta_{ij}^0)} \right|
+\end{align}
+which normalizes differences by their magnitude, similar to z-scores for comparing Gaussian distributed random variables.
+
+\paragraph{Homogeneous kidney-egg simulation} % (fold)
+\label{par:homogeneous_kidney_egg_simulation}
+
+For the homogeneous kidney-egg simulations, we assume $n=10$, so $\eta^y \in (0,1)^{n\times n}$.  We further assume a stochastic block model, with two blocks, for both classes.  For class 0, $\eta_{ij}=q_0=0.25$ for $i,j \in [3]$, and for class 1, $\eta_{ij}=q_1=0.75$ for $i,j \in [3]$.  In both classes, $\eta_{ij}=p=0.5$ for $i,j \in \{4,\ldots 10\}$.  See Figure \ref{fig:homo} for a graphical depiction of this model.  
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/homo_kidney_egg_params}
+	\caption{caption}
+	\label{fig:homo}
+\end{figure}
+
+
+% paragraph homogeneous_kidney_egg_simulation (end)
 
 
 A Monte Carlo experiment (20000 paired replications) demonstrates that, (using {\bf directed loopy} graphs for simplicity) with
@@ -344,14 +369,14 @@ achieved for our unlabeled scenario using this assignment algorithm, but perform
 
 \begin{figure}[htbp]
 	\centering
-		\includegraphics[width=1.0\linewidth]{../../../figs/unlabeled_graphs/LPvsFW500}
+		\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/LPvsFW500}
 	\caption{caption}
-	\label{fig:figs_sims_unlabeled_LPvsFW500}
+	\label{fig:figs_Sims_unlabeled_LPvsFW500}
 \end{figure}
 
 
 \begin{figure}[!ht]
-\centering \includegraphics[width=.9\linewidth]{/Users/jovo/Research/figs/unlabeled_graphs/block_params}
+\centering \includegraphics[width=.9\linewidth]{../../../figs/graph_sims/unlabeled/block_params}
 \caption{Top row: true parameters for simulation 1.  Bottom row: estimates using all training data (assuming vertices are labeled)
 }
 \label{fig:sim1_params}
@@ -808,7 +833,7 @@ NB: perhaps we should be doing hypothesis testing instead???
 	(iv) solve the following subproblem:
 	min f(x_k) + g(x_k) xbar_k, where xbar_k is in the feasible region
 	(v) compute the step size, lambda that solves
-	min f(x_k + lambda (xbar_l - x_k)) subject to lambda is in (0,1)
+	min f(x_k + lambda (xbar_s - x_k)) subject to lambda is in (0,1)
 	(vi) let x_{k+1} = x_k + lambda*(xbar_k - x_k), and let k=k+1
 
 	we stop if ever g(x_k)=0 or lambda=0.
@@ -1020,99 +1045,9 @@ conditioned on the training sample [see DGL 1996].
 Note that $g_{\mcE}(G;\mcT)$ should dominate $g_{NB}(G;\mcT)$.
 
 
-\section{Simulations} % (fold)
-\label{sec:simulation}
-
-\texttt{
-n = 10; % # of vertices
-p = 0.5; % prob of connection for kidney
-m = 5;   
-q0 = 0.2; % prob of connection for egg
-q1 = 0.8; % prob of connection for egg
-s(test) = 100;  % # of samples
-s(train) = 2;
-}
-
-For each of the 100 test samples, we first tried to solve GIP with respect to each of the two training samples.  Then, given the solution, we tried to classify.  Note that because the number of training samples is 2, the parameter estimates are degenerate, we therefore add or subtract epsilon to ensure they are not 0 or 1.  The MAP estimates would likely perform better.  I will have that code working soon.
-
-
-\section{Results} % (fold)
-\label{sec:results}
-
-
-
-% \begin{figure}[htbp]
-% 	\centering
-% 		\includegraphics[height=3in]{../../../figs/sims/unlabeled_graphs/LPvsFW500.jpg}
-% 	\caption{caption}
-% 	\label{fig:figs_sims_unlabeled_LPvsFW500}
-% \end{figure}
-% 
-% 
-% \begin{figure}[!ht]
-% \centering \includegraphics[width=.9\linewidth]{/Users/jovo/Research/figs/sims/unlabeled_graphs/block_params}
-% \caption{Top row: true parameters for simulation 1.  Bottom row: estimates using all training data (assuming vertices are labeled)
-% }
-% \label{fig:sim1_params}
-% \end{figure}
-% 
-% \begin{figure}[!ht]
-% \centering \includegraphics[width=.9\linewidth]{/Users/jovo/Research/figs/sims/unlabeled_graphs/block_error}
-% \caption{Misclassification rate as a function of max iteration.  Note that iteration 0 means did not try to solve GIP.  Iteration 31 is assumes that GIP was solved exactly (that is, the algorithm used vertex labels).  Lhat between those should be between the bounds, and it is. ``Tru'' means only classify using the signal subgraph, ``nb'' means classify using the entire graph. I do not fully understand why ``tru'' behaves as it does.  Note that running this code multiple times gives quantitatively quite different results, but the bounds are always basically respected, suggesting it is bug free.  
-% }
-% \label{fig:sim1_error}
-% \end{figure}
-
-
-
-\section{Some misc thoughts} % (fold)
-\label{sec:introduction}
-
-% section introduction (end)
-
-Classifying labeled graphs has already been solved (VP10a, VLP10b).
-
-Two broadly different approaches to classifying unlabeled graphs: i) first (approximately) solve graph isomorphism and then use standard graph classification problems, and ii) classify using graph invariants.  
-
-The first approach can be universally consistent, interpretable, etc.  Yet, it might take too long.  The second approach might have good performance, but lacks consistency results.
-
-
-Given two unlabeled graphs with $n$ vertices, $A$, and $B$, the graph isomorphism problem can be written as:
-\begin{align} \label{eq:P}
-	\mh{P} = \argmin_{P \in \pi} \norm{P A P\T - B}
-\end{align}
-where $\pi$ is the set of permutation matrices ($0-1$ matrices with a single $1$ in each row and column).  Some people know (ref?) that this problem is nearly NP, and the fastest known algorithms to solve this exactly scale exponentially with $n$.  One could instead solve:
-\begin{align} \label{eq:d}
-	\mh{X} = \argmin_{X \in \mc{D}} \norm{X A X\T - B}
-\end{align}
-where $\mc{D}$ is the set of doubly stochastic matrices (matrices with non-negative elements whose rows and columns sum to one), which is a superset of permutation matrices.  In fact, the permutation matrices are the extreme points of the set of doubly stochastic matrices. Thus, sometimes solving \eqref{eq:d} gives you the solution to \eqref{eq:P}. So, one way to approximately solve \eqref{eq:P} is to first solve \eqref{eq:d}, and then project $\mh{X}$ onto the set of permutation matrices:
-\begin{align} \label{eq:l}
-	\mh{P} = \argmin_{P \in \pi} \norm{P - \mh{X}}
-\end{align}
-Both \eqref{eq:d} and \eqref{eq:l} can be solved in $\mc{O}(n^3)$ using the Hungarian algorithm.  However, sometimes $\mh{X}$ is far from any extreme point in $\pi$, thus the projection might end up somewhere bad.
-
-According to JCM, \eqref{eq:d} is not log-concave, so the initial starting point matters significantly.  Thus, multiple restarts, each time starting with a doubly stochastic matrix, can improve results.  
-
-JCM fills in here how his algorithm works, as I don't yet understand it.
-
-For classification, we wonder: for what models do multiple restarts help?
-
-In the kidney-egg classification problem, $n-m$ of the vertices can be arbitrarily permuted without loss of classification accuracy (as they are exchangeable).  However, in the more general independent edge model, no vertices may be exchangeable with one another, and in such cases, multiple restarts may help significantly.
-
-
-% section bayes_error (end)
-
-
-% section results (end)
-
-% section simulation (end)
-
-% \input{body}
-
 % \paragraph{Acknowledgments}
 
 % \appendix
-% \input{appendix}
 \clearpage
 
 \bibliography{/Users/joshyv/Research/papers/meta/biblist}
