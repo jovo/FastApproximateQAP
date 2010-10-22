@@ -279,34 +279,37 @@ In all the below simulations, as mentioned above, we assume the data is sampled 
 \PP[A,Q | Y] &= \PP[A|Q,Y] \PP[Q] = \prod_{i,j \in [n]} \text{Bernoulli}\left(\sum_{ij} q_{ij} q_{ji} a_{ij}; \eta_{ij}^y\right) \sum_{Q\in \mc{Q}} \delta_Q/n! \\
 &=  \prod_{i,j \in [n]} \text{Bernoulli}\left(\mt{a}_{ij}; \eta_{ij}^y\right) \sum_{Q\in \mc{Q}} \delta_Q/n!
 \end{align}
-where $\mt{a}_{ij} = \sum_{ij} q_{ij} q_{ji} a_{ij}$.  This means that the class conditional distributions are just the matrices $\eta^0$ and $\eta^1$, where $\eta^y=\{\eta_{ij}^y\}$. Moreover, the class conditional difference is therefore also a matrix, $\delta=\{\delta_{ij}\}$, where
+where $\mt{a}_{ij} = \sum_{ij} q_{ij} q_{ji} a_{ij}$.  This means that the class-conditional distributions are just the matrices $\eta^0$ and $\eta^1$, where $\eta^y=\{\eta_{ij}^y\}$. Moreover, the class-conditional difference is therefore also a matrix, $\delta=\{\delta_{ij}\}$, where
 \begin{align}
-	\delta_{ij} = | \eta_{ij}^1\eta_{ij}^0|.
+	\delta_{ij} = | \eta_{ij}^1-\eta_{ij}^0|.
 \end{align}
 We also define the relative class-conditional differences
 \begin{align}
 	\delta_{ij}^r = \left| \frac{\eta_{ij}^1}{\eta_{ij}^1 (1-\eta_{ij}^1)} - \frac{\eta_{ij}^0}{\eta_{ij}^0 (1-\eta_{ij}^0)} \right|
 \end{align}
-which normalizes differences by their magnitude, similar to z-scores for comparing Gaussian distributed random variables.
+which normalizes differences by their magnitude, similar to z-scores for comparing Gaussian distributed random variables. For each of the below simulated experiments, we generated $S=100$ training samples, half from each class, and two test samples, one from each class.  
+
+
 
 \paragraph{Homogeneous kidney-egg simulation} % (fold)
 \label{par:homogeneous_kidney_egg_simulation}
 
-For the homogeneous kidney-egg simulations, we assume $n=10$, so $\eta^y \in (0,1)^{n\times n}$.  We further assume a stochastic block model, with two blocks, for both classes.  For class 0, $\eta_{ij}=q_0=0.25$ for $i,j \in [3]$, and for class 1, $\eta_{ij}=q_1=0.75$ for $i,j \in [3]$.  In both classes, $\eta_{ij}=p=0.5$ for $i,j \in \{4,\ldots 10\}$.  See Figure \ref{fig:homo} for a graphical depiction of this model.  
+For the homogeneous kidney-egg simulations, we assume $n=10$, so $\eta^y \in (0,1)^{n\times n}$.  We further assume a stochastic block model, with two blocks, for both classes.  For class 0, $\eta_{ij}^0=q_0=0.25$ for $i,j \in [3]$, and for class 1, $\eta_{ij}^1=q_1=0.75$ for $i,j \in [3]$.  In both classes, $\eta_{ij}=p=0.5$ for $i,j \in \{4,\ldots 10\}$.  See Figure \ref{fig:models} (top row) for a graphical depiction of this model.  
 
-\begin{figure}[htbp]
-	\centering
-		\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/homo_kidney_egg_params}
-	\caption{caption}
-	\label{fig:homo}
-\end{figure}
+
+% paragraph homogeneous_kidney_egg_simulation (end)
+
+\paragraph{Heterogeneous simulation} % (fold)
+\label{par:homogeneous_kidney_egg_simulation}
+
+For the heterogeneous simulations, we assume $n=10$, so $\eta^y \in (0,1)^{n\times n}$.  We further assume that each $\eta_{ij}^y \overset{iid}{\sim}$Uniform$(0,1)$.  See Figure \ref{fig:models} (bottom) row for a graphical depiction of this model.
+
 
 
 % paragraph homogeneous_kidney_egg_simulation (end)
 
 
-A Monte Carlo experiment (20000 paired replications) demonstrates that, (using {\bf directed loopy} graphs for simplicity) with
-$n=10, p=0.5$, $q_0=0.25$, $q_1=0.75$, and $|\mcE|=9$ (where $\mcE$ is in fact a $3 \times 3$ block).
+
 
 
 
@@ -367,20 +370,57 @@ from $\hatL = 0.0476 \approx L^* = 1-F_{Binomial(9,0.25)}(4) = 0.04892731\dots$ 
 achieved for our unlabeled scenario using this assignment algorithm, but performance is significantly degraded.
 
 
+\subsubsection{homogeneous kidney egg simulations} % (fold)
+\label{ssub:homogeneous_kidney_egg_simulations}
+
+
 \begin{figure}[htbp]
-	\centering
-		\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/LPvsFW500}
-	\caption{caption}
+	\centering		\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/homo_kidney_egg_params}
+	\caption{model}
+	\label{fig:models}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering			\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/homo_kidney_egg_Lhats}
+	\caption{Lhats for homo kidney egg}
 	\label{fig:figs_Sims_unlabeled_LPvsFW500}
 \end{figure}
 
 
 \begin{figure}[!ht]
-\centering \includegraphics[width=.9\linewidth]{../../../figs/graph_sims/unlabeled/block_params}
-\caption{Top row: true parameters for simulation 1.  Bottom row: estimates using all training data (assuming vertices are labeled)
-}
+\centering \includegraphics[width=.9\linewidth]{../../../figs/graph_sims/unlabeled/homo_kidney_egg_obj}
+\caption{objective function for simulation 1}
 \label{fig:sim1_params}
 \end{figure}
+
+
+% subsubsection homogeneous_kidney_egg_simulations (end)
+
+
+
+\subsubsection{heterogeneous simulations} % (fold)
+\label{ssub:heterogeneous_simulations}
+
+\begin{figure}[htbp]
+	\centering		\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/hetero_params}
+	\caption{hetero model}
+	\label{fig:models}
+\end{figure}
+
+\begin{figure}[htbp]
+	\centering			\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/hetero_Lhats}
+	\caption{Lhats for hetero}
+	\label{fig:figs_Sims_unlabeled_LPvsFW500}
+\end{figure}
+
+
+\begin{figure}[!ht]
+\centering \includegraphics[width=.9\linewidth]{../../../figs/graph_sims/unlabeled/hetero_obj}
+\caption{objective function for hetero simulation}
+\label{fig:sim1_params}
+\end{figure}
+
+% subsubsection heterogeneous_simulations (end)
 
 % subsection simulation_results (end)
 
@@ -394,7 +434,7 @@ achieved for our unlabeled scenario using this assignment algorithm, but perform
 
 % section methods (end)
 
-
+\clearpage
 \section{other} % (fold)
 \label{sec:other}
 
