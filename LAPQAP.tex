@@ -1,0 +1,188 @@
+\input{/Users/jovo/Research/latex/latex_paper.tex} 
+% \input{latex_paper} 
+
+%\documentstyle[12pt,twoside,fleqn,espcrc1]{article}
+%{\catcode`\@=11\global\let\reset@font\relax}
+% put your own definitions here:
+%   \newcommand{\cZ}{\cal{Z}}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\theoremstyle{break} \newtheorem{Cor}{Corollary}
+\theoremstyle{plain} \newtheorem{Exa}{Example}[section]
+%\theorembodyfont{\rmfamily}
+\newtheorem{Rem}{Remark}[section]
+\newtheorem{Alg}{Algorithm}[section]
+\newtheorem{Thm}{Theorem}[section]
+%\theoremstyle{marginbreak}
+\newtheorem{Lem}{Lemma}[section]
+%\newtheorem{Lem}[Cor]{Lemma}
+%\theoremstyle{change}
+%\theorembodyfont{\itshape}
+\newtheorem{Def}{Definition}[section]
+\title{On the LAP Relaxations of QAP}
+\author
+{John~M.~Conroy}
+
+\begin{document}
+\bibliographystyle{plain}
+%\begin {abstract}
+%\end {abstract}
+\maketitle
+%\keywords SVD, Frank-Wolfe Method, SLP, matrix Procrustes problems
+%\endkeywords
+% \subjclass \endsubjclass
+% ----------------------------------------------------------------------
+
+
+\renewcommand{\topfraction}{1.0}
+\renewcommand{\bottomfraction}{1.0}
+\renewcommand{\textfraction}{0.0}
+%\setlength{\textfloatsep}{2\baselineskip}
+
+% \input mydefs
+% \input epsf
+%\UseAMSsymbols\TagsOnRight\TopOrBottomTagsOnSplits
+% ----------------------------------------------------------------------
+%\shortauthor{Conroy, Kratzer and Podrazik} \shorttitle {Continuous Methods for QAP}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%\section{LAP as an Approximation to the QAP}
+
+In this note we discuss the linear assignment problem (LAP) 
+method  as applied to a class of the quadratic assignment problems (QAPs) that
+arise in classification of 2 by 2 stochastic un-labeled block model. 
+In particular, we show that the LAP is an optimal solution of a
+relaxed version of the QAP.   More generally, the LAP approach
+solves an assignment problem that corresponds to a linearization
+of the quadratic function in for symmetric instances of the QAP.
+
+ 
+ Recall, the QAP is defined by the following, where we seek to 
+ find a permutation matrix $\mh{Q}$ such that
+ \begin{align} \label{eq:QAP}
+	\mh{Q}_{\text{QAP}} = \argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F
+\end{align}
+
+ 
+ The classification problem studied is a class of  homogeneous 
+ ``kidney-egg'' graphs with $n$ nodes.  
+We are given graphs generated from one of two classes of
+ stochastic block models.    Our model problem has the following parameters: $n=10$, so $\eta^y \in (0,1)^{n\times n}$.  We further assume a stochastic block model, with two blocks, for both classes.  For class 0, $\eta_{ij}^0=q_0=0.25$ for $i,j \in \{1,2,3\}$, and for class 1, $\eta_{ij}^1=q_1=0.75$ for $i,j \in \{1,2,3\}$.  In both classes, $\eta_{ij}=p=0.5$ for $i,j \in \{4,\ldots 10\}$.   For  training data we are given a sample matrix for
+ each class ($B_{0}$ and $B_{1}$); the parameters for the block model are
+ known to classifier.    In each trail of the simulation we are given a matrix
+ $A$ and then use an approximate algorithm to find a 
+approximate solutions to the 2 QAPs with $B=B_{i}, i=0,1.$ 
+
+
+The LAP approximation  for this class problem is given by the following equation:
+\begin{align} \label{eq:LAP}
+	\mh{Q}^{\text{LAP}}_i = \argmin_{Q \in \mc{Q}} \norm{A Q\T - B_{i}}^2_F,~i=0,1.
+\end{align}
+
+As the LAP approximation applies just column operations
+to the $A,$   it has power to distinguish between the two classes
+due to the fact that both classes have non-uniform column distributions.
+The entries in the columns of are distributed as a mixture of the
+binomial distribution for the kidney and the egg in both classes. 
+(This panel of the the matrices we might call a ``scambled-egg,'' as the
+egg ``signal'' is mixed into portion of the ``kidney'' edges.)
+ The ability of the LAP to distinguish between class 0 and 1 relies
+ on the fact that the column distributions of the 
+ scambled-egg portions differ from the kidney columns in both classes are
+ non-zero with probability 0.5.  
+In our model problem for class 0, the entries in columns 1,2, and 3 are non-zero
+with probability $\frac{17}{40}=\frac {3(0.25)+7(0.5)}{10}$ 
+while the remaining columns' entries
+are non-zero with probability $\frac{1}{2}.$  Similarly, for class 1, entries in
+columns 1,2, and 3   are non-zero with probabiltiy
+$\frac{23}{40}=\frac{3(0.75)+7(0.5)}{10}.$  As long as the stochastic block
+models for at least one of the classes has a ``scambled-egg'' subset of
+columns that differ from the remaining subset of columns, the LAP approximation
+of this class of QAPs will have power to distinguish between the two classes.
+
+
+Secondly, the LAP approximation to the QAP solves the same  linear assignment
+algorithm used in the first iteration of the Frank Wolfe algorithm (FW) when started
+at the identity, when $A$ and $B$ are symmetric.   In particular, recall that function and its gradient
+employed by FW are
+given by
+$$ \aligned
+f(P)
+&= \sum_{i=1}^m \sum_{j=1}^n \left( A \circ PBP^t \right)_{ij}\\
+\nabla_Pf(P) &= APB^t+ A^tPB.
+\endaligned
+$$
+
+The Frank-Wolfe method (FW) is an iterative method to approximately solve
+a quadratic programming problem.   FW takes a starting point 
+$X^{(0)}\in \mathcal D,$ the set of doubly stochastic matrices, and then proceeds by solving the LAP derived from a first order Taylor series expansion about $X^{(0)}$ as given in Step 1:   
+$$
+W^{(k)} = {\argmin{W^{(k)}}}
+\lbrace { \sum_{i,j=1}^m \left( \nabla_X f(X^{(k)}) \circ W^{(k)} \right)_{ij}
+\mid W^{(k)} \in {\mc Q} }\rbrace
+$$
+The solution of this LAP defines the
+direction to search for the next iterate.  An exact line search is used to find the next iterate which is also a doubly stochastic matrix.  
+The procedure is iterated until a desired 
+accuracy is obtained or convergence.    Our variation of FW outputs
+the nearest permutation matrix to the double stochastic matrix on the final
+iteration.   
+
+We note that the LAP approximation to the QAP solves equation
+ \ref{eq:LAP} as follows:
+$$
+\mh {Q}_{LAP}=\argmin_{Q}\lbrace { \sum_{i,j=1}^m \left(AB\T \circ Q \right)_{ij}
+\mid Q \in {\mc Q} }\rbrace
+$$
+In the case where $A$ and $B$ are symmetric we note that 
+$$ \nabla_X f(I)=2AB\T,$$
+so in this case the LAP solves the assignment problem that would be
+tackled by FW on the first iteration given the starting point of the identity matrix.
+
+We note that in our experiments with FW the starting point in the classification
+experiments was $\frac{1}{n} J,$ the ``flat'' doubly stochastic matrix.
+%\subsubsection{Frank-Wolfe Approach}
+%In view of the fact the solution to Problem 2.8 is a vertex,
+%we now consider the Frank-Wolfe algorithm [xx].
+%
+%%\block \voffset+0.25in \null \hrule \voffset+0.25in \null
+%\begin{Alg}[Frank-Wolfe Algorithm (FW)]
+%Given $ X^{(1)} \in \mathcal D_m $.
+%%\roster \widestnumber\item{xxxxxxxx} \raggedright
+%\item {Step 0:} Let $k$ = 1.
+%
+%\item {Step 1:} Compute $W^{(k)}$  by solving the
+%linear assignment problem:
+%$$
+%W^{(k)} = {\text{\rm arg }} \min_{W^{(k)}}
+%\lbrace { \sum_{i,j=1}^m \left( \nabla_X f(X^{(k)}) \circ W^{(k)} \right)_{ij}
+%\mid W^{(k)} \in {\mathcal D_m} }\rbrace
+%$$
+%\item {Step 2:} Let $d^{(k)} = W^{(k)} - X^{(k)}. $
+%\item {Step 3:} Find $\alpha^k \in [0,1]$ such that
+%$$\alpha^{(k)}={\text{\rm arg }} \min_{\alpha^{(k)}}
+%f(X^{(k)} + \alpha^{(k)} d^{(k)}).
+%$$
+%\item {Step 4:} Let
+%
+%$$ X^{(k+1)} = X^{(k)} + \alpha^{(k)} d_X^{(k)}. $$
+%\item {Step 5:} 
+%If $\norm d^{(k)}_{P} \norm \le \epsilon$ or $\alpha^{(k)}=0$ or $k=k_{\max}$
+%then stop; else $k$ = $k$ + 1 and go to step 1.
+%\end{Alg}
+%
+%
+
+
+
+\end{document}
+
+
+
+
+/* 24 September 1997 */
+% ----------------------------------------------------------------------
+\Refs %\nofrills{\smc REFERENCES}
+\widestnumber\key{77}
+\widestnumber\no{77}
