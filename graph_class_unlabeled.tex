@@ -79,25 +79,7 @@ Formally, we assume that  $(G,Y), \{(G_s,Y_s)\} \sim \PP_{\bth}[G,Y]$, where $(G
 Unfortunately, we do not observe the graphs in their entirety, but rather, the permutation matrices are latent (we will often implicitly assume that vertices are observed).  That is, instead of observing $G_s=(A_s,Q_s)$, we observe only $A_s$.  Throughout, we will use the notation that $\mt{A}_s = Q_s A_s Q_s\T$, so, had we observed $\mt{A}_s$'s, then we would have observed all there is to perform the classification.  Note that graph invariants can therefore be defined as functions on $A$, that is if $f(A,Q)=f(A)$ for all $A\in \mc{A}$ and all $Q \in \mc{Q}$, then $f(\cdot)$ computes a graph invariant.
 
 
-\subsection{Graph invariant based classifiers} % (fold)
-\label{sub:graph_invariant_based_classifiers}
-
-Many graph invariants are available from the literature (see 
-\url{http://en.wikipedia.org/wiki/Graph_invariant}
-for a list of some of the most popular ones).   A subfield of random graph models, collectively called exponential family random graph models (ERGMs), typically models a graph by its triangles, $k$-stars, and the like \cite{??}.  Recent work from Pao et al. analyzed the power of various graph invariants for a special case of hypothesis testing \cite{??}.  Because of the close relationship between hypothesis testing and classification (see B\&D, pg. XXX \cite{??}), we consider the same set of graph invariants here.  In particular, we consider:
-\begin{enumerate}
-	\item size:  $\#(A)$ = the number of edges in the graph
-	\item  maximum degree: $\del(G)= \max_{i \in [n]} d(V_i)$, where $d(V_i)$ indicates degree of vertex $i$, that is, the number of edges incident to $V_i$.
-	\item maximum average degree: 	$MAD(G)=\max_{\Omega_G} \bar{d}(\Omega_G)$, where $\bar{d}(G)$ is the average degree of a graph, and $\Omega_G$ is all subgraphs of $G$.  Because computing $MAD(G)$ exactly is computationally taxing (how much???), we instead compute the maximum eigenvalue $MAD$ \cite{PaoPriebe10}.
-	\item scan statistics: the $k$-th scan statistic is the maximum number of edges over all $k$-th order neighborhoods, $S_k(G) = \max_{i \in [n]} \#(\Omega_{N_k[i;G]})$, where $N_k[i;G]=\{j \in [n] : l(V_i,V_j) \leq k\}$, and $l(V_i,V_j)$ is the distance between any two vertices, that is, the minimum number of edges traversals between them.  We assume that $l(V_i,V_i)=0 \, \forall i$, and $l(V_i,V_j)=\infty$ if no path exists between $V_i$ and $V_j$.
-	\item number of triangles:  a triangle exists whenever there is an edge from $V_i$ to $V_j$, one from $V_j$ to $V_k$, and one from $V_k$ back to $V_i$
-	\item clustering coefficient: a measure that captures the degree to which nodes tend to cluster together
-	\item average path length: typically defined by $\sum_{i,j} l(V_i,V_j)/(n^2-n)$, but to exclude the infinities, we let $\infty \mapsto 2 \max l(V_i,V_j)$.
-\end{enumerate}
-
-Let $\mb{f}(\cdot): \mc{G} \mapsto \Real^k$ be the function that takes a graph as input, and outputs a set of $k$ graph invariants.  Having defined such a function, one can then use standard machine learning algorithms to perform classification.  We plug the results into a ``standard'' suite of machine learning tools: (i) a linear classifier---linear discriminant analysis (LDA), (ii) a quadratic classifier---quadratic discriminant analysis (QDA), (iii) a support vector machine (SVM), (iv) random forests (RF), and (v) $k_n$ nearest neighbor classifier.  Note that the dimensionality of the data is quite large ($\mc{O}(n^2)$), we first reduce the dimensionality of the data using principal components analysis (PCA).  The dimensionality of the data to keep is chosen using the method of \cite{??}.
-
-\subsection{Likelihood based approach} % (fold)
+\subsection{Optimal approach} % (fold)
 \label{sec:lik}
 
 The Bayes optimal classifier is:
@@ -151,7 +133,7 @@ where $\mc{D}$ is the set of doubly stochastic matrices.  Using Lagrange multipl
 where the additional terms impose the constraint that the columns and rows sum to one, respectively.  Now, the likelihood term is concave in $\eta$ (but not $Q$), and the constraints are linear, and therefore concave in $Q$, thus, one can use a coordinate ascend strategy, optimizing $Q$ followed by optimizing $\eta$, until convergence. This ignores the $Q$ terms in the likelihood.  Perhaps somebody (else) could figure out how to (at least approximately) account for those.  Regardless, this is an approximate solution to finding the most likely permutation matrix for each sample, as well as the independent edge probabilities.   
 
 
-\subsection{Quadratic assignment problem approach} % (fold)
+\subsection{Quadratic assignment problem approximation} % (fold)
 \label{sub:graph_isomorphism_approach}
 
 
@@ -255,6 +237,25 @@ That the objective function is not necessarily convex is clear by virtue of comp
 \end{align}
 where $\otimes$ indicates the Kronecker product, which is not positive definite (in general).
 % subsection graph_isomorphism_approach (end)
+
+\subsection{Graph invariant based classifiers (it is not obvious to me that it is even worth comparing the graph invariant classification, as this study is really about performance degradation when $Q$ is unknown, and the utility of additional iterations)} % (fold)
+\label{sub:graph_invariant_based_classifiers}
+
+Many graph invariants are available from the literature (see 
+\url{http://en.wikipedia.org/wiki/Graph_invariant}
+for a list of some of the most popular ones).   A subfield of random graph models, collectively called exponential family random graph models (ERGMs), typically models a graph by its triangles, $k$-stars, and the like \cite{??}.  Recent work from Pao et al. analyzed the power of various graph invariants for a special case of hypothesis testing \cite{??}.  Because of the close relationship between hypothesis testing and classification (see B\&D, pg. XXX \cite{??}), we consider the same set of graph invariants here.  In particular, we consider:
+\begin{enumerate}
+	\item size:  $\#(A)$ = the number of edges in the graph
+	\item  maximum degree: $\del(G)= \max_{i \in [n]} d(V_i)$, where $d(V_i)$ indicates degree of vertex $i$, that is, the number of edges incident to $V_i$.
+	\item maximum average degree: 	$MAD(G)=\max_{\Omega_G} \bar{d}(\Omega_G)$, where $\bar{d}(G)$ is the average degree of a graph, and $\Omega_G$ is all subgraphs of $G$.  Because computing $MAD(G)$ exactly is computationally taxing (how much???), we instead compute the maximum eigenvalue $MAD$ \cite{PaoPriebe10}.
+	\item scan statistics: the $k$-th scan statistic is the maximum number of edges over all $k$-th order neighborhoods, $S_k(G) = \max_{i \in [n]} \#(\Omega_{N_k[i;G]})$, where $N_k[i;G]=\{j \in [n] : l(V_i,V_j) \leq k\}$, and $l(V_i,V_j)$ is the distance between any two vertices, that is, the minimum number of edges traversals between them.  We assume that $l(V_i,V_i)=0 \, \forall i$, and $l(V_i,V_j)=\infty$ if no path exists between $V_i$ and $V_j$.
+	\item number of triangles:  a triangle exists whenever there is an edge from $V_i$ to $V_j$, one from $V_j$ to $V_k$, and one from $V_k$ back to $V_i$
+	\item clustering coefficient: a measure that captures the degree to which nodes tend to cluster together
+	\item average path length: typically defined by $\sum_{i,j} l(V_i,V_j)/(n^2-n)$, but to exclude the infinities, we let $\infty \mapsto 2 \max l(V_i,V_j)$.
+\end{enumerate}
+
+Let $\mb{f}(\cdot): \mc{G} \mapsto \Real^k$ be the function that takes a graph as input, and outputs a set of $k$ graph invariants.  Having defined such a function, one can then use standard machine learning algorithms to perform classification.  We plug the results into a ``standard'' suite of machine learning tools: (i) a linear classifier---linear discriminant analysis (LDA), (ii) a quadratic classifier---quadratic discriminant analysis (QDA), (iii) a support vector machine (SVM), (iv) random forests (RF), and (v) $k_n$ nearest neighbor classifier.  Note that the dimensionality of the data is quite large ($\mc{O}(n^2)$), we first reduce the dimensionality of the data using principal components analysis (PCA).  The dimensionality of the data to keep is chosen using the method of \cite{??}.
+
 
 
 \subsection{Simulations} % (fold)
@@ -417,9 +418,20 @@ achieved for our unlabeled scenario using this assignment algorithm, but perform
 % section methods (end)
 
 
+\subsection{C elegans simulations} % (fold)
+\label{sub:c_elegans_simulations}
+
+
+We took the C. elegans connectome, randomly permuted it, added noise, and then ran the same classification code with the following results....
+
+
+% subsection c_elegans_simulations (end)
+
+\clearpage
 \section{Discussion} % (fold)
 \label{sec:discussion}
 
+XXX cep's original write-up had a bunch of stuff about signal subgraph finding.  it now seems quite unrelated to me.  perhaps we drop that bit? XXX
 
 other graph matching approaches---inexact, get you closer
 
@@ -427,16 +439,15 @@ incorporating priors using distance
 
 parallel implementations for large graphs
 
+
+starting with ``truth'' or not
+
 % section discussion (end)
 
 \clearpage
 \appendix
-\section{assignment problem solutions} % (fold)
-\label{sec:assignment_problem_solutions}
 
-% section assignment_problem_solutions (end)
-
-\subsection{Linear assignment problem solution} % (fold)
+\section{Linear assignment problem solution} % (fold)
 \label{ssub:linear_assignment_problem_solution}
 
 % Solving \eqref{eq:a} is difficult for two reasons: (i) the objective function is not necessarily convex, and (ii) the constraints are nonlinear.  That the objective function is not necessarily convex is clear by virtue of computing the Hessian of the argument in \eqref{eq:a} with respect to $Q$:
@@ -481,36 +492,6 @@ where the trace rule follows from \cite{HornJohnson}.
 
 % subsubsection linear_assignment_problem_solution (end)
 
-\section{other} % (fold)
-\label{sec:other}
-
-% section other (end)
-
-
-
-
-Finding the best alignment of vertices has been called the graph isomorphism problem (GIP) \cite{??}, and is known to be computationally equivalent to the quadratic alignment problem (QAP) \cite{??}.  Given to graphs, $A$ and $B$, the QAP can be formalized as follows:
-\begin{align}
-	\mh{P} = \argmin_{P \in \Pi} \norm{PAP\T - B}
-\end{align}
-where $\Pi$ is the set of all permutation matrices, that is, all matrices with a single one in each row and column, and zeros otherwise.  
-
-
-We therefore investigate building classifiers on the space of collections of unlabeled graphs.  Specifically, we consider two distinct approaches. First, we build classifiers using ``graph invariants,'' that is, statistics of the graphs that are invariant to isomorphic translations.  Second, we first approximately solve the graph isomorphism problem,  
-
-
-
-
-
-Data today are unlabeled graphs.  examples (mostly brain-graph examples)....
-
-Previous work classifying unlabeled graphs..... Problem: consistency for what model?
-
-Previous work classifying labeled graphs.... Problem: graph isomorphism
-
-Previous work solving graph isomorphism problem.
-
-Paper organization...
 
 \section{Preliminaries} % (fold)
 \label{sec:preliminaries}
@@ -848,161 +829,33 @@ then, generalizing to (perhaps) approach experimental settings?
 NB: perhaps we should be doing hypothesis testing instead???
 
 
-\section{20 statements}
 
-\begin{verbatim}
+\section{other} % (fold)
+\label{sec:other}
 
-	allow me to try to state some things that it seems we agree on, and some things that seem to be open questions for us, &c,
-	with the hope of clarifying at least where we are, and where we'd like to be.  if anything i write below is incorrect, or somehow disagreed with, please state your qualms.
-
-	(1) The "quadratic assignment problem" (QAP) is the following:  
-	give two matrices, A and B,
-	find a Q and P such that
-	min ||QAP' - B||
-	where both Q and P are permutation matrices.
+% section other (end)
 
 
-	JMC: Actually, this is the bi-linear assignment problem for the QAP P=Q.
-	The bilinear problem has the pleasant property that the relaxed version
-	(replacing the permutation constraint with the doubly stochastic constraint)
-	has its solutions on the vertices.  That is when you solve the
-	bilinear assignment
-	your are guaranteed to find a vertex.  The solution may be a local optimum and
-	multiple starts may still be necessary.
-	
-	JoVo: modified first two points
-	(1) The "bilinear assignment problem" (BAP) is the following:  
-	give two matrices, A and B,
-	find a Q and P such that
-	min ||QAP' - B||
-	where both Q and P are permutation matrices.
-
-	(2) The Quadratic Assignment Problem (QAP) is the following:
-
-	given two adjacency matrices, A and B,
-	find a P such that
-	min || PAP' - B||
-	where P is a permutation matrix.
-	thus, QAP is a constrained BAP.
-
-	(3) the graph isomorphism problem is a QAP
-	
-	
-	(2) QAP is NP-hard
-
-	(3) The Graph Isomorphism Problem (GIP) is the following:
-	given two adjacency matrices, A and B,
-	find a P such that
-	min || PAP' - B||
-	where P is a permutation matrix.
-	thus, GIP is a constrained QAP.
-
-	(4) GIP has weird complexity, somewhere between NP-complete and P
-
-	(4) The Linear Assignment Problem (LAP) is the following:
-	given two adjacency matrices, A and B,
-	find a P such that
-	min || PA - B||
-	where P is a permutation matrix.
-
-	(5) LAP can be solved in O(n^3) by the hungarian algorithm
-
-	(6) The Frank-Wolfe (FW) algorithm is an algorithm designed to *solve* quadratic problems with linear constraints, that is:
-	min f(x) = 0.5* x' E x + h' x
-	where x is in some feasible region defined by a set of linear constraints, that is Ax \leq b and Cx = d.
-
-	(7) FW is an iterative algorithm that works as follows
-
-	(i) initialize x with x_0
-	(ii) compute the first order taylor expansion around f(x_k)
-	(iii) compute the gradient of f(x_k), call that g(x_k)
-	(iv) solve the following subproblem:
-	min f(x_k) + g(x_k) xbar_k, where xbar_k is in the feasible region
-	(v) compute the step size, lambda that solves
-	min f(x_k + lambda (xbar_s - x_k)) subject to lambda is in (0,1)
-	(vi) let x_{k+1} = x_k + lambda*(xbar_k - x_k), and let k=k+1
-
-	we stop if ever g(x_k)=0 or lambda=0.
-
-	(8) FW can be quite slow.  although the first few iterations are often fast.
-
-	(9) doubly stochastic matrices have the following properties:
-
-	(i) each row sums to 1
-	(ii) each column sums to 1
-	(iii) each element is a non-negative real number
-
-	these can each be written as linear constraints (linear equalities, in fact).
-
-	(10) the set of doubly stochastic matrices is a convex polytope, and is the convex hull of the set of permutation matrices
-
-	(11) permutation matrices are square matrices with exactly one 1 in each row and one 1 in each column.  this can NOT be written as linear constraints.
-
-	(12) thus, one can solve the following relaxation of GIP, called the Doubly Stochastic Approximation (DSA): 
-	Yhat = min || YAY' - B||
-	where Y is the set of doubly stochastic matrices.
-	in particular, FW can solve this problem in linear time.
-
-	(13) it is possible that the solution to DSA is in fact also a solution to GIP, because the extreme points of the set of doubly stochastic matrices are permutation matrices.
-
-	(14) if Yhat is not a permutation matrix, then one can find the closest permutation matrix by  solving the following:
-	min || Yhat - X ||
-	which can be solved in polynomial time using the hungarian algorithm.  
-
-	(15) we have found a case for which we can show in simulo:
-	L* ~ E[L_{labeled}] << E[L_{LAP}] << 1/2
-
-	(16) question 1: where does E[L_{QAP}] fit in for this simulation.  this is a question we can solve for very small graphs, perhaps analytically in some (overly) simplistic settings
-
-	(17) question 2: where does E[L_{DSA}] fit in, where L_{DSA} is the misclassification rate when one solves DSA and then projects the answer onto the set of permutation matrices.  we can solve this problem analytically for some problems too.  for instance, for any problem that the solution to DSA is a permutation matrix, and we already know analytic results for the permutation case.
-
-	(18) question 3: since DSA takes a long time, let DSA_k indicate the solution to DSA from the k-th iteration, projected onto the set of permutation matrices.  again, for a simple simulation, what does the plot of E[L_{DSA_k}] vs. k look like.
-
-	(19) question 4: is it the case that the solution to DSA_1always equals the solution to LAP
-
-	(20) question 5: how does conroy's algorithm fit into all of this? it seems that FW will eventually converge to the same solution no matter where it starts.  but, it seems FW is often stopped early (like after a single iteration).  so, perhaps conroy's algorithm is running FW many times, each starting in a different place, and each only iterating once?  i say multiple starts because that is the term conroy used in his email on 3/29, and multiple iterations doesn't make much sense to be, because FW is iterative, so conroy's code can't simply be FW, unless conroy was the first to propose to use FW to approximate GIP?
-
-	i hope this missive at least clarifies what i believe and don't understand.  i also hope it inspires somebody else to correct any mistakes i currently have made, and conroy to fill me in (again) on what his algorithm is doing, as i still do not understand (much to my chagrin) (and my lack of understanding is likely due only to my failings).
-
-	shabbat shalom to all,
-	jovo
-	
-\end{verbatim}
-
-\section{email from jmc}
-
-\begin{verbatim}
-
-	John Conroy <conroyjohnm@gmail.com>	 Sat, Sep 18, 2010 at 11:15 PM
-	To: Carey Priebe <cep@jhu.edu>, joshuav <joshuav@jhu.edu>
-	Hi Carey and Joshua,
-	 Here's a rough draft description of the FW method for QAP.  I adapted from the
-	original late 90's unpublished paper by Lou, Steve, and I.  I suspect that 
-	once this is merged into the paper much can be cut out and some may be appropriate
-	for an appendix.   I think it would be good to include the performance of the FW method
-	on the QAP test set to justify the method. 
-
-	Here's a couple of points relative to our discussion on Thursday:
-
-	 1.  Indeed, the subproblem
-	FW solves is a linearization of the quadratic function, a Taylor series about $X^{(k)}$.  
-	This sub-problem's solution then produces a vertex which give a 
-	search direction for the "exact line search."   
-	2.  Furthermore, I am convinced that the
-	relaxed QAP is NOT in general a convex optimization problem.  The Hessian is 
-	kron(A,B)+kron(A',B') and in general this will not be a positive definite matrix.
-	(A sufficient condition is for A and B to be symmetric positive definite or for them
-	both to be symmetric negative definite.)
-
-	I sent a copy of this draft to Lou and Steve as well
-	 with some background where we intend to
-	go next.
-
-	Best regards,
-	Johnny
+Finding the best alignment of vertices has been called the graph isomorphism problem (GIP) \cite{??}, and is known to be computationally equivalent to the quadratic alignment problem (QAP) \cite{??}.  Given to graphs, $A$ and $B$, the QAP can be formalized as follows:
+\begin{align}
+	\mh{P} = \argmin_{P \in \Pi} \norm{PAP\T - B}
+\end{align}
+where $\Pi$ is the set of all permutation matrices, that is, all matrices with a single one in each row and column, and zeros otherwise.  
 
 
-\end{verbatim}
+We therefore investigate building classifiers on the space of collections of unlabeled graphs.  Specifically, we consider two distinct approaches. First, we build classifiers using ``graph invariants,'' that is, statistics of the graphs that are invariant to isomorphic translations.  Second, we first approximately solve the graph isomorphism problem,  
+
+
+
+Data today are unlabeled graphs.  examples (mostly brain-graph examples)....
+
+Previous work classifying unlabeled graphs..... Problem: consistency for what model?
+
+Previous work classifying labeled graphs.... Problem: graph isomorphism
+
+Previous work solving graph isomorphism problem.
+
+Paper organization...
 
 
 \section*{Appendix}
@@ -1092,9 +945,7 @@ sum(cuc2[[4]])
 
 \end{verbatim}
 
-
-
-\newpage
+% \newpage
 
 \subsection{move this \dots}
 
