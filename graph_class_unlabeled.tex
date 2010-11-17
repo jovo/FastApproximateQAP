@@ -1,4 +1,4 @@
-\input{/Users/jovo/Research/papers/meta/latex_paper.tex} 
+\input{/Users/jovo/Research/latex/latex_paper.tex} 
 \usepackage{url}
 \lhead{Vogelstein JT, et al}
 \rhead{short title}
@@ -31,7 +31,7 @@
 
 \title{PRE-DRAFT: On unlabeled graph classification}
 
-\author{cep,djm,jmc,jv2}
+\author{jv1,jv2,djm,jmc,cep}
 % JV1 ; Henry ; \dots
 
 \begin{document}
@@ -40,23 +40,25 @@
 % \tableofcontents
 \begin{abstract}
 	
-Many kinds of data are better characterized by graphs than vectors, including social networks, telecommunication grids, and brains.  It is often desirable to compare two or more of these graphs with one another.  Unfortunately, sometimes these graphs are unlabeled, meaning there is no known correspondence between vertices on one graph and vertices on another graph. In such scenarios, making comparisons is relatively difficult, although two general strategies are possible.  First, one can compute a number of ``graph invariants,'' that is, scalar measures of graphs that are invariant to vertex permutations.  Second, one can solve the graph isomorphism problem (GIP), effectively aligned graphs with one another, as close as can be aligned.  Because no known algorithm can solve GIP in polynomial time, one is often forced to use approximate solutions.  We provide several approximations to GIP, and show how performance scales with computational time.  We compare various approaches, using somewhat idealized simulations, as well as simulations based on real brain-graph data, and finally real human brain-graph data.
+Many kinds of data are better characterized by graphs than vectors, including social networks, telecommunication grids, and brains.  It is often desirable to compare two or more of these graphs with one another.  Unfortunately, sometimes these graphs are unlabeled, meaning there is no known correspondence between vertices on one graph and vertices on another graph. In such scenarios, making comparisons is relatively difficult, as it typically first requires at least approximately solving the ``graph matching'' or ``graph isomorphism'' problem.  
+
+% although two general strategies are possible.  First, one can compute a number of ``graph invariants,'' that is, scalar measures of graphs that are invariant to vertex permutations.  Second, one can solve the graph isomorphism problem (GIP), effectively aligned graphs with one another, as close as can be aligned.  
+Because no known algorithm can solve GIP in polynomial time, one is often forced to use approximate solutions.  We provide several approximations to GIP, and show how performance scales with computational time.  We compare various approaches, using somewhat idealized simulations, as well as simulations based on real brain-graph data, and finally real human brain-graph data.
 
 \end{abstract}
 
 \section{Introduction}
 
-In the current digital age, swaths of data are collected in myriad diverse fields ranging from astronomy to zoology.  While these data are well characterized by networks, or graphs, the vast majority of statistical inference techniques, including the recent advances in machine learning, tend to assume the data live in finite dimensional Euclidean space.  Thus, inference techniques designed to specifically to address collections of graphs could potentially yield fruitful results across many domains.  Furthermore, these collections of graphs often lack vertex labels, meaning no known mapping from vertices in any one graph to any other graph, is available.  In such scenarios, the graphs are called ``unlabeled,'' and this is the scenario of interest for this manuscript.  Consider, for example, two food networks in different jungles.  Both might have lions and tigers and bears (oh my), so it is easy to compare across the jungles.  On the contrary, if one jungle only has the birds and the bees, one might still be interested in comparing the food networks, but a bird might play the same role in the second jungle as the lion does in the first, making comparisons across jungles more complicated.
-
+In the current digital age, swaths of data are collected in myriad diverse fields ranging from astronomy to zoology.  While these data are well characterized by networks, or graphs, the vast majority of statistical inference techniques, including the recent advances in machine learning, tend to assume the data live in finite dimensional Euclidean space.  Thus, inference techniques designed to specifically to address collections of graphs could potentially yield fruitful results across many domains.  Furthermore, these collections of graphs often lack vertex labels, meaning the function labeling each vertex in each graph is unknown.  In such scenarios, the graphs are called ``unlabeled,'' and this is the scenario of interest for this manuscript.  Consider, for example, two food networks in different jungles.  Both might have lions and tigers and bears (oh my), so it is easy to compare across the jungles.  On the contrary, if one jungle only has the birds and the bees, one might still be interested in comparing the food networks, but a bird might play the same role in the second jungle as the lion does in the first, making comparisons across jungles more complicated.
 
 
 The exploitation task of investigation for this manuscript is that of unlabeled graph classification.  More specifically, we assume that we have observed some number of unlabeled graph/class pairs, and we want to classify a novel unlabeled graph into its appropriate class. Unfortunately, because we do not directly observe the complete graphs, rather, only the unlabeled version of each graph, our classifiers must somehow deal with this additional complication.
 
-We consider two general approaches.  First, one can compute a large number of statistics on unlabeled graphs that are invariant to isomorphisms.  That is, if $g$ is a graph, and $\mt{g}$ is another graph isomorphic to $g$, then any function that satisfies $f(g)=f(\mt{g})$ is called a ``graph invariant.''  For example, the number of edges or triangles in a graph is invariant to isomorphisms.  By computing a large number of these graph invariants, one effectively projects the graph into finite Euclidean space, at which time one can apply standard machine learning tools.  A second approach under consideration involves first (approximately) solving GIP for each test graph, and then applying \emph{labeled} graph classification algorithms, such as those developed in \cite{??}.
+We consider two general approaches.  First, one can compute a large number of statistics on unlabeled graphs that are invariant to isomorphisms.  That is, if $g$ is a graph, and $\mt{g}$ is another graph isomorphic to $g$, then any function that satisfies $f(g)=f(\mt{g})$ is called a ``graph invariant.''  For example, the number of edges or triangles in a graph is invariant to isomorphisms.  By computing a large number of these graph invariants, one effectively projects the graph into finite Euclidean space, at which time one can apply standard machine learning tools.  A second approach under consideration involves first (approximately) solving the graph matching (also known as the graph isomorphism) problem (GIP) for each test graph, and then applying \emph{labeled} graph classification algorithms, such as those developed in \cite{VogelsteinPriebe10a}.
 
 Neither of these approaches are likely to dominate the other in general, as both have rather severe limitations.  The graph invariant approach lacks much rigorous theoretical support.  For instance, it remains an open question for which distributions can the graph invariant approach achieve the Bayes optimal classification rate (except in trivial cases for which the generative model is a function of the particular graph invariants being used). However, many graph invariants can be computed quite quickly.  Further, graph invariants have both local and global properties, that is, they capture some aspect of the whole graph, by recursively considering local functions.  Finally, for certain exploitation tasks, one might desire to understand the relationship between certain graph invariants and the class (for instance, are transportation grids more efficient when more triangles exist?).  
 
-On the other hand, if one first (approximately) solves GIP, then limiting results for many classifiers are readily available (upon stacking each adjacency matrix to project it onto finite Euclidean space).  Unfortunately, solving GIP is known to be NP incomplete \cite{??} (not known to be NP complete nor P).   This means that solving GIP remains quite computationally expensive, especially as $n$, the number of vertices in the graphs, gets large.
+On the other hand, if one first (approximately) solves GIP, then limiting results for many classifiers are readily available (upon representing each graph as an adjacency matrix that resides in finite  Euclidean space).  Unfortunately, solving GIP is known to be NP incomplete \cite{??} (not known to be NP complete nor P).   This means that solving GIP remains quite computationally expensive, especially as $n$, the number of vertices in the graphs, gets large.
 
 Several questions therefore arise for us, as a first investigation into unlabeled graph classification.  Are there distributions for which approximate GIP solutions yield good classification results? If so, can we establish any general rules under which approximating GIP is expected to perform relatively well?  Alternately, are there distributions for which the graph invariant approach outperforms the GIP approach?  How do the computations and performances for these two approaches scale with respect to one another?  In this study, we first describe precisely how one might proceed upon using either of the above two approaches.  Then, we conduct a number of in simulu experiments that we believe are informative with regard to some of these questions.  We conclude with some discussion and outlines for possible future work and applications.
 
@@ -70,11 +72,11 @@ Several questions therefore arise for us, as a first investigation into unlabele
 
 Let $G$ be a graph-valued random variable, $G: \Omega \mapsto \mc{G}$, where $\mc{G}$ is the set of all possible graphs, $g \in \mc{G}$ (and $\Omega$ is the universal sample space). A graph is assumed to be a triple, $(V,A,Q)$, where $V=\{V_i\}=V_i \, \forall i \in [n]=\{1,\ldots,n\}$ is the set of vertices, $A=\{A_{ij}\}$ is the adjacency matrix, each edge is binary (an easily relaxed assumption), and $Q$ is a permutation matrix (a matrix with a single one in each column and row, and zeros otherwise). Let $\mc{A}=\{0,1\}^{n \times n}$ be the space of all possible adjacency matrices, and $\mc{Q}$ denote the set of permutation matrices.
 
-Further, let $Y$ be a binary-valued random variable, $Y: \Omega \mapsto \mc{Y} = \{0,1\}$, which can be easily generalized to any multinomial space (or continuous spaces with a bit more work).  Graphs and classes are sampled jointly and exchangeably from some unknown but true distribution, $\PP[G,Y; \theta] \in \mc{P}$, where $\mc{P}$ is the family of distributions under consideration, $\mc{P} = \{\PP[G,Y; \theta] : \theta \in \Theta\}$, $\theta$ is the parameter of the distribution, and $\Theta$ is the set of all possible parameters (in the sequel, we often drop the $\theta$ from $\PP[G,Y; \theta]$).  
+Further, let $Y$---the \emph{class} of an object---be a binary-valued random variable, $Y: \Omega \mapsto \mc{Y} = \{0,1\}$, which can be easily generalized to any multinomial space (or continuous spaces with a bit more work).  Graphs and classes are sampled jointly and exchangeably from some unknown but true distribution, $\PP_{\bth}[G,Y] \in \mc{P}$, where $\mc{P}$ is the family of distributions under consideration, $\mc{P} = \{\PP_{\bth}[G,Y] : \bth \in \Theta\}$, $\bth$ is the parameter of the distribution, and $\Theta$ is the set of all possible parameters (in the sequel, we often drop the $\bth$ from $\PP_{\bth}[G,Y]$).  
 
-Formally, we assume that  $(G,Y), \{(G_s,Y_s)\} \sim \PP[G,Y; \theta]$, where $(G,Y)$ is the graph/class test sample pair, and $\mc{T}_S=\{G_s,Y_s\}=\{(G_1,Y_1),\ldots, (G_S,Y_S)\}$ is the training sample set, where $S$ is the total number of training samples.  The goal is to impute the latent test sample class, $Y=y$, given the training data.  While we do not believe that $\PP[G,Y; \theta]$ is in fact true, we do believe that the true distribution (if one exists) can be approximated reasonably well by some distributions in $\mc{P}$, such that we have hope to achieve misclassification rates better than chance on at least some data sets.  
+Formally, we assume that  $(G,Y), \{(G_s,Y_s)\} \sim \PP_{\bth}[G,Y]$, where $(G,Y)$ is the graph/class test sample pair, and $\mc{T}_S=\{G_s,Y_s\}=\{(G_1,Y_1),\ldots, (G_S,Y_S)\}$ is the training sample set, where $S$ is the total number of training samples.  The goal is to impute the latent test sample class, $Y=y$, given the training data.  While we do not believe that $\PP_{\bth}[G,Y]$ is in fact true for any possibly extant data, we do believe that the true distribution (if one exists) can be approximated reasonably well by some distributions in $\mc{P}$, such that we have hope to achieve misclassification rates better than chance on at least some data sets.  
 
-Unfortunately, we do not observe the graphs in their entirety, but rather, the permutation matrices are latent (we will often implicitly assume that vertices are observed or not, it is confusing).  That is, instead of observing $G_s=(A_s,Q_s)$, we observe only $A_s$.  Throughout, we will use the notation that $\mt{A}_s = Q_s A_s Q_s\T$, so, had we observed $\mt{A}_s$'s, then we would have observed all there is to perform the classification.  Note that graph invariants can therefore be defined as functions on $A$, not requiring $Q$ for computing their values.
+Unfortunately, we do not observe the graphs in their entirety, but rather, the permutation matrices are latent (we will often implicitly assume that vertices are observed).  That is, instead of observing $G_s=(A_s,Q_s)$, we observe only $A_s$.  Throughout, we will use the notation that $\mt{A}_s = Q_s A_s Q_s\T$, so, had we observed $\mt{A}_s$'s, then we would have observed all there is to perform the classification.  Note that graph invariants can therefore be defined as functions on $A$, that is if $f(A,Q)=f(A)$ for all $A\in \mc{A}$ and all $Q \in \mc{Q}$, then $f(\cdot)$ computes a graph invariant.
 
 
 \subsection{Graph invariant based classifiers} % (fold)
@@ -112,7 +114,7 @@ where $\mhP[G|Y]$ and $\mhP[Y]$ are the plugin estimates of the likelihood and p
 \end{align}
 as the adjacency matrix, $A$, and permutation matrix $Q$, are conditionally independent given the class label, $Y$.  Further, the permutation matrix is assumed to be independent of the class label.  Thus, if $Q$ were observed, then estimating $\PP[A|Y]$ would be all there is to it; unfortunately, $Q$ is latent, and thus must be imputed for each example.  
 
-To proceed, we define an explicit likelihood model, which we will use in the sequel.  Because each element of the adjacency matrix is Binary, edges are Bernoulli random variables.  We assume that each edge is independent, but not identical.  If the permutation matrix was known to be the identity matrix, we would have:
+To proceed, we define an explicit likelihood model, which we will use in the sequel.  Because each element of the adjacency matrix is binary, edges are Bernoulli random variables.  We assume that each edge is independent, but not identical.  If the permutation matrix was known to be the identity matrix, we would have:
 \begin{align}
 \PP[A,Q|Y] = \prod_{ij} \text{Bernoulli}(a_{ij}; \eta_{ij}^y)
 \end{align}
@@ -146,78 +148,80 @@ where $\mc{D}$ is the set of doubly stochastic matrices.  Using Lagrange multipl
 \begin{align}
 	(\mh{\eta},\mh{Q}) \approx \argmax_{\eta \in  (0,1)^{n\times n}} \mc{L}(\mb{\eta},Q) - \lambda (1 - \tfrac{1}{n}\mb{1}\T Q) - \lambda (1 - \tfrac{1}{n}\mb{1}\T Q\T),
 \end{align}
-where the additional terms impose the constraint that the columns and rows sum to one, respectively.  Now, the likelihood term is concave in $\eta$, and the constraints are linear, and therefore concave in $Q$, thus, one can use a coordinate ascend strategy, optimizing $Q$ followed by optimizing $\eta$, until convergence. This ignores the $Q$ terms in the likelihood.  Perhaps somebody (else) could figure out how to (at least approximately) account for those.  Regardless, this is an approximate solution to finding the most likely permutation matrix for each sample, as well as the independent edge probabilities.   
+where the additional terms impose the constraint that the columns and rows sum to one, respectively.  Now, the likelihood term is concave in $\eta$ (but not $Q$), and the constraints are linear, and therefore concave in $Q$, thus, one can use a coordinate ascend strategy, optimizing $Q$ followed by optimizing $\eta$, until convergence. This ignores the $Q$ terms in the likelihood.  Perhaps somebody (else) could figure out how to (at least approximately) account for those.  Regardless, this is an approximate solution to finding the most likely permutation matrix for each sample, as well as the independent edge probabilities.   
 
 
-\subsection{Assignment problem approach} % (fold)
+\subsection{Quadratic assignment problem approach} % (fold)
 \label{sub:graph_isomorphism_approach}
 
 
-Instead of the likelihood based approach outlined above, one could consider the permutation matrices ``nuisance parameters,'' and construct \emph{some} way to estimate them, and plug that value in, assuming it is ``correct.'' Note that the disadvantage of this approach relative to the likelihood based approach is that it is less ``natural'' from a statistical point of view, for example, modeling averaging is not quite as obvious, and incorporating prior information might also be less obvious.  The advantage, however, is that much work as already been devoted to solving assignment problems, and we can therefore piggyback on the shoulders of giants.  %In this case, we piggyback on the shoulders of Marguerite Frank and Phil Wolfe, who developed the Frank-Wolfe (FW) algorithm for solving quadratic programming problems with linear constraints.  
+Instead of the likelihood based approach outlined above, one could consider the permutation matrices ``nuisance parameters,'' and construct \emph{some} way to estimate them, and plug that value in, assuming it is ``correct.'' Note that the disadvantage of this approach relative to the likelihood based approach is that it is less ``natural'' from a statistical point of view, for example, modeling averaging is not quite as obvious, and incorporating prior information might also be less obvious.  The advantage, however, is that much work as already been devoted to solving closely related problems,  and we can therefore piggyback on the shoulders of giants.  %In this case, we piggyback on the shoulders of Marguerite Frank and Phil Wolfe, who developed the Frank-Wolfe (FW) algorithm for solving quadratic programming problems with linear constraints.  
 
-More specifically, assume we have the same model assumed above in Section \ref{sec:lik}, and assume that $\eta$ is known, such that we must only estimate the permutation matrix.  This problem is closely related to the graph isomorphism problem (GIP), in which, given any pair of graphs, one searches for the permutation matrix that makes them as similar as possible:
-\begin{align} \label{eq:a}
-	\mh{Q} = \argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F
+More specifically, assume we have the same model assumed above in Section \ref{sec:lik}, and assume that $\eta$ is known, such that we must only estimate the permutation matrix.  This problem is closely related to the graph matching (or graph isomorphism) problem (GIP), in which, given any pair of graphs, one searches for the permutation matrix that makes them as similar as possible.  ``Similarity'' can be defined as desired, with some definitions perhaps better than others in some domains.  The likelihood is one measure of similarity, and since the classifier that we are using is a likelihood based classifier, the likelihood is the ``best'' measure of similarity for this problem.  However, since we cannot solve the likelihood approach, instead, we look for a measure of similarity as close to likelihood as possible.  Least squares seems like a reasonable guess, given the close relationship between least squares, maximum likelihood estimation, and Kullback-Leibler divergence \cite{YangPriebe10, Grunwald07} (although absolute distance is another reasonable approach, and efficient algorithms exist \cite{}):  
+\begin{align} \label{eq:qap}
+	\mh{Q} &= \argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F
 \end{align}
-where $A$ and $B$ are two arbitrary adjacency matrices, $\norm{\cdot}_{F}$ indicates the Froebenius norm, $\norm{x}_F=\sum_{ij} \sqrt{x_{ij}^2}$.  Unfortunately, because the set of permutation matrices, $\mc{Q}$, is discrete, optimizing over them is difficult.  In fact, solving GIP is known to be $NP$ incomplete (meaning it is not known to be in either $P$ or $NP$) \cite{??}.  Therefore, instead of trying to solve this exactly, we make approximations to make it easier.  
-
-\subsubsection{Linear assignment problem solution} % (fold)
-\label{ssub:linear_assignment_problem_solution}
-
-Solving \eqref{eq:a} is difficult for two reasons: (i) the objective function is not necessarily convex, and (ii) the constraints are nonlinear.  That the objective function is not necessarily convex is clear by virtue of computing the Hessian of the argument in \eqref{eq:a} with respect to $Q$:
+where $A$ and $B$ are two arbitrary adjacency matrices, $\norm{\cdot}_{F}$ indicates the Froebenius norm, $\norm{x}_F=\sum_{ij} \sqrt{x_{ij}^2}$.  Unfortunately, because the set of permutation matrices, $\mc{Q}$, is discrete, optimizing over them is difficult.  Eq. \eqref{eq:qap} is closely related to a well studied problem, called the \emph{quadratic assignment problem}.  Noting that $Q\T Q=I$, where $I$ is the identity matrix, is true for any orthogonal $Q$, and that permutation matrices are orthogonal, Eq. \eqref{eq:qap} can be rewritten:
+\begin{align} \label{eq:qap}
+	\mh{Q} &= \argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F
+			\\ &= \argmin_{Q \in \mc{Q}}tr\big((QAQ\T-B)\T(QAQ\T-B)\big)
+			\\ &= \argmin_{Q \in \mc{Q}}tr(QA\T Q\T QA Q\T)  - tr(B\T QAQ\T) - tr(QAQ\T B) + tr(B\T B)
+			\\ &= \argmin_{Q \in \mc{Q}}tr(QA\T A Q\T)  - tr(B\T QAQ\T) - tr(QAQ\T B)
+			\\ &= \argmin_{Q \in \mc{Q}} - tr(B\T QAQ\T) - tr(QAQ\T B),			
+\end{align}
+which is equivalent to the standard representation of the quadratic assignment problem \cite{}:
 \begin{align}
-	\nabla_Q^2 \mc{L} =  B \otimes A + B\T \otimes A\T,
+	\mh{\sigma}= \argmin_{\sigma} a_{\sigma(i), \sigma(j)} b_{ij} = \argmin_{q \in \mc{Q}} q_{ij} a_{ij} q_{ji} b_{ij}
 \end{align}
-where $\otimes$ indicates the Kronecker product, which is not positive definite (in general).  To resolve non-convexity, we can simply drop one of the $Q$'s from \eqref{eq:a}.  The implication of this is that instead of permuting both rows and columns, we only permute one or the other.  While this may seem like a totally ridiculous thing to do, crazier things have worked.  Given this simplification, the argument is not merely convex, but it is quadratic in $Q$, making solving it exactly feasible (independent of the constraints).  
+where $\sigma$ is a permutation, that is, $\sigma: [n] \mapsto [n]$, and the second equality follows from the definition of a permutation matrix.  
 
-To deal with the nonlinear of the constraints, we relax them to require that $Q$ merely be a doubly stochastic matrix.  A matrix is doubly stochastic if both its rows and columns sum to unity.  This is a ``natural'' relaxation in the sense that permutation matrices are doubly stochastic matrices, in fact, permutation matrices are the extreme points of the set of all doubly stochastic matrices, which we denote by $\mc{D}$.  
+In fact, solving GIP is known to be $NP$ incomplete (meaning it is not known to be in either $P$ or $NP$) \cite{??}.  Therefore, instead of trying to solve this exactly, we make approximations to make it easier.  
 
-Given the above two relaxations, we instead try to solve:
-\begin{align} \label{eq:a}
-	\mh{Q} = \argmin_{Q \in \mc{D}} \norm{A Q\T - B}_F^2 = \argmin_{Q} \norm{A Q\T - B}_F^2 - \lambda (1 - \tfrac{1}{n}\mb{1}\T Q) - \lambda (1 - \tfrac{1}{n}\mb{1}\T Q\T),
+
+Because the primary difficulty is the constraint set, the natural simplification is to relax it.  And because the set of permutation matrices is a subset of the doubly stochastic matrices, we define the approximate quadratic assignment problem:
+\begin{align} \label{eq:tqap}
+	\mh{Q} = \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F
 \end{align}
-where the second equality follows from replacing the linear constraint with its equivalent Lagrange multipliers.  If $\mh{Q}$ is not a permutation matrix, then projecting it onto its nearest permutation matrix is linear assignment problem:
+where $\mc{D}$ is the set of doubly stochastic matrices.  Note that when the permutation matrix constraint it relaxed, the equivalence relation shown in Eq. \eqref{eq:qap} no longer holds, that is:
+\begin{align} \label{eq:nqap}
+	\argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F \neq \argmin_{Q \in \mc{D}} - tr(B\T QAQ\T) - tr(QAQ\T B)
+\end{align}
+
+Nonetheless, we proceed by trying to solve the right-hand-side of Eq. \eqref{eq:nqap}, considering it an auxiliary function for which we can compute gradients and ascend a likelihood, unlike the permutation constrained case.  
+
+The general strategy is a constrained gradient ascent, sometimes referred to as successive linear programming (SLP) \cite{}, or the Frank-Wolfe (FW) algorithm, which is a particular succesive linear programing (SLP) algorithm for quadratic programs with linear constraints.  With each step $k$, the gradient of the argument with respect to $Q$ is given by:
+\begin{align} \label{eq:grad}
+	\nabla_Q^{(k)} = A Q^{(k)} B\T + A\T Q^{(k)} B, 
+\end{align}
+see \cite{MDS} pg. 168 for details.  In the typical gradient ascent approach, one simply ascends the gradient until a fixed point is reached.  However, this is not necessarily the case in the more general SLP setting.  For this problem, there may not be a permutation matrix or a doubly stochastic matrix along this gradient.  Therefore, we find the doubly stochastic matrix that is closest to the gradient, by finding the doubly stochastic matrix whose direction is closest to the gradient.  Noting that that direction may be computed by the dot product operator, we have:
+\begin{align}\label{eq:LAP}
+	W^{(k)} = \argmin_{W^{(k)} \in \mc{D}} \sum_{i,j=1}^m 	\left( 	\nabla_Q^{(k)}\circ W^{(k)} \right)_{ij},
+\end{align}
+making $W^{(k)}$ the search direction.  Interestingly, although $W^{(k)}$ was constrained only to be a doubly stochastic matrix, it is guaranteed to be a permutation.   The intuition for this follows because the permutation matrices are the vertices of the set of doubly stochastic matrices,   thus the minimum must be a permutation matrix.  Note that Eq. \eqref{eq:LAP} is equivalent to the linear assignment problem (LAP) \cite{}.  Efficiently algorithms are available for solving LAP, including the Hungarian algorithm, which requires $\mc{O}(n^3)$ in general \cite{}. See appendix for more details.  More efficient algorithms are available for certain special cases, that is, whenever the matrix-vector multiplication operation is fast (for example, when both $A$ and $B$ are sparse).  Given the direction, one can then perform a line search to find the doubly stochastic matrix that minimizes the objective function along that direction:
 \begin{align}
-	\mh{Q}_{LAP} = \argmin_{Y \in \mc{Q}} \norm{\mh{Q} - Y}_F^2 = \argmin_{Y \in \mc{Q}} Y\T \mh{Q}
+	\alpha^{(k)} = \argmin_{\alpha \in [0,1]} \mc{L}(Q^{(k)} + \alpha^{(k)} W^{(k)})
 \end{align}
-which can be solved using the Hungarian algorithm in $\mc{O}(n^3)$, as shown in the below lemma. XXX: do we need this additional step? seems like we should not need it, but i don't see how.
-
-\begin{Lem}
-  Given $Y \in \Real^{n \times n}$, the projection of $Y$ onto $\mc{Q}_n$ can
-  be obtained by solving the linear assignment problem:
-  $$ 
-  \mh{W}= \argmin_{W \in \Pi_n} \norm{ W-Y}_F = \argmax_{W \in \mc{D}_n}  tr(YW\T)
-  %   \Pi_n }\rbrace \equiv {\text{\rm arg }} \max_W \lbrace{ tr(YW^t)
-  %   \mid W \in \mathcal D_n }\rbrace .
-  $$
-  Proof: Since $W \in \Pi_n \subset \mathcal O$, we have
-  \begin{align}
-  \norm{W-Y}_F^2 &= tr( (W-Y)\T (W-Y)) \\
-  &= (\norm{Y}_F^2 + \norm{I}_F^2) - 2tr( Y W\T ). \qed
-  \end{align}
-\end{Lem}
-
-(XXX: I don't know the trace rule.  perhaps somebody can prove that to me, or point it out?)
-
-
-% subsubsection linear_assignment_problem_solution (end)
-
-
-\subsubsection{Bilinear assignment problem solution} % (fold)
-\label{ssub:bilinear_assignment_problem_solution}
-
-
-A different strategy is to simply neglect the non-convexity of the argument, and merely relax the constraints to be linear.  This results in finding a local maximum, but if the initial conditions are chosen wisely, then this local maximum might be better than the global maximum found in the linear assignment approach.  Furthermore, it is desirable to permute both the rows and columns together, and the linear assignment approach only permutes one or the other.  Thus, making only the constraint relaxation, we have:
-\begin{align} \label{eq:D}
-	\mh{Q} = \argmin_{Q \in \mc{D}} \mc{L}(Q) = \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}_F^2 
+This can be performed exactly, because $\mc{L}$ is a quadratic function.  Finally, the new estimated doubly stochastic matrix is given by:
+\begin{align}\label{eq:update}
+	Q^{(k+1)} = Q^{(k)} + \alpha^{(k)} W^{(k)}
 \end{align}
-The Frank-Wolfe (FW) algorithm is a successive linear programming algorithm specifically designed to solve quadratic programming problems with linear constraints \cite{??}.  Here, the problem is not quadratic in $Q$, rather, it is a 4th order polynomial function of $Q$.  Thus, FW will not (in general) achieve the global optimal.  Regardless, it proceeds as follows:
+Eqs. \eqref{eq:grad}--\eqref{eq:update} are iterated until convergence, computational budget limits, or some other stopping criterion is met.  Note that while $Q^{(k+1)}$ is not a permutation matrix, we do not project $Q^{(k+1)}$ back onto the set of permutation matrices between each iteration, as that projection is a LAP, and requires $\mc{O}(n^3)$ time, in general.  Further, 
+% 
+% 
+% A different strategy is to simply neglect the non-convexity of the argument, and merely relax the constraints to be linear.  This results in finding a local maximum, but if the initial conditions are chosen wisely, then this local maximum might be better than the global maximum found in the linear assignment approach.  Furthermore, it is desirable to permute both the rows and columns together, and the linear assignment approach only permutes one or the other.  Thus, making only the constraint relaxation, we have:
+% \begin{align} \label{eq:D}
+% 	\mh{Q} = \argmin_{Q \in \mc{D}} \mc{L}(Q) = \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}_F^2 
+% \end{align}
+% The Frank-Wolfe (FW) algorithm is a successive linear programming algorithm specifically designed to solve quadratic programming problems with linear constraints \cite{??}.  Here, the problem is not quadratic in $Q$, rather, it is a 4th order polynomial function of $Q$.  Thus, 
+FW will not (in general) achieve the global optimal.  
+% Regardless, it proceeds as follows:
+Pseudocode for the FW algorithm to approximately solve the QAP is provided below:
 \begin{Alg}[Frank-Wolfe Algorithm (FW)]
 Given $ Q^{(1)} \in \mathcal D_m $.
 %\roster \widestnumber\item{xxxxxxxx} \raggedright
 \item {Step 0:} Let $k$ = 1.
 
-\item {Step 1:} Let $\nabla_Q^{(k-1)} = A Q^{(k-1)} B\T + A\T Q^{(k-1)} B$.  
+\item {Step 1:} Let $\nabla_Q^{(k)} = A Q^{(k-1)} B\T + A\T Q^{(k-1)} B$.  
 
 \item {Step 2:} Compute $W^{(k)}$  by solving the
 linear assignment problem:
@@ -227,47 +231,29 @@ linear assignment problem:
 	% \lbrace { 
 	\sum_{i,j=1}^m 
 	\left( 
-	\nabla_Q^{(k-1)}\circ W^{(k)}
+	\nabla_Q^{(k)}\circ W^{(k)}
 	 \right)_{ij}
 	% }\rbrace	
 \end{align}
 % $$
-\item {Step 3:} Let $d^{(k)} = W^{(k)} - Q^{(k-1)}. $
-\item {Step 4:} Find $\alpha^{(k)} \in [0,1]$ such that
+% \item {Step 3:} Let $d^{(k)} = W^{(k)} - Q^{(k-1)}. $
+\item {Step 3:} Find $\alpha^{(k)} \in [0,1]$ such that
 $$\alpha^{(k)}=\argmin_{\alpha^{(k)}}
-\mc{L} (Q^{(k)} + \alpha^{(k)} d^{(k)}).
+\mc{L} (Q^{(k)} + \alpha^{(k)} W^{(k)}).
 $$
-\item {Step 5:} Let
+\item {Step 4:} Let
 
-$$ Q^{(k+1)} = Q^{(k)} + \alpha^{(k)} d^{(k)}. $$
-\item {Step 6:} 
+$$ Q^{(k+1)} = Q^{(k)} + \alpha^{(k)} W^{(k)}. $$
+\item {Step 5:} 
 If $\norm d^{(k)}_{P} \norm \le \epsilon$ or $\alpha^{(k)}=0$ or $k=k_{\max}$
 then stop; else $k$ = $k$ + 1 and go to step 1.
 \end{Alg}
 
-
-
-\begin{Rem}
-%\item This implementation is based upon a stop rule that uses the
-%norm of the gradient projected onto the doubly stochastic constraint set;
-%consequently, any solution produced by the above algorithm satisfies
-%the first-order necessary optimality conditions.
-%Other stop rules can be used that require less work than the projection and
-%will be considered when the general QAP is solved later in the paper.
-
-\begin{enumerate}
-\item The above algorithm is effectively Netwon's method, applied to the this problem, with linear constraints.  
-\item With each step, $Q^{(k)}$ is not (in general) a permutation matrix.  
-\item One can project $Q^{(k)}$ into the space of permutation matrices at each step, or one can merely project the final $Q^{(k_{max})}$ (see below Lemma).
-\item Step 3 is a ``line search;'' however, as the objective function is linear, the optimum $\alpha$ can be found exactly.
-%\item It is well-known that the algorithm is quadratically
-%convergent when in the neighborhood of a KKT point.
-\end{enumerate}
-\end{Rem}
-
-
-% subsubsection bilinear_assignment_problem_solution (end)
-
+That the objective function is not necessarily convex is clear by virtue of computing the Hessian of the argument in \eqref{eq:a} with respect to $Q$:
+\begin{align}
+	\nabla_Q^2 \mc{L} =  B \otimes A + B\T \otimes A\T,
+\end{align}
+where $\otimes$ indicates the Kronecker product, which is not positive definite (in general).
 % subsection graph_isomorphism_approach (end)
 
 
@@ -426,15 +412,75 @@ achieved for our unlabeled scenario using this assignment algorithm, but perform
 
 % subsection latent_permutation_matrix_approach (end)
 
-
-
-
-
 % subsection graph_invariant_based_classifiers (end)
 
 % section methods (end)
 
+
+\section{Discussion} % (fold)
+\label{sec:discussion}
+
+
+other graph matching approaches---inexact, get you closer
+
+incorporating priors using distance
+
+parallel implementations for large graphs
+
+% section discussion (end)
+
 \clearpage
+\appendix
+\section{assignment problem solutions} % (fold)
+\label{sec:assignment_problem_solutions}
+
+% section assignment_problem_solutions (end)
+
+\subsection{Linear assignment problem solution} % (fold)
+\label{ssub:linear_assignment_problem_solution}
+
+% Solving \eqref{eq:a} is difficult for two reasons: (i) the objective function is not necessarily convex, and (ii) the constraints are nonlinear.  That the objective function is not necessarily convex is clear by virtue of computing the Hessian of the argument in \eqref{eq:a} with respect to $Q$:
+% \begin{align}
+% 	\nabla_Q^2 \mc{L} =  B \otimes A + B\T \otimes A\T,
+% \end{align}
+% where $\otimes$ indicates the Kronecker product, which is not positive definite (in general).  To resolve non-convexity, we can simply drop one of the $Q$'s from \eqref{eq:a}.  The implication of this is that instead of permuting both rows and columns, we only permute one or the other.  While this may seem like a totally ridiculous thing to do, crazier things have worked.  Given this simplification, the argument is not merely convex, but it is quadratic in $Q$, making solving it exactly feasible (independent of the constraints).  
+% 
+% To deal with the nonlinear of the constraints, we relax them to require that $Q$ merely be a doubly stochastic matrix.  A matrix is doubly stochastic if both its rows and columns sum to unity.  This is a ``natural'' relaxation in the sense that permutation matrices are doubly stochastic matrices, in fact, permutation matrices are the extreme points of the set of all doubly stochastic matrices, which we denote by $\mc{D}$.  
+
+% Given the above two relaxations, we instead try to solve:
+% \begin{align} \label{eq:a}
+% 	\mh{Q} = \argmin_{Q \in \mc{D}} \norm{A Q\T - B}_F^2 = \argmin_{Q} \norm{A Q\T - B}_F^2 - \lambda (1 - \tfrac{1}{n}\mb{1}\T Q) - \lambda (1 - \tfrac{1}{n}\mb{1}\T Q\T),
+% \end{align}
+% where the second equality follows from replacing the linear constraint with its equivalent Lagrange multipliers.  If $\mh{Q}$ is not a permutation matrix, then projecting it onto its nearest permutation matrix is 
+linear assignment problem:
+\begin{align}
+	\mh{Q}_{LAP} = \argmin_{Y \in \mc{Q}} \norm{\mh{Q} - Y}_F^2 = \argmin_{Y \in \mc{Q}} tr (Y\T \mh{Q})
+\end{align}
+which can be solved using the Hungarian algorithm in $\mc{O}(n^3)$, as shown in the below lemma. 
+
+\begin{Lem}
+  Given $Y \in \Real^{n \times n}$, the projection of $Y$ onto $\mc{Q}_n$ can
+  be obtained by solving the linear assignment problem:
+  $$ 
+  \mh{W}= \argmin_{W \in \Pi_n} \norm{ W-Y}_F = \argmax_{W \in \mc{D}_n}  tr(YW\T)
+  %   \Pi_n }\rbrace \equiv {\text{\rm arg }} \max_W \lbrace{ tr(YW^t)
+  %   \mid W \in \mathcal D_n }\rbrace .
+  $$
+  Proof: Since $W \in \Pi_n \subset \mathcal O$, we have
+  \begin{align}
+  \norm{W-Y}_F^2 &= tr( (W-Y)\T (W-Y)) \\
+  &= (\norm{Y}_F^2 + \norm{I}_F^2) - 2tr( Y W\T ). \qed
+  \end{align}
+\end{Lem}
+where the trace rule follows from \cite{HornJohnson}.
+
+
+
+
+% subsubsection bilinear_assignment_problem_solution (end)
+
+% subsubsection linear_assignment_problem_solution (end)
+
 \section{other} % (fold)
 \label{sec:other}
 
@@ -1046,6 +1092,8 @@ sum(cuc2[[4]])
 
 \end{verbatim}
 
+
+
 \newpage
 
 \subsection{move this \dots}
@@ -1090,7 +1138,7 @@ Note that $g_{\mcE}(G;\mcT)$ should dominate $g_{NB}(G;\mcT)$.
 % \appendix
 \clearpage
 
-\bibliography{/Users/joshyv/Research/papers/meta/biblist}
+\bibliography{/Users/joshyv/Research/latex/biblist}
 \addcontentsline{toc}{section}{References}
 %\bibliographystyle{apalike}
 \bibliographystyle{ieeetr}
