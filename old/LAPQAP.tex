@@ -1,5 +1,4 @@
-\input{/Users/jovo/Research/latex/latex_paper.tex} 
-% \input{latex_paper} 
+\input{latex_paper.tex} 
 
 %\documentstyle[12pt,twoside,fleqn,espcrc1]{article}
 %{\catcode`\@=11\global\let\reset@font\relax}
@@ -19,7 +18,7 @@
 %\theoremstyle{change}
 %\theorembodyfont{\itshape}
 \newtheorem{Def}{Definition}[section]
-\title{On the LAP Relaxations of QAP}
+\title{QAP, LAP, and Bayes Plugins}
 \author
 {John~M.~Conroy}
 
@@ -39,7 +38,7 @@
 \renewcommand{\textfraction}{0.0}
 %\setlength{\textfloatsep}{2\baselineskip}
 
-% \input mydefs
+\input mydefs
 % \input epsf
 %\UseAMSsymbols\TagsOnRight\TopOrBottomTagsOnSplits
 % ----------------------------------------------------------------------
@@ -47,7 +46,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%\section{LAP as an Approximation to the QAP}
+
+\section{LAP as an Approximation to the QAP}
 
 In this note we discuss the linear assignment problem (LAP) 
 method  as applied to a class of the quadratic assignment problems (QAPs) that
@@ -61,7 +61,7 @@ of the quadratic function in for symmetric instances of the QAP.
  Recall, the QAP is defined by the following, where we seek to 
  find a permutation matrix $\mh{Q}$ such that
  \begin{align} \label{eq:QAP}
-	\mh{Q}_{\text{QAP}} = \argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F
+	\mh{Q}_{\text{QAP}} = \argmin_{Q \in \mc{Q}} \norm Q A Q\T - B \norm ^2_F
 \end{align}
 
  
@@ -70,14 +70,14 @@ of the quadratic function in for symmetric instances of the QAP.
 We are given graphs generated from one of two classes of
  stochastic block models.    Our model problem has the following parameters: $n=10$, so $\eta^y \in (0,1)^{n\times n}$.  We further assume a stochastic block model, with two blocks, for both classes.  For class 0, $\eta_{ij}^0=q_0=0.25$ for $i,j \in \{1,2,3\}$, and for class 1, $\eta_{ij}^1=q_1=0.75$ for $i,j \in \{1,2,3\}$.  In both classes, $\eta_{ij}=p=0.5$ for $i,j \in \{4,\ldots 10\}$.   For  training data we are given a sample matrix for
  each class ($B_{0}$ and $B_{1}$); the parameters for the block model are
- known to classifier.    In each trail of the simulation we are given a matrix
+ unknown to classifier.    In each trail of the simulation we are given a matrix
  $A$ and then use an approximate algorithm to find a 
 approximate solutions to the 2 QAPs with $B=B_{i}, i=0,1.$ 
 
 
 The LAP approximation  for this class problem is given by the following equation:
 \begin{align} \label{eq:LAP}
-	\mh{Q}^{\text{LAP}}_i = \argmin_{Q \in \mc{Q}} \norm{A Q\T - B_{i}}^2_F,~i=0,1.
+	\mh{Q}_{\text{LAP}} = \argmin_{Q \in \mc{Q}} \norm A Q\T - B_{i} \norm ^2_F,~i=0,1.
 \end{align}
 
 As the LAP approximation applies just column operations
@@ -174,8 +174,64 @@ experiments was $\frac{1}{n} J,$ the ``flat'' doubly stochastic matrix.
 %
 %
 
+\section{Bayes Plug-In}
+We illustrate how to formulate the QAP to serve as a Bayes plugin.  In particular,
+if the parameters of the classes $\eta_{ij}^0 >0$ and $\eta _{ij}^1> 0$ are known for both
+classes, a QAP for each class can be formulated whose solution finds a permutation 
+that maximizes the log probability of the observed edges in the graph, conditional on a class label.
+Thus, given an   
+binary matrix $A$ representing the adjacency matrix, we consider the two QAP problems for $y=0$ and $y=1.$
 
+$$
+\mh {Q^y}_{QAP}=\argmin_{Q}\lbrace { \sum_{i,j=1}^m \left(Q H^y Q\T \circ A \right)_{ij}
+\mid Q \in {\mc Q} }\rbrace
+$$
+where
+$$H^y_{ij}=\log (\eta_{ij}^y).$$
+The solutions to these QAPs return the $\log(P(A|y))$ for $y=0,1.$  Given priors $P(y)$ and Bayes rule 
+we can readily compute the posterior probabliities of the class labels 0 and 1 and thereby form a Bayes plugin classifier.
+\section{C-elegans Results}
+To further test the approximate solution of the QAP we turn to the c-elegans data.  Three representations of the data expressing the neurons interrationships are available.  While in each case,
+there are 279 neurons in the model their connectivity is represented differently as a 
+weighted graph (sparse matrix).  The below table shows some of the characteristics.  
+ We note in particular, that
+the Agordered representation has the fewest edges and unique edge weights.
 
+\begin{table}[h]
+\begin{tabular}{|c|c|c|}
+
+\hline
+Graph   &  Number of Edges & Number of Unique Edge Weights\\
+\hline
+Agordered &    1031 &      11  \\
+Ainittordered &    2194 &      29  \\
+        Ac &    2194 &      37  \\
+\hline 
+\end{tabular} 
+\end{table}
+
+100 random permututations were used to generate
+300 test problems, 100 for each representation.  A test problem consisted of two matrices,
+the original and a permuted verion of the original.   Finding the unknown permuation is
+an instance of a quadratic assignment problem.  In each test problem the Frank-Wolfe method
+was applied starting from the ``flat" double-stochastic matrix.  For Agtordered a maximum of 20 
+iteration was done and for the remaining formulations a maximum of 5 iterations were done.
+The number of iterations was chosen so that the average run time was approximately the same.  For
+Agordered the FW method failed to converge in less than 20 iterations in 73 of the 100 problems.  In contrast,  convergence was achieved in less than 5 iterations for both of the richer models.
+The below table gives a summary of the results.  As seen in each case for the richer models
+the assignment of the neurons was correctly found by the FW method.
+
+\begin{table}[h]
+\begin{tabular}{|c|c|c|c|}
+\hline
+Graph & Mean Time & Mean Iterations & Mean Correct \\
+\hline
+Agtordered &   82.95 &   19.16 &     162 \\
+Ainittordered &   79.90 &    3.00 &     279 \\
+        Ac &   79.98 &    3.57 &     279 \\
+\hline 
+\end{tabular} 
+\end{table}
 \end{document}
 
 

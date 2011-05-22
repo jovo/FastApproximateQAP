@@ -15,6 +15,7 @@
 \newcommand{\hatL}{\widehat{L}}
 \newcommand{\mhP}{\widehat{\PP}}
 \newcommand{\tildeA}{\widetilde{A}}
+\newcommand{\GG}{\mathbb{G}}
 
 \newcommand{\defa}{\begin{defi}}
 \newcommand{\defb}{\end{defi}}
@@ -38,6 +39,9 @@
 
 \maketitle
 % \tableofcontents
+
+
+
 \begin{abstract}
 	
 Many kinds of data are better characterized by graphs than vectors, including social networks, telecommunication grids, and brains.  It is often desirable to compare two or more of these graphs with one another.  Unfortunately, sometimes these graphs are unlabeled, meaning there is no known correspondence between vertices on one graph and vertices on another graph. In such scenarios, making comparisons is relatively difficult, as it typically first requires at least approximately solving the ``graph matching'' or ``graph isomorphism'' problem.  
@@ -160,84 +164,39 @@ where $\sigma$ is a permutation, that is, $\sigma: [n] \mapsto [n]$, and the sec
 In fact, solving GIP is known to be $NP$ incomplete (meaning it is not known to be in either $P$ or $NP$) \cite{??}.  Therefore, instead of trying to solve this exactly, we make approximations to make it easier.  
 
 
-Because the primary difficulty is the constraint set, the natural simplification is to relax it.  And because the set of permutation matrices is a subset of the doubly stochastic matrices, we define the approximate quadratic assignment problem:
-\begin{align} \label{eq:tqap}
-	\mh{Q} = \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F
-\end{align}
-where $\mc{D}$ is the set of doubly stochastic matrices.  Note that when the permutation matrix constraint it relaxed, the equivalence relation shown in Eq. \eqref{eq:qap} no longer holds, that is:
-\begin{align} \label{eq:nqap}
-	\argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F \neq \argmin_{Q \in \mc{D}} - tr(B\T QAQ\T) - tr(QAQ\T B)
-\end{align}
-
-Nonetheless, we proceed by trying to solve the right-hand-side of Eq. \eqref{eq:nqap}, considering it an auxiliary function for which we can compute gradients and ascend a likelihood, unlike the permutation constrained case.  
-
-The general strategy is a constrained gradient ascent, sometimes referred to as successive linear programming (SLP) \cite{}, or the Frank-Wolfe (FW) algorithm, which is a particular succesive linear programing (SLP) algorithm for quadratic programs with linear constraints.  With each step $k$, the gradient of the argument with respect to $Q$ is given by:
-\begin{align} \label{eq:grad}
-	\nabla_Q^{(k)} = A Q^{(k)} B\T + A\T Q^{(k)} B, 
-\end{align}
-see \cite{MDS} pg. 168 for details.  In the typical gradient ascent approach, one simply ascends the gradient until a fixed point is reached.  However, this is not necessarily the case in the more general SLP setting.  For this problem, there may not be a permutation matrix or a doubly stochastic matrix along this gradient.  Therefore, we find the doubly stochastic matrix that is closest to the gradient, by finding the doubly stochastic matrix whose direction is closest to the gradient.  Noting that that direction may be computed by the dot product operator, we have:
-\begin{align}\label{eq:LAP}
-	W^{(k)} = \argmin_{W^{(k)} \in \mc{D}} \sum_{i,j=1}^m 	\left( 	\nabla_Q^{(k)}\circ W^{(k)} \right)_{ij},
-\end{align}
-making $W^{(k)}$ the search direction.  Interestingly, although $W^{(k)}$ was constrained only to be a doubly stochastic matrix, it is guaranteed to be a permutation.   The intuition for this follows because the permutation matrices are the vertices of the set of doubly stochastic matrices,   thus the minimum must be a permutation matrix.  Note that Eq. \eqref{eq:LAP} is equivalent to the linear assignment problem (LAP) \cite{}.  Efficiently algorithms are available for solving LAP, including the Hungarian algorithm, which requires $\mc{O}(n^3)$ in general \cite{}. See appendix for more details.  More efficient algorithms are available for certain special cases, that is, whenever the matrix-vector multiplication operation is fast (for example, when both $A$ and $B$ are sparse).  Given the direction, one can then perform a line search to find the doubly stochastic matrix that minimizes the objective function along that direction:
-\begin{align}
-	\alpha^{(k)} = \argmin_{\alpha \in [0,1]} \mc{L}(Q^{(k)} + \alpha^{(k)} W^{(k)})
-\end{align}
-This can be performed exactly, because $\mc{L}$ is a quadratic function.  Finally, the new estimated doubly stochastic matrix is given by:
-\begin{align}\label{eq:update}
-	Q^{(k+1)} = Q^{(k)} + \alpha^{(k)} W^{(k)}
-\end{align}
-Eqs. \eqref{eq:grad}--\eqref{eq:update} are iterated until convergence, computational budget limits, or some other stopping criterion is met.  Note that while $Q^{(k+1)}$ is not a permutation matrix, we do not project $Q^{(k+1)}$ back onto the set of permutation matrices between each iteration, as that projection is a LAP, and requires $\mc{O}(n^3)$ time, in general.  Further, 
+ % Pseudocode for the FW algorithm to approximately solve the QAP is provided below:
+% \begin{Alg}[Frank-Wolfe Algorithm (FW)]
+% Given $ Q^{(1)} \in \mathcal D_m $.
+% %\roster \widestnumber\item{xxxxxxxx} \raggedright
+% \item {Step 0:} Let $k$ = 1.
 % 
+% \item {Step 1:} Let $\nabla_Q^{(k)} = A Q^{(k-1)} B\T + A\T Q^{(k-1)} B$.  
 % 
-% A different strategy is to simply neglect the non-convexity of the argument, and merely relax the constraints to be linear.  This results in finding a local maximum, but if the initial conditions are chosen wisely, then this local maximum might be better than the global maximum found in the linear assignment approach.  Furthermore, it is desirable to permute both the rows and columns together, and the linear assignment approach only permutes one or the other.  Thus, making only the constraint relaxation, we have:
-% \begin{align} \label{eq:D}
-% 	\mh{Q} = \argmin_{Q \in \mc{D}} \mc{L}(Q) = \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}_F^2 
+% \item {Step 2:} Compute $W^{(k)}$  by solving the
+% linear assignment problem:
+% % $$
+% \begin{align}
+% 	W^{(k)} = \argmin_{W^{(k)} \in \mc{D}} %{\text{\rm arg }} \min_{W^{(k)}}
+% 	% \lbrace { 
+% 	\sum_{i,j=1}^m 
+% 	\left( 
+% 	\nabla_Q^{(k)}\circ W^{(k)}
+% 	 \right)_{ij}
+% 	% }\rbrace	
 % \end{align}
-% The Frank-Wolfe (FW) algorithm is a successive linear programming algorithm specifically designed to solve quadratic programming problems with linear constraints \cite{??}.  Here, the problem is not quadratic in $Q$, rather, it is a 4th order polynomial function of $Q$.  Thus, 
-FW will not (in general) achieve the global optimal.  
-% Regardless, it proceeds as follows:
-Pseudocode for the FW algorithm to approximately solve the QAP is provided below:
-\begin{Alg}[Frank-Wolfe Algorithm (FW)]
-Given $ Q^{(1)} \in \mathcal D_m $.
-%\roster \widestnumber\item{xxxxxxxx} \raggedright
-\item {Step 0:} Let $k$ = 1.
-
-\item {Step 1:} Let $\nabla_Q^{(k)} = A Q^{(k-1)} B\T + A\T Q^{(k-1)} B$.  
-
-\item {Step 2:} Compute $W^{(k)}$  by solving the
-linear assignment problem:
+% % $$
+% % \item {Step 3:} Let $d^{(k)} = W^{(k)} - Q^{(k-1)}. $
+% \item {Step 3:} Find $\alpha^{(k)} \in [0,1]$ such that
+% $$\alpha^{(k)}=\argmin_{\alpha^{(k)}}
+% \mc{L} (Q^{(k)} + \alpha^{(k)} W^{(k)}).
 % $$
-\begin{align}
-	W^{(k)} = \argmin_{W^{(k)} \in \mc{D}} %{\text{\rm arg }} \min_{W^{(k)}}
-	% \lbrace { 
-	\sum_{i,j=1}^m 
-	\left( 
-	\nabla_Q^{(k)}\circ W^{(k)}
-	 \right)_{ij}
-	% }\rbrace	
-\end{align}
-% $$
-% \item {Step 3:} Let $d^{(k)} = W^{(k)} - Q^{(k-1)}. $
-\item {Step 3:} Find $\alpha^{(k)} \in [0,1]$ such that
-$$\alpha^{(k)}=\argmin_{\alpha^{(k)}}
-\mc{L} (Q^{(k)} + \alpha^{(k)} W^{(k)}).
-$$
-\item {Step 4:} Let
-
-$$ Q^{(k+1)} = Q^{(k)} + \alpha^{(k)} W^{(k)}. $$
-\item {Step 5:} 
-If $\norm d^{(k)}_{P} \norm \le \epsilon$ or $\alpha^{(k)}=0$ or $k=k_{\max}$
-then stop; else $k$ = $k$ + 1 and go to step 1.
-\end{Alg}
-
-That the objective function is not necessarily convex is clear by virtue of computing the Hessian of the argument in \eqref{eq:a} with respect to $Q$:
-\begin{align}
-	\nabla_Q^2 \mc{L} =  B \otimes A + B\T \otimes A\T,
-\end{align}
-where $\otimes$ indicates the Kronecker product, which is not positive definite (in general).
-% subsection graph_isomorphism_approach (end)
-
+% \item {Step 4:} Let
+% 
+% $$ Q^{(k+1)} = Q^{(k)} + \alpha^{(k)} W^{(k)}. $$
+% \item {Step 5:} 
+% If $\norm d^{(k)}_{P} \norm \le \epsilon$ or $\alpha^{(k)}=0$ or $k=k_{\max}$
+% then stop; else $k$ = $k$ + 1 and go to step 1.
+% \end{Alg}
 \subsection{Graph invariant based classifiers (it is not obvious to me that it is even worth comparing the graph invariant classification, as this study is really about performance degradation when $Q$ is unknown, and the utility of additional iterations)} % (fold)
 \label{sub:graph_invariant_based_classifiers}
 
@@ -278,18 +237,6 @@ which normalizes differences by their magnitude, similar to z-scores for compari
 
 
 
-\paragraph{Homogeneous kidney-egg simulation} % (fold)
-\label{par:homogeneous_kidney_egg_simulation}
-
-For the homogeneous kidney-egg simulations, we assume $n=10$, so $\eta^y \in (0,1)^{n\times n}$.  We further assume a stochastic block model, with two blocks, for both classes.  For class 0, $\eta_{ij}^0=q_0=0.25$ for $i,j \in [3]$, and for class 1, $\eta_{ij}^1=q_1=0.75$ for $i,j \in [3]$.  In both classes, $\eta_{ij}=p=0.5$ for $i,j \in \{4,\ldots 10\}$.  See Figure \ref{fig:models} (top row) for a graphical depiction of this model.  
-
-
-% paragraph homogeneous_kidney_egg_simulation (end)
-
-\paragraph{Heterogeneous simulation} % (fold)
-\label{par:homogeneous_kidney_egg_simulation}
-
-For the heterogeneous simulations, we assume $n=10$, so $\eta^y \in (0,1)^{n\times n}$.  We further assume that each $\eta_{ij}^y \overset{iid}{\sim}$Uniform$(0,1)$.  See Figure \ref{fig:models} (bottom) row for a graphical depiction of this model.
 
 
 
@@ -319,34 +266,6 @@ to the best known solution as given in column 2 and the Path algorithm  \cite{Pa
 $$X^{(0)}=\frac {1}{2n} + \frac{1}{2} S$$
 where $S$ is a doubly stochastic matrix as computed by running Sinkhorn balancing on a uniform $[0,1]$ matrix.
 
-\begin{table}[htdp]
-\caption{Comparison of Frank-Wolfe with Minimum Solution and Path Algorithm}
-\begin{center}
-\begin{tabular}{|r|r||r|r|r|r|r|}
-\hline
-Problem  &   Min    & FW$_{100}$&FW$_{3}$&FW$_{2}$&FW$_{1}$&Path\\
-\hline
-    chr12c &   11156 &   12176 &   13072 &   13072 &   13072 &   18048\\
-    chr15a &    9896 &    9896 &   17272 &   17272 &   27584 &   19086\\
-    chr15c &    9504 &   10960 &   14274 &   14274 &   17324 &   16206\\
-    chr20b &    2298 &    2786 &    3068 &    3068 &    3068 &    5560\\
-    chr22b &    6194 &    7218 &    7876 &    7876 &    8482 &    8500\\
-    esc16b &     292 &     292 &     294 &     294 &     320 &     300\\
-     rou12 &  235528 &  235528 &  238134 &  253684 &  253684 &  256320\\
-     rou15 &  354210 &  356654 &  371458 &  371458 &  371458 &  391270\\
-     rou20 &  725522 &  730614 &  743884 &  743884 &  743884 &  778284\\
-    tai10a &  135028 &  135828 &  148970 &  157954 &  157954 &  152534\\
-    tai15a &  388214 &  391522 &  397376 &  397376 &  397376 &  419224\\
-    tai17a &  491812 &  496598 &  511574 &  511574 &  529134 &  530978\\
-    tai20a &  703482 &  711840 &  721540 &  721540 &  734276 &  753712\\
-    tai30a & 1818146 & 1844636 & 1890738 & 1894640 & 1894640 & 1903872\\
-    tai35a & 2422002 & 2454292 & 2460940 & 2460940 & 2460940 & 2555110\\
-    tai40a & 3139370 & 3187738 & 3194826 & 3194826 & 3227612 & 3281830\\
-    \hline
-\end{tabular}
-\end{center}
-\label{tab:fwpath}
-\end{table}%
 
 
 \subsection{Simulation results} % (fold)
@@ -362,20 +281,20 @@ achieved for our unlabeled scenario using this assignment algorithm, but perform
 
 
 \begin{figure}[htbp]
-	\centering		\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/homo_kidney_egg_params}
+	\centering		\includegraphics[width=1.0\linewidth]{/Users/jovo/Research/figs/sims/unlabeled/homo_kidney_egg_params}
 	\caption{model}
 	\label{fig:models}
 \end{figure}
 
 \begin{figure}[htbp]
-	\centering			\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/homo_kidney_egg_Lhats}
+	\centering			\includegraphics[width=1.0\linewidth]{/Users/jovo/Research/figs/sims/unlabeled/homo_kidney_egg_Lhats}
 	\caption{Lhats for homo kidney egg}
 	\label{fig:figs_Sims_unlabeled_LPvsFW500}
 \end{figure}
 
 
 \begin{figure}[!ht]
-\centering \includegraphics[width=.9\linewidth]{../../../figs/graph_sims/unlabeled/homo_kidney_egg_obj}
+\centering \includegraphics[width=.9\linewidth]{/Users/jovo/Research/figs/sims/unlabeled/homo_kidney_egg_obj}
 \caption{objective function for simulation 1}
 \label{fig:sim1_params}
 \end{figure}
@@ -389,20 +308,20 @@ achieved for our unlabeled scenario using this assignment algorithm, but perform
 \label{ssub:heterogeneous_simulations}
 
 \begin{figure}[htbp]
-	\centering		\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/hetero_params}
+	\centering		\includegraphics[width=1.0\linewidth]{/Users/jovo/Research/figs/sims/unlabeled/hetero_params}
 	\caption{hetero model}
 	\label{fig:models}
 \end{figure}
 
 \begin{figure}[htbp]
-	\centering			\includegraphics[width=1.0\linewidth]{../../../figs/graph_sims/unlabeled/hetero_Lhats}
+	\centering			\includegraphics[width=1.0\linewidth]{/Users/jovo/Research/figs/sims/unlabeled/hetero_Lhats}
 	\caption{Lhats for hetero}
 	\label{fig:figs_Sims_unlabeled_LPvsFW500}
 \end{figure}
 
 
 \begin{figure}[!ht]
-\centering \includegraphics[width=.9\linewidth]{../../../figs/graph_sims/unlabeled/hetero_obj}
+\centering \includegraphics[width=.9\linewidth]{/Users/jovo/Research/figs/sims/unlabeled/hetero_obj}
 \caption{objective function for hetero simulation}
 \label{fig:sim1_params}
 \end{figure}
@@ -994,6 +913,7 @@ Note that $g_{\mcE}(G;\mcT)$ should dominate $g_{NB}(G;\mcT)$.
 %\bibliographystyle{apalike}
 \bibliographystyle{ieeetr}
 %\bibliographystyle{nature}
+
 
 
 \end{document}
