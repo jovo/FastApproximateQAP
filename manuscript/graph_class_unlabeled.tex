@@ -1,7 +1,93 @@
-\input{/Users/jovo/Research/latex/latex_paper.tex} 
-\usepackage{url}
-\lhead{Vogelstein JT, et al}
-\rhead{short title}
+\documentclass{article} % For LaTeX2e
+\usepackage{nips11submit_e,times,amsmath,amsfonts, graphicx, subfigure}
+%\documentstyle[nips10submit_09,times,art10]{article} % For LaTeX 2.09
+
+
+\title{Unlabeled graph classification}
+
+
+\author{
+Joshua T.~Vogelstein\thanks{ Use footnote for providing further information
+about author (webpage, alternative address)---\emph{not} for acknowledging
+funding agencies.} \\
+Department of Applied Mathematics and Statistics\\
+Johns Hopkins University\\
+Baltimore, MD 21218 \\
+\texttt{joshuav@jhu.edu} \\
+\And
+John M.~Conroy \\
+Affiliation \\
+Address \\
+\texttt{conroyjohnm@gmail.com} \\
+\AND
+Glen A.~Coppersmith \\
+Affiliation \\
+Address \\
+\texttt{coppersmith@jhu.edu} \\
+\And
+Mark Dredze \\
+Affiliation \\
+Address \\
+\texttt{mdredze@cs.jhu.edu} \\
+\And
+R.~Jacob Vogelstein \\
+Affiliation \\
+Address \\
+\texttt{Jacob.Vogelstein@jhuapl.edu} \\
+\And
+Carey E.~Priebe \\
+Affiliation \\
+Address \\
+\texttt{cep@jhu.edu} \\
+}
+
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\newcommand{\jv}{Joshua Vogelstein}
+\newcommand{\jhu}{Johns Hopkins University}
+%\newcommand{\hp}{https://jshare.johnshopkins.edu/jvogels3/public_html/}
+\newcommand{\ema}{joshuav@jhu.edu}
+
+\newcommand{\eqdef}{\overset{\triangle}{=}}
+\newcommand{\D}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\DD}[2]{\frac{\partial ^2 #1}{\partial #2 ^2}}
+\newcommand{\DDD}[3]{\frac{\partial ^2 #1}{\partial #2 \partial #3}}
+\newcommand{\Di}[2]{\frac{\partial ^i #1}{\partial #2 ^i}}
+\newcommand{\grad}{\nabla}
+\newcommand{\Hess}{\nabla\nabla}
+
+\providecommand{\ve}[1]{\boldsymbol{#1}}
+\providecommand{\norm}[1]{\left \lVert#1 \right  \rVert}
+\providecommand{\deter}[1]{\lvert #1 \rvert}
+\providecommand{\abs}[1]{\left \lvert #1 \right \rvert}
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\T}{^{\ensuremath{\mathsf{T}}}}           % transpose
+\newcommand{\EE}{\mathbb{E}}           % expected value
+\newcommand{\PP}{\mathbb{P}}           % probability
+\newcommand{\II}{\mathbb{I}}           % indicator function
+\newcommand{\QQ}{\mathbb{Q}}           
+\newcommand{\SSS}{\mathbb{S}}           
+
+\newcommand{\bth}{\ve{\theta}}
+\newcommand{\bTh}{\ve{\Theta}}
+\newcommand{\hbth}{\widehat{\thet}}
+
+\providecommand{\mc}[1]{\mathcal{#1}}
+\providecommand{\mb}[1]{\boldsymbol{#1}}
+\providecommand{\mbb}[1]{\mathbb{#1}}
+\providecommand{\mv}[1]{\vec{#1}}
+\providecommand{\mh}[1]{\hat{#1}}
+\providecommand{\mt}[1]{\widetilde{#1}}
+\providecommand{\mhc}[1]{\hat{\mathcal{#1}}}
+\providecommand{\mhb}[1]{\hat{\boldsymbol{#1}}}
+\providecommand{\mvb}[1]{\vec{\boldsymbol{#1}}}
+\providecommand{\mtb}[1]{\widetilde{\boldsymbol{#1}}}
+
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\conv}{\rightarrow}
 
 \newcommand{\mcE}{\mathcal{E}}
 \newcommand{\mcT}{\mathcal{T}}
@@ -17,33 +103,22 @@
 \newcommand{\tildeA}{\widetilde{A}}
 \newcommand{\GG}{\mathbb{G}}
 
-\newcommand{\defa}{\begin{defi}}
-\newcommand{\defb}{\end{defi}}
 
-\newtheorem{Rem}{Remark}%[section]
-\newtheorem{Alg}{Algorithm}%[section]
-\newtheorem{Thm}{Theorem}[section]
-%\theoremstyle{marginbreak}
-\newtheorem{Lem}{Lemma}[section]
-%\newtheorem{Lem}[Cor]{Lemma}
-%\theoremstyle{change}
-%\theorembodyfont{\itshape}
-\newtheorem{Def}{Definition}[section]
-
-\title{PRE-DRAFT: On unlabeled graph classification}
-
-\author{jv1,jv2,djm,jmc,cep}
-% JV1 ; Henry ; \dots
+%\nipsfinalcopy % Uncomment for camera-ready version
 
 \begin{document}
 
-\maketitle
-% \tableofcontents
 
+\maketitle
+
+\begin{abstract}
+Because graphs can encode more information in their structure than vectors, they are becoming increasingly popular data structures for representing information.  While the last century has witnessed the development of a plethora of statistical tools for the analysis of data, the vast majority of these tools natively operate in vector spaces, not graph spaces.  Thus, even relatively simple statistical inference tasks, such as two-way classification,  are essentially absent for graph data.  In this work, we propose a number of complementary algorithms to classify graphs whose vertices are unlabeled.  Since solving the graph-matching problem is currently computational intractable, we consider several approximate approaches, each with polynomial time complexity.  We introduce a multiple-restart Frank-Wolfe approach to solving the graph matching problem by formulating it as a quadratic assignment problem.  Although this approach has superior performance than previous state-of-the-art approaches to the graph matching problem, even when it ``should'' do well in classification problems, it is outperformed by a graph invariant strategy.  This is just the beginning. 
+\end{abstract}
 
 \section{Introduction}
 
 The statistical analysis of collections of graphs is becoming an increasingly popular desideratum [cite].  Specifically, we consider the following idealized and simplified scenario. Let $\GG: \Omega \mapsto \mc{G}$ be a graph-valued random variable taking values $G\in \mc{G}$. Each graph is a 4-tuple: $G=(\mc{V},\mc{E},\alpha_V,\alpha_E)$, where $\mc{V}$ is a set of $|\mc{V}|=V$ vertices, $\mc{E}$ is a set of $|\mc{E}|=E$ edges, $\alpha_V: \mc{V} \mapsto \mc{A}_V$ is a vertex labeling function, and $\alpha_E: \mc{E} \mapsto \mc{A}_E$ is an edge attributing function (for example, edge weights).  Given a graph, one can construct an adjacency matrix representation, $A \in \mc{A}_E^{V \times V}$.  When the edge attributing function is binary, $\mc{A}_E=\{0,1\}$, resulting in a binary adjacency matrix (generalizations are straightforward).  Let $Y$ be a Bernoulli covariate: $Y: \Omega \mapsto \{0,1\}$, yielding graph \emph{classification} problem.  Given a collection of graphs and associated covariates,  we assume they were jointly sampled independently and identically from some true but unknown distribution, $\{(\GG_i,Y_i)\}_{i \in [n]} \sim F_{\GG,Y}(\cdot; \theta)$.  Note that $F_{\GG,Y}(\cdot; \bth)$ is but one of a (possibly infinite) set of distributions, collectively comprising the model $\mc{F_{\GG,Y}}=\{F_{\GG,Y}(\cdot; \bth) : \theta \in \bTh\}$.  The goal of such an analysis is to learn about the relationship between $\GG$ and $Y$.   Standard classification techniques fail in this domain as they typically require classifying finite dimensional Euclidean objects ($G \in \EE^d$), whereas the object of interest here are graphs ($G \in \mc{G}$).   In this work, therefore, we propose a novel extension of classification algorithms appropriate for the graph domain.
+
 
 
 \section{Graph Classification} % (fold)
@@ -59,6 +134,9 @@ In general, $h^*$ is unavailable and dependent on the model, $\mc{F}_{\GG,Y}$.  
 	\mt{h} \approx \argmin_{h \in \mc{H}} F[h(\GG) \neq Y | \mc{T}_n],
 \end{align}
 where $\approx$ indicates that in general, we might not be able to find the actual minimum in the set $\mc{H}$. Regardless, any approach requires estimating a decision boundary in the space of graphs separating them into two classes.  We consider a few distinct such approaches to constructing such a decision boundary:
+
+% \subsection{Graph dissimilarity based approach approach} % (fold)
+% \label{sub:_k__n_nearest_neighbor_approach}
 
 % \subsection{Graph dissimilarity based approach approach} % (fold)
 % \label{sub:_k__n_nearest_neighbor_approach}
@@ -136,11 +214,26 @@ which is our approximate solution to QAP.  Note that FW will not generally achie
 \begin{align}
 	\nabla_Q^2  =  B \otimes A + B\T \otimes A\T,
 \end{align}
-where $\otimes$ indicates the Kronecker product. This means that the initialization, $Q^{(0)}$, will be important.  While any doubly stochastic matrix would be a feasible initial point,  the ``flat doubly  stochastic matrix,'' $J=\ve{1}\T \ve{1}/V$, is the middle of the feasible region.  Therefore, if we run the FW algorithm once, we always start with the flat matrix.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $J'$, a random doubly stochastic matrix using 10 iterations of Sinkhorn rebalancing, and let $Q^{(0)}=(J+J')/2$.  We call this approach the Multiple Frank-Wolfe (MFW) approach to approximating QAP.
+where $\otimes$ indicates the Kronecker product. This means that the initialization, $Q^{(0)}$, will be important.  While any doubly stochastic matrix would be a feasible initial point,  the ``flat doubly  stochastic matrix,'' $J=\ve{1}\T \ve{1}/V$, is the middle of the feasible region.  Therefore, if we run the FW algorithm once, we always start with the flat matrix.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $J'$, a random doubly stochastic matrix using 10 iterations of Sinkhorn rebalancing, and let $Q^{(0)}=(J+J')/2$.  We call this approach the Multiple Frank-Wolfe (MFW) approach to approximating QAP, versus 1-QAP which refers to a single FW run.
+
+
+
+\subsubsection{$k$nn $\circ$ QAP} % (fold)
+\label{ssub:_k_nn_circ_qap}
+
 
 We use the following algorithm to utilize the above approach within a $k$nn classification framework.  Given a test adjacency matrix, $A$, find $\mh{Q}_i^A=\mh{Q}_{QAP}(A,A_i)$ for all $n$ training samples, $\{A_i\}_{i \in [n]}$.  Given these solutions, let $\mt{A}_i=\mh{Q}_i^A A {\mh{Q}_i^A}{}\T$ for all $i$. Now, define a suitable dissimilarity $d: \mc{A} \times \mc{A} \mapsto \Real_+$, one can compute $d(\mt{A}_i,A_i)$ for all $i \in [n]$, and then one can sort the distances, $d_{(1)} \leq d_{(2)} \leq \cdot \leq d_{(n)}$.  Let the $k_n$ nearest neighbors of $A$ be the graphs with the $k_n$ smallest distances, $\{d_{(1)},\ldots, d_{(k)}\}$.\footnote{Note that $k_n$ is a function of $n$, typically chosen so that as $n \conv \infty$, $k \conv infinity$ but $k/n \conv 0$.}  The estimated class of the training sample $A$ is then the plurality class of the $k_n$ nearest neighbors.  Formally, $\mh{y}=\argmax_{y} \II\{\sum_{i \in [k_n]} y_{(i)} = y \}$.
 
+% subsubsection _k_nn_circ_qap (end)
 
+
+\subsubsection{Bayes Plugin $\circ$ QAP} % (fold)
+\label{ssub:bayes_plugin_circ_qap}
+
+
+To utilize a Bayes plugin classifier with QAP, we take the following strategy.  First, we assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}}p_{uv|y}^{a_{uv}} (1-p_{uv|y})^{(1-a_{uv|y})}$, where $\{p_{uv|y}\}$ are the likelihood parameters.  For simplicity, we assume class prior probabilities are equal, $\PP[Y=1]=\PP[Y=0]=1/2$.  Given a test adjacency matrix, $A$,  do 1-QAP with respect to a single training graph from each class: $\mh{Q}_i^A=\mh{Q}_{QAP}(A,A_i)$ for $i=0,1$.  Then, compute the likelihood of $A$ coming from each class, using the true parameters.  Because class-prior probabilities are $1/2$, the likelihood is equal to the posterior, so $\mh{y}=\argmax_y \PP[Y=y | A; \{p_{uv|y}\}]$.
+
+% subsubsection bayes_plugin_circ_qap (end)
 
 % subsection graph_isomorphism_approach (end)
 
@@ -154,16 +247,6 @@ In the graph invariant approach, we first define a set of $d$ graph invariants: 
 
 % section methods (end)
 
-
-% 
-% \subsection{truth}
-% \subsection{invariants}
-% \subsection{approx GM; potential GM-based classifiers}
-% 
-% \paragraph{knn - requires ts GM's (t=\# training samples, s=\# testing samples)}
-% \paragraph{bayes plugin - requires (s-2)+kt GM's} we only do this one.
-% \paragraph{iterpoint distance matrix - requires choose(s,2)+ts}
-% 
 
 \section{Results}
 
@@ -209,54 +292,132 @@ Before comparing the QAP and GI approach, we first compare the performance of MF
 \end{figure}
 
 
-\subsection{Misclassification rate and computational complexity for different model/classifier combo's}
+
+
+\subsection{Simulations}
+
+For each of the 3 below simulations, $V=10$, $n=1000$.  The results consistent show that multiple iterations of 1-QAP improve the objective function, but do not improve the misclassification rate.  This led us to investigate the relationship between QAP and Linear Assignment Problem (LAP).
+
+
+\begin{figure}[ht]
+\centering
+\subfigure[model]{
+\includegraphics[scale=0.4]{../figs/homo_kidney_egg_model}
+\label{fig:subfig1}
+}
+\subfigure[objective function]{
+\includegraphics[scale=0.4]{../figs/homo_kidney_egg_obj}
+\label{fig:subfig2}
+}
+\subfigure[Lhat +/- Lstd]{
+\includegraphics[scale=1]{../figs/homo_kidney_egg_Lhats}
+\label{fig:subfig3}
+}
+\label{fig:subfigureExample}
+\caption{homo kidney egg model}
+\end{figure}
 
 
 
-\paragraph{model 1: symmetric model in which LAP=1 iter of QAP} % (fold)
-\label{par:homogeneous_kidney_egg_simulation}
+\begin{figure}[ht]
+\centering
+\subfigure[model]{
+\includegraphics[scale=0.4]{../figs/hetero_kidney_egg_model}
+\label{fig:subfig1}
+}
+\subfigure[objective function]{
+\includegraphics[scale=0.4]{../figs/hetero_kidney_egg_obj}
+\label{fig:subfig2}
+}
+\subfigure[Lhat +/- Lstd]{
+\includegraphics[scale=1]{../figs/hetero_kidney_egg_Lhats}
+\label{fig:subfig3}
+}
+\label{fig:subfigureExample}
+\caption{hetero kidney egg model}
+\end{figure}
 
-fig 1: model params
-
-proof that LAP=QAP.
-
-fig 2: numerical confirmation of proof: Lhat vs. \# iters of FW
-
-possible simulation details: Homogeneous kidney-egg simulation: For the homogeneous kidney-egg simulations, we assume $n=10$, so $\eta^y \in (0,1)^{n\times n}$.  We further assume a stochastic block model, with two blocks, for both classes.  For class 0, $\eta_{ij}^0=q_0=0.25$ for $i,j \in [3]$, and for class 1, $\eta_{ij}^1=q_1=0.75$ for $i,j \in [3]$.  In both classes, $\eta_{ij}=p=0.5$ for $i,j \in \{4,\ldots 10\}$.  See Figure \ref{fig:models} (top row) for a graphical depiction of this model.  
 
 
+\begin{figure}[ht]
+\centering
+\subfigure[model]{
+\includegraphics[scale=0.4]{../figs/hetero_model}
+\label{fig:subfig1}
+}
+\subfigure[objective function]{
+\includegraphics[scale=0.4]{../figs/hetero_obj}
+\label{fig:subfig2}
+}
+\subfigure[Lhat +/- Lstd]{
+\includegraphics[scale=1]{../figs/hetero_Lhats}
+\label{fig:subfig3}
+}
+\label{fig:subfigureExample}
+\caption{hetero model}
+\end{figure}
 
 
-% paragraph homogeneous_kidney_egg_simulation (end)
+\subsection{LAP vs. QAP} % (fold)
+\label{sub:lap_vs_qap}
 
-\paragraph{perhaps: model 2: assymetric model in which LAP $<$ QAP (fig 2: show model params)} % (fold)
-\label{par:homogeneous_kidney_egg_simulation}
+LAPs can be cast as follows:
 
-(this one we do depending on the results from the below synthetic data analysis (SDA).  if the SDA results are much different than the above results, this warrants a ``linking'' simulated result.)
+The LAP approximation  for this class problem is given by the following equation:
+\begin{align} \label{eq:LAP}
+	\mh{Q}_{\text{LAP}} = \argmin_{Q \in \mc{Q}} \norm{A Q\T - B }^2_F,
+\end{align}
+which is quite similar to QAP, except $A$ is only post-multiplied by $Q$, instead of also being pre-multiplied by $Q$. To solve a LAP, we compute the gradient of $f'(Q)=\norm{AQ\T-B}_F^2$:
+\begin{align} \label{eq:grad2}
+	\nabla_{Q'}^{(k)} = 2A B\T. 
+\end{align}
+Interestingly, this is identical to the gradient of QAP, Eq. \eqref{eq:grad}, when $Q^{(k)}$ is the identical matrix.  Thus, if QAP is initialized at the identity matrix, the first iteration is identical to LAP.  This suggests that for certain problems, LAP is both an efficient and useful approximation to graph matching.  We confirm this intuition by replacing QAP with LAP in the above simulations.  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic complexity, will often suffice.
 
-perhaps: Heterogeneous simulation: For the heterogeneous simulations, we assume $n=10$, so $\eta^y \in (0,1)^{n\times n}$.  We further assume that each $\eta_{ij}^y \overset{iid}{\sim}$Uniform$(0,1)$.  See Figure \ref{fig:models} (bottom) row for a graphical depiction of this model.
 
-same figures as above.
+% subsection lap_vs_qap (end)
 
-\paragraph{synthetic data} % (fold)
-\label{par:synthetic_data}
+\subsection{Connectome Classification} % (fold)
+\label{sub:connectome_classification}
 
-49 subjects: 25 male, 24 female.  each with 70x70 symmetric binary matrix.  
+A ``connectome'' is a graph in which vertices correspond to biological neural units, and edges correspond to connections between the units.  Diffusion Magnetic Resonance (MR) Imaging and related technologies are making the acquisition of MR connectomes routine [cite].  We use 49 subjects from the Baltimore Longitudinal Study on Aging, with acquisition and connectome inference details as reported in [cite].  For each connectome, we obtain a $70 \times 70$ element adjacency matrix, where each element of the matrix encodes the number of streamlines between a pair of regions [FACT cite], ranging between 0 and about 65,000.  Associated with each graph is class label based on the gender of the individual (24 males, 25 females).  Because the vertices are labeled, we can compare the results of having the labels and not having the labels.  As such, we implement the following classification strategies.  In each case, we use a leave-one-out strategy:
 
-figure 3: plot mean male, mean female, significant difference matrix.
+\begin{enumerate}
+	\item Using the vertex labels, implement a standard $1$nn classifier, where distance is the norm of the difference between any pair of adjacency matrices.
+	\item Permute only the vertex labels of the test graph, and then implement $1$nn$\circ$1-QAP.
+	\item Permuting the vertex labels, then implement $1$nn$\circ$1-QAP as described above.
+	\item Permuting the vertex labels, QAP each of the 48 training graphs to the test graph.  Then, given those permuted adjacency matrices, compute the average, and then implement a standard $1$nn classifier.
+	\item Use the graph invariant approach as described above. We provide the normalized graph invariants as inputs into a number of standard classifiers, including $k$nn, linear classifiers, support vector machines, random forests, and CW. On this data, the CW classifier performed best; we therefore only report its results.
+\end{enumerate}
 
-labeled results: naive bayes performance around $70\%$.  finding signal subgraph performance around $85\%$.  
 
-fig 4: unlabeled results: Lhat vs. \# iters of FW (we scrabble labels).  
-
-NB: we might want to add a table (like the benchmark results) showing average performance of QAP for these guys
-
-% paragraph synthetic_data (end)
-
+\begin{table}[h!]
+\caption{MR Connectome Classification Results}
+\begin{center}
+\begin{tabular}{|r|r|r|r|r|}
+\hline
+1 & 2  & 3 & 4 & 5\\
+\hline
+$20\%$ & $31\%$ & $45\%$ & ?? & $25\%$ \\
+    \hline
+\end{tabular}
+\end{center}
+\label{tab:fwpath}
+\end{table}%
 
 
 \section{Discussion}
 
+
+In this work, we have presented a number of approaches one could take \cite{VogelsteinPaninski09}
+
+
+
+% \subsubsection*{Acknowledgments}
+% 
+% Use unnumbered third level headings for the acknowledgments. All
+% acknowledgments go at the end of the paper. Do not include 
+% acknowledgments in the anonymized submission, only in the 
+% final paper. 
 
 
 \bibliography{/Users/joshyv/Research/latex/biblist}
@@ -265,5 +426,30 @@ NB: we might want to add a table (like the benchmark results) showing average pe
 \bibliographystyle{ieeetr}
 %\bibliographystyle{nature}
 
+
+% 
+% \subsubsection*{References}
+% 
+% References follow the acknowledgments. Use unnumbered third level heading for
+% the references. Any choice of citation style is acceptable as long as you are
+% consistent. It is permissible to reduce the font size to `small' (9-point) 
+% when listing the references. {\bf Remember that this year you can use
+% a ninth page as long as it contains \emph{only} cited references.}
+% 
+% \small{
+% [1] Alexander, J.A. \& Mozer, M.C. (1995) Template-based algorithms
+% for connectionist rule extraction. In G. Tesauro, D. S. Touretzky
+% and T.K. Leen (eds.), {\it Advances in Neural Information Processing
+% Systems 7}, pp. 609-616. Cambridge, MA: MIT Press.
+% 
+% [2] Bower, J.M. \& Beeman, D. (1995) {\it The Book of GENESIS: Exploring
+% Realistic Neural Models with the GEneral NEural SImulation System.}
+% New York: TELOS/Springer-Verlag.
+% 
+% [3] Hasselmo, M.E., Schnell, E. \& Barkai, E. (1995) Dynamics of learning
+% and recall at excitatory recurrent synapses and cholinergic modulation
+% in rat hippocampal region CA3. {\it Journal of Neuroscience}
+% {\bf 15}(7):5249-5262.
+% }
 
 \end{document}

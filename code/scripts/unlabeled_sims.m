@@ -3,14 +3,14 @@ clear; clc
 
 alg.datadir = '../../data/';
 alg.figdir  = '../../figs/';
-alg.fname   = 'homo_kidney_egg';    % different names will generate different simulations
+alg.fname   = 'hetero';    % different names will generate different simulations
 
 n   = 10;                           % # of vertices
-S   = 500;                          % # of samples
+S   = 100;                          % # of samples
 
 alg.save    = 1;                    % whether to save/print results
 alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
-alg.truth_start = true;                % start LAP and QAP at truth
+alg.truth_start = false;                % start LAP and QAP at truth
 
 alg.QAP_max_iters   = 10;            % max # of iterations when using QAP approx
 alg.QAP_init        = eye(n); %ones(n)/n;       % starting value for QAP (see sfw comments for explanation)
@@ -42,7 +42,7 @@ switch alg.fname
          
         E0=rand(n);     % params in class 0
         E1=rand(n);     % params in class 1
-        egg = 1:3;      % vertices in egg
+        egg = 1:5;      % vertices in egg
         E1(egg,egg)=E0(egg,egg);
         
         params.n=n; params.S=S; params.E0=E0; params.E1=E1;
@@ -97,17 +97,17 @@ end
 
 Atst=adj_mat(:,:,tst_ind);
 
-[Lhat Lvar] = naive_bayes_classify(Atst,ytst,P);
+[Lhat Lstd] = naive_bayes_classify(Atst,ytst,P);
 Lhats.rand  = Lhat.all;
-Lvars.rand  = Lvar.all;
+Lstds.rand  = Lstd.all;
 
 %% performance using true parameters and labels
 
 Atst=adjacency_matrices(:,:,tst_ind);
 
-[Lhat Lvar] = naive_bayes_classify(Atst,ytst,P);
+[Lhat Lstd] = naive_bayes_classify(Atst,ytst,P);
 Lhats.star  = Lhat.all;
-Lvars.star  = Lvar.all;
+Lstds.star  = Lstd.all;
 
 %% test using hold-out training data
 
@@ -166,20 +166,20 @@ figure(3), clf, hold all
 ms=16;
 
 % rand
-errorbar(0,Lhats.rand,Lvars.rand,'g','linewidth',2,'Marker','.','Markersize',ms)
+errorbar(0.5,Lhats.rand,Lstds.rand,'g','linewidth',2,'Marker','.','Markersize',ms)
 
 % LAP
 if strcmp(alg.names(1),'LAP'),
-    errorbar(1.1,LAP.Lhat,LAP.Lvar,'k','linewidth',2,'Marker','.','Markersize',ms)
+    errorbar(1.1,LAP.Lhat,LAP.Lstd,'k','linewidth',2,'Marker','.','Markersize',ms)
 end
 
 % QAP
 if strcmp(alg.names(2),'QAP'),
-    errorbar(1:alg.QAP_max_iters+.2,QAP.Lhat,QAP.Lvar,'linewidth',2,'Marker','.','Markersize',ms)
+    errorbar(1:alg.QAP_max_iters+.2,QAP.Lhat,QAP.Lstd,'linewidth',2,'Marker','.','Markersize',ms)
 end
 
 % L*
-errorbar(alg.QAP_max_iters+1,Lhats.star,Lvars.star,'r','linewidth',2,'Marker','.','Markersize',ms)
+errorbar(alg.QAP_max_iters+1,Lhats.star,Lstds.star,'r','linewidth',2,'Marker','.','Markersize',ms)
 
 legend('rand','LAP','QAP','L^*')
 % axis([-0.5 alg.QAP_max_iters+1.5 0 0.5])

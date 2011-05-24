@@ -119,6 +119,7 @@ end
 
 if LAP.do
     LAP.Lhat = 1-mean(LAP.correct);
+    LAP.Lstd = std(LAP.correct);
     LAP.Lvar = var(LAP.correct);
 end
 
