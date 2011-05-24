@@ -10,18 +10,18 @@ S   = 500;                          % # of samples
 
 alg.save    = 0;                    % whether to save/print results
 alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
-alg.truth_start = 1;                % start LAP and QAP at truth
+alg.truth_start = true;                % start LAP and QAP at truth
 
-alg.QAP_max_iters   = 2;            % max # of iterations when using QAP approx
-alg.QAP_init        = eye(n);       % starting value for QAP (see sfw comments for explanation)
+alg.QAP_max_iters   = 10;            % max # of iterations when using QAP approx
+alg.QAP_init        = eye(n); %ones(n)/n;       % starting value for QAP (see sfw comments for explanation)
 
 switch alg.fname
     case 'homo_kidney_egg'
         
         p   = 0.5;      % prob of connection for kidney
-        q0  = 0.25;     % prob of connection for egg
-        q1  = 0.75;     % prob of connection for egg
-        egg = 1:3;      % vertices in egg
+        q0  = 0.2;     % prob of connection for egg
+        q1  = 0.8;     % prob of connection for egg
+        egg = 1:5;      % vertices in egg
         
         E0=p*ones(n);   % params in class 0
         E0(egg,egg)=q0; % egg params in class 0
@@ -38,6 +38,15 @@ switch alg.fname
                 
         params.n=n; params.S=S; params.E0=E0; params.E1=E1;
         
+    case 'hetero_kidney_egg'
+         
+        E0=rand(n);     % params in class 0
+        E1=rand(n);     % params in class 1
+        egg = 1:3;      % vertices in egg
+        E1(egg,egg)=E0(egg,egg);
+        
+        params.n=n; params.S=S; params.E0=E0; params.E1=E1;
+
     case 'hard_hetero'
          
         E0=rand(n);         % params in class 0
@@ -76,7 +85,7 @@ P.ln1E1 = log(1-params.E1);
 P.lnprior0 = log(S0/S);
 P.lnprior1 = log(S1/S);
 
-%% when not trying to solve GIP
+%% when not trying to solve QAP
 
 % make data unlabeled
 adj_mat=0*adjacency_matrices;
@@ -109,6 +118,7 @@ Atrn=adjacency_matrices(:,:,trn_ind);
 save([alg.datadir alg.fname '_results'],'adjacency_matrices','class_labels','params','alg','Lhat','LAP','QAP')
 
 %% plot model
+
 
 figure(2), clf
 fs=10;  % fontsize
@@ -172,7 +182,8 @@ end
 errorbar(alg.QAP_max_iters+1,Lhats.star,Lvars.star,'r','linewidth',2,'Marker','.','Markersize',ms)
 
 legend('rand','LAP','QAP','L^*')
-axis([-0.5 alg.QAP_max_iters+1.5 0 0.5])
+% axis([-0.5 alg.QAP_max_iters+1.5 0 0.5])
+axis('tight')
 
 ylabel('$\hat{L}$','interp','latex','Rotation',0)
 xlabel('# of interations','interp','none')

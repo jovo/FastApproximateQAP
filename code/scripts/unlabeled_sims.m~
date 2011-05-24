@@ -1,16 +1,16 @@
 %% simulate independent edge models and classify using or not using the vertex names
-clear; %clc
+clear; clc
 
-alg.datadir = '~/Research/data/graph_sims/unlabeled/';
-alg.figdir  = '~/Research/figs/graph_sims/unlabeled/';
+alg.datadir = '~/Research/data/sims/unlabeled/';
+alg.figdir  = '~/Research/figs/sims/unlabeled/';
 alg.fname   = 'homo_kidney_egg';    % different names will generate different simulations
 
 n   = 10;                           % # of vertices
-S   = 100;                          % # of samples
+S   = 500;                          % # of samples
 
 alg.save    = 0;                    % whether to save/print results
 alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
-alg.truth_start = 0;                % start LAP and QAP at truth
+alg.truth_start = 1;                % start LAP and QAP at truth
 
 alg.QAP_max_iters   = 2;            % max # of iterations when using QAP approx
 alg.QAP_init        = eye(n);       % starting value for QAP (see sfw comments for explanation)
@@ -101,11 +101,20 @@ Lhats.star  = Lhat.all;
 Lvars.star  = Lvar.all;
 
 %% test using hold-out training data
+
+Atrn=adjacency_matrices(:,:,trn_ind);
+
 [LAP QAP] = classify_unlabeled_graphs(Atrn,Atst,ytst,P,alg);
 
 save([alg.datadir alg.fname '_results'],'adjacency_matrices','class_labels','params','alg','Lhat','LAP','QAP')
 
 %% plot model
+
+
+
+
+
+
 
 figure(2), clf
 fs=10;  % fontsize
