@@ -1,14 +1,14 @@
 %% simulate independent edge models and classify using or not using the vertex names
 clear; clc
 
-alg.datadir = '~/Research/data/sims/unlabeled/';
-alg.figdir  = '~/Research/figs/sims/unlabeled/';
+alg.datadir = '../../data/';
+alg.figdir  = '../../figs/';
 alg.fname   = 'homo_kidney_egg';    % different names will generate different simulations
 
 n   = 10;                           % # of vertices
 S   = 500;                          % # of samples
 
-alg.save    = 0;                    % whether to save/print results
+alg.save    = 1;                    % whether to save/print results
 alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
 alg.truth_start = true;                % start LAP and QAP at truth
 
