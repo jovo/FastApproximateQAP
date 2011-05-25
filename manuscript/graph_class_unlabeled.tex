@@ -214,7 +214,7 @@ which is our approximate solution to QAP.  Note that FW will not generally achie
 \begin{align}
 	\nabla_Q^2  =  B \otimes A + B\T \otimes A\T,
 \end{align}
-where $\otimes$ indicates the Kronecker product. This means that the initialization, $Q^{(0)}$, will be important.  While any doubly stochastic matrix would be a feasible initial point,  the ``flat doubly  stochastic matrix,'' $J=\ve{1}\T \ve{1}/V$, is the middle of the feasible region.  Therefore, if we run the FW algorithm once, we always start with the flat matrix.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $J'$, a random doubly stochastic matrix using 10 iterations of Sinkhorn rebalancing, and let $Q^{(0)}=(J+J')/2$.  We call this approach the Multiple Frank-Wolfe (MFW) approach to approximating QAP, versus 1-QAP which refers to a single FW run.
+where $\otimes$ indicates the Kronecker product. This means that the initialization, $Q^{(0)}$, will be important.  While any doubly stochastic matrix would be a feasible initial point,  the ``flat doubly  stochastic matrix,'' $J=\ve{1}\T \ve{1}/V$, is the middle of the feasible region.  Therefore, if we run the FW algorithm once, we always start with the flat matrix.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $J'$, a random doubly stochastic matrix using 10 iterations of Sinkhorn rebalancing, and let $Q^{(0)}=(J+J')/2$.  We refer to multiple re-starts of QAP with subscripts, that is, the performance of $QAP_j$ is the best QAP of $j$ pseudo-random re-starts.
 
 
 
@@ -222,7 +222,7 @@ where $\otimes$ indicates the Kronecker product. This means that the initializat
 \label{ssub:_k_nn_circ_qap}
 
 
-We use the following algorithm to utilize the above approach within a $k$nn classification framework.  Given a test adjacency matrix, $A$, find $\mh{Q}_i^A=\mh{Q}_{QAP}(A,A_i)$ for all $n$ training samples, $\{A_i\}_{i \in [n]}$.  Given these solutions, let $\mt{A}_i=\mh{Q}_i^A A {\mh{Q}_i^A}{}\T$ for all $i$. Now, define a suitable dissimilarity $d: \mc{A} \times \mc{A} \mapsto \Real_+$, one can compute $d(\mt{A}_i,A_i)$ for all $i \in [n]$, and then one can sort the distances, $d_{(1)} \leq d_{(2)} \leq \cdot \leq d_{(n)}$.  Let the $k_n$ nearest neighbors of $A$ be the graphs with the $k_n$ smallest distances, $\{d_{(1)},\ldots, d_{(k)}\}$.\footnote{Note that $k_n$ is a function of $n$, typically chosen so that as $n \conv \infty$, $k \conv infinity$ but $k/n \conv 0$.}  The estimated class of the training sample $A$ is then the plurality class of the $k_n$ nearest neighbors.  Formally, $\mh{y}=\argmax_{y} \II\{\sum_{i \in [k_n]} y_{(i)} = y \}$.
+We use the following algorithm to utilize the above approach within a $k$nn classification framework.  Given a test adjacency matrix, $A$, find $\mh{Q}_i^A=\mh{Q}_{QAP}(A,B_i)$ for all $n$ training adjacency matrices, $\{B_i\}_{i \in [n]}$.  Given these solutions, let $\mt{A}_i=\mh{Q}_i^A A {\mh{Q}_i^A}{}\T$ for all $i$. Given a suitable dissimilarity $d: \mc{A}_E^{V\times V} \times \mc{A}_E^{V\times V} \mapsto \Real_+$, one can compute $d(\mt{A}_i,B_i)$ for all $i \in [n]$, and sort them: $d_{(1)} \leq d_{(2)} \leq \cdot \leq d_{(n)}$.  Let the $k_n$ nearest neighbors of $A$ be the graphs with the $k_n$ smallest distances, $\{d_{(1)},\ldots, d_{(k)}\}$.\footnote{Note that $k_n$ is a function of $n$, typically chosen so that as $n \conv \infty$, $k \conv \infty$ but $k/n \conv 0$, to satisfy the universal consistency proofs [cite].}  The estimated class of the training sample $A$ is then the plurality class of the $k_n$ nearest neighbors: $\mh{y}=\argmax_{y} \II\{\sum_{i \in [k_n]} y_{(i)} = y \}$.
 
 % subsubsection _k_nn_circ_qap (end)
 
@@ -231,7 +231,7 @@ We use the following algorithm to utilize the above approach within a $k$nn clas
 \label{ssub:bayes_plugin_circ_qap}
 
 
-To utilize a Bayes plugin classifier with QAP, we take the following strategy.  First, we assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}}p_{uv|y}^{a_{uv}} (1-p_{uv|y})^{(1-a_{uv|y})}$, where $\{p_{uv|y}\}$ are the likelihood parameters.  For simplicity, we assume class prior probabilities are equal, $\PP[Y=1]=\PP[Y=0]=1/2$.  Given a test adjacency matrix, $A$,  do 1-QAP with respect to a single training graph from each class: $\mh{Q}_i^A=\mh{Q}_{QAP}(A,A_i)$ for $i=0,1$.  Then, compute the likelihood of $A$ coming from each class, using the true parameters.  Because class-prior probabilities are $1/2$, the likelihood is equal to the posterior, so $\mh{y}=\argmax_y \PP[Y=y | A; \{p_{uv|y}\}]$.
+To utilize a Bayes plugin classifier with QAP, we take the following strategy.  First, we assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}}p_{uv|y}^{a_{uv}} (1-p_{uv|y})^{(1-a_{uv|y})}$, where $\{p_{uv|y}\}$ are the likelihood parameters.  For simplicity, we assume class prior probabilities are equal, $\PP[Y=1]=\PP[Y=0]=1/2$.  Given a test adjacency matrix, $A$,  do QAP$_1$ with respect to a single training graph from each class: $\mh{Q}_i^A=\mh{Q}_{QAP}(A,B_i)$ for $i=0,1$.  Then, compute the likelihood of $A$ coming from each class, using the true parameters.  Because class-prior probabilities are $1/2$, the likelihood is equal to the posterior, so $\mh{y}=\argmax_y \PP[Y=y | A; \{p_{uv|y}\}]$. This procedure fundamentally only uses \emph{two} training samples, one from each class.
 
 % subsubsection bayes_plugin_circ_qap (end)
 
@@ -252,7 +252,7 @@ In the graph invariant approach, we first define a set of $d$ graph invariants: 
 
 \subsection{QAP benchmarks vs. PATH algorithm}
 
-Before comparing the QAP and GI approach, we first compare the performance of MFW-QAP with recent state-of-the-art approaches on the QAP benchmark library [Cela07 \# 38 in PATH paper].  Specifically, in [PATH] this benchmark was used to compare the PATH algorithm against previous state-of-the-art approaches.  In all but two cases the PATH algorithm achieved a lower minimum.  For those two, the QPB method of Cremers et al. [18 in PATH] achieved a lower minimum.  We compare MFW-QAP with the previous best performing algorithm.  In \emph{all} cases, MFW-QAP outperforms the previous best result.  In 12 out of 16 cases $75\%$, the simple FW algorithm outperforms the others.  See Table \ref{tab:fwpath} and Figure \ref{fig:fwpath} for quantitative results.
+Before comparing the QAP and GI approach, we first compare the performance of MFW-QAP with recent state-of-the-art approaches on the QAP benchmark library [Cela07 \# 38 in PATH paper].  Specifically, in [PATH] this benchmark was used to compare the PATH algorithm against previous state-of-the-art approaches.  In all but two cases the PATH algorithm achieved a lower minimum.  For those two, the QPB method of Cremers et al. [18 in PATH] achieved a lower minimum.  We compare QAP$_n$ with the previous best performing algorithm.  In \emph{all} cases, QAP$_100$ outperforms the previous best result.  In 12 out of 16 cases $75\%$, the simple QAP$_1$ algorithm outperforms the others.  See Table \ref{tab:fwpath} and Figure \ref{fig:fwpath} for quantitative results.
 
 
 \begin{table}[h!]
@@ -260,7 +260,7 @@ Before comparing the QAP and GI approach, we first compare the performance of MF
 \begin{center}
 \begin{tabular}{|r|r|r||r|r|r|r|r|}
 \hline
-\# & Problem  &   Min    & FW$_{100}$&FW$_{3}$&FW$_{2}$&FW$_{1}$& min(PATH,QPB)\\
+\# & Problem  &   Min    & QAP$_{100}$ & QAP$_{3}$ & QAP$_{2}$ & QAP$_{1}$& min(PATH,QPB)\\
 \hline
 1&    chr12c &   11156 &   12176 &   13072 &   13072 &   13072 &   18048\\
 2&    chr15a &    9896 &    9896 &   17272 &   17272 &   27584 &   19086\\
@@ -296,7 +296,7 @@ Before comparing the QAP and GI approach, we first compare the performance of MF
 
 \subsection{Simulations}
 
-For each of the 3 below simulations, $V=10$, $n=1000$.  The results consistent show that multiple iterations of 1-QAP improve the objective function, but do not improve the misclassification rate.  This led us to investigate the relationship between QAP and Linear Assignment Problem (LAP).
+For each of the 3 below simulations, $V=10$, $n=1000$.  The results consistently show that multiple iterations of QAP$_1$ improve the objective function, but do not improve the misclassification rate.  This led us to investigate the relationship between QAP and the Linear Assignment Problem (LAP).
 
 
 \begin{figure}[ht]
@@ -361,9 +361,7 @@ For each of the 3 below simulations, $V=10$, $n=1000$.  The results consistent s
 \subsection{LAP vs. QAP} % (fold)
 \label{sub:lap_vs_qap}
 
-LAPs can be cast as follows:
-
-The LAP approximation  for this class problem is given by the following equation:
+The LAP approximation for this class problem is given by the following equation:
 \begin{align} \label{eq:LAP}
 	\mh{Q}_{\text{LAP}} = \argmin_{Q \in \mc{Q}} \norm{A Q\T - B }^2_F,
 \end{align}
@@ -371,7 +369,7 @@ which is quite similar to QAP, except $A$ is only post-multiplied by $Q$, instea
 \begin{align} \label{eq:grad2}
 	\nabla_{Q'}^{(k)} = 2A B\T. 
 \end{align}
-Interestingly, this is identical to the gradient of QAP, Eq. \eqref{eq:grad}, when $Q^{(k)}$ is the identical matrix.  Thus, if QAP is initialized at the identity matrix, the first iteration is identical to LAP.  This suggests that for certain problems, LAP is both an efficient and useful approximation to graph matching.  We confirm this intuition by replacing QAP with LAP in the above simulations.  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic complexity, will often suffice.
+Interestingly, when $Q^{(k)}$ is the identical matrix, this is identical to the gradient of QAP  (Eq. \eqref{eq:grad}).  Thus, if QAP is initialized at the identity matrix, the first iteration is identical to LAP.  This suggests that for certain problems, LAP is both an efficient and useful approximation to graph matching.  We confirm this intuition by substituting QAP with LAP in the above simulations (black line).  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic complexity, will often suffice.
 
 
 % subsection lap_vs_qap (end)
@@ -381,13 +379,13 @@ Interestingly, this is identical to the gradient of QAP, Eq. \eqref{eq:grad}, wh
 
 A ``connectome'' is a graph in which vertices correspond to biological neural units, and edges correspond to connections between the units.  Diffusion Magnetic Resonance (MR) Imaging and related technologies are making the acquisition of MR connectomes routine [cite].  We use 49 subjects from the Baltimore Longitudinal Study on Aging, with acquisition and connectome inference details as reported in [cite].  For each connectome, we obtain a $70 \times 70$ element adjacency matrix, where each element of the matrix encodes the number of streamlines between a pair of regions [FACT cite], ranging between 0 and about 65,000.  Associated with each graph is class label based on the gender of the individual (24 males, 25 females).  Because the vertices are labeled, we can compare the results of having the labels and not having the labels.  As such, we implement the following classification strategies.  In each case, we use a leave-one-out strategy:
 
-\begin{enumerate}
-	\item Using the vertex labels, implement a standard $1$nn classifier, where distance is the norm of the difference between any pair of adjacency matrices.
-	\item Permute only the vertex labels of the test graph, and then implement $1$nn$\circ$1-QAP.
-	\item Permuting the vertex labels, then implement $1$nn$\circ$1-QAP as described above.
-	\item Permuting the vertex labels, QAP each of the 48 training graphs to the test graph.  Then, given those permuted adjacency matrices, compute the average, and then implement a standard $1$nn classifier.
-	\item Use the graph invariant approach as described above. We provide the normalized graph invariants as inputs into a number of standard classifiers, including $k$nn, linear classifiers, support vector machines, random forests, and CW. On this data, the CW classifier performed best; we therefore only report its results.
-\end{enumerate}
+\begin{description}
+	\item[\texttt{NO-QAP}] Using the vertex labels, implement a standard $1$nn classifier, where distance is the norm of the difference between any pair of adjacency matrices.
+	\item[\texttt{1-QAP}] Permute only the vertex labels of the test graph, and then implement $1$nn$\circ$QAP$_1$.
+	\item[\texttt{LOO-QAP}] Permuting the vertex labels, then implement $1$nn$\circ$1-QAP as described above.
+	\item[\texttt{AVG-QAP}] Permuting the vertex labels, QAP each of the 48 training graphs to the test graph.  Then, given those permuted adjacency matrices, compute the average, and then implement a standard $1$nn classifier.
+	\item[\texttt{1NN-GI}] Use the graph invariant approach as described above. We provide the normalized graph invariants as inputs into a number of standard classifiers, including $k$nn, linear classifiers, support vector machines, random forests, and CW. On this data, the CW classifier performed best; we therefore only report its results.
+\end{description}
 
 
 \begin{table}[h!]
@@ -395,7 +393,7 @@ A ``connectome'' is a graph in which vertices correspond to biological neural un
 \begin{center}
 \begin{tabular}{|r|r|r|r|r|}
 \hline
-1 & 2  & 3 & 4 & 5\\
+\texttt{NO-QAP} & \texttt{1-QAP} & \texttt{LOO-QAP} & \texttt{AVG-QAP} & \texttt{1NN-GI}\\
 \hline
 $20\%$ & $31\%$ & $45\%$ & ?? & $25\%$ \\
     \hline
