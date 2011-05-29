@@ -122,8 +122,9 @@ Lsems.star  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_MC);
 
 %% test using hold-out training data
 
-alg.classifier = '1NN';
-alg.names   = [{'LAP'}; {'NAP'}];   % which algorithms to run
+alg.classifier = 'BPI';
+alg.QAP_max_iters=0.5;
+
 
 [LAP QAP] = classify_unlabeled_graphs(Atrn,Atst,ytst,P,alg);
 
@@ -179,8 +180,8 @@ end
 
 figure(4), clf, hold all
 
-errorbar(0:alg.QAP_max_iters,QAP.obj0_avg,QAP.obj0_var,'k','linewidth',2)
-errorbar(0:alg.QAP_max_iters,QAP.obj1_avg,QAP.obj1_var,'r','linewidth',2)
+errorbar(0:QAP.max_iters,QAP.obj0_avg,QAP.obj0_var,'k','linewidth',2)
+errorbar(0:QAP.max_iters,QAP.obj1_avg,QAP.obj1_var,'r','linewidth',2)
 
 legend('class 0','class 1')
 
@@ -202,23 +203,23 @@ figure(3), clf, hold all
 ms=16;
 
 % rand
-errorbar(0.5,Lhats.rand,Lstds.rand,'g','linewidth',2,'Marker','.','Markersize',ms)
+errorbar(0.5,Lhats.rand,Lsems.rand,'g','linewidth',2,'Marker','.','Markersize',ms)
 
 % LAP
 if strcmp(alg.names(1),'LAP'),
-    errorbar(1.1,LAP.Lhat,LAP.Lstd,'k','linewidth',2,'Marker','.','Markersize',ms)
+    errorbar(1.1,LAP.Lhat,LAP.Lsem,'k','linewidth',2,'Marker','.','Markersize',ms)
 end
 
 % QAP
 if strcmp(alg.names(2),'QAP'),
-    errorbar(1:alg.QAP_max_iters+.2,QAP.Lhat,QAP.Lstd,'linewidth',2,'Marker','.','Markersize',ms)
+    errorbar(0:QAP.max_iters,[Lhats.rand QAP.Lhat],[Lsems.rand QAP.Lsem],'linewidth',2,'Marker','.','Markersize',ms)
 end
 
 % L*
-errorbar(alg.QAP_max_iters+1,Lhats.star,Lstds.star,'r','linewidth',2,'Marker','.','Markersize',ms)
+errorbar(QAP.max_iters+1,Lhats.star,Lstds.star,'r','linewidth',2,'Marker','.','Markersize',ms)
 
 legend('rand','LAP','QAP','L^*')
-% axis([-0.5 alg.QAP_max_iters+1.5 0 0.5])
+% axis([-0.5 QAP.max_iters+1.5 0 0.5])
 axis('tight')
 
 ylabel('$\hat{L}$','interp','latex','Rotation',0)
@@ -233,4 +234,11 @@ if alg.save
     saveas(gcf,figname)
 end
 
+%% plot permutations
 
+subplot(321), imagesc(LAP.ind0)
+subplot(322), imagesc(LAP.ind1)
+subplot(323), imagesc(squeeze(QAP.inds0(:,1,:)))
+subplot(324), imagesc(squeeze(QAP.inds1(:,1,:)))
+subplot(325), imagesc(LAP.ind0==squeeze(QAP.inds0(:,1,:)))
+subplot(326), imagesc(LAP.ind0==squeeze(QAP.inds0(:,1,:)))

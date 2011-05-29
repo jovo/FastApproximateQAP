@@ -122,8 +122,8 @@ Lsems.star  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_MC);
 
 %% test using hold-out training data
 
-alg.classifier = '1NN';
-alg.QAP_max_iters=9.5;
+alg.classifier = 'BPI';
+alg.QAP_max_iters=0.5;
 
 
 [LAP QAP] = classify_unlabeled_graphs(Atrn,Atst,ytst,P,alg);
@@ -233,3 +233,13 @@ if alg.save
     print('-deps',figname)
     saveas(gcf,figname)
 end
+
+%% plot permutations
+
+figure(5), clf
+subplot(321), imagesc(LAP.ind0)
+subplot(322), imagesc(LAP.ind1)
+subplot(323), imagesc(squeeze(QAP.inds0(:,1,:)))
+subplot(324), imagesc(squeeze(QAP.inds1(:,1,:)))
+subplot(325), samesame=LAP.ind0==squeeze(QAP.inds0(:,1,:)); imagesc(samesame), title(sum(samesame(:))/numel(samesame))
+subplot(326), samesame=LAP.ind1==squeeze(QAP.inds1(:,1,:)); imagesc(samesame), title(sum(samesame(:))/numel(samesame))

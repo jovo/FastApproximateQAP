@@ -73,6 +73,7 @@ end;
 stoptol=1.0e-4;
 myp=[];
 iter=0; stop=0;
+myps=nan(IMAX,n);
 while ( (iter < IMAX) && (stop==0))
     % ---- fun+grad ------
     [f0,g] = fungrad(x,A,B);
@@ -103,7 +104,7 @@ while ( (iter < IMAX) && (stop==0))
         else
             temp=myp;
         end
-        myps{iter}=temp;
+        myps(iter,:)=temp;
         fs(iter)=sum(sum(A.*B(temp,temp)));
     end
     %frintf(1,'Norm of error=%e.  Step length=%f\n ',norm(x-xs),salpha)
