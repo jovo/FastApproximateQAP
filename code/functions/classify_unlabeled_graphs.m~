@@ -93,18 +93,18 @@ for j=1:n_MC
     if QAP.do
         
         starttime = cputime;
-        [~,~,~,iter0,fs0,QAP_inds0]=sfw(Atrn(:,:,j),-A,alg.QAP_max_iters,alg.QAP_init);
+        [~,~,~,iter0,~,QAP_inds0]=sfw(Atrn(:,:,j),-A,alg.QAP_max_iters,alg.QAP_init);
         
-        QAP.obj0(j,1) = sum(sum(Atrn(:,:,j).*A)); %
+        QAP.obj0(j,1) = sum(sum(Atrn(:,:,j).*A)); %norm(Atrn(:,:,j)-A);
         for ii=1:iter0
-            QAP.obj0(j,ii+1) = fs0(ii); %sum(sum(Atrn(:,:,j).*A(QAP_inds0{ii},QAP_inds0{ii}))); %norm(Atrn(:,:,j) - A(QAP_inds0{ii},QAP_inds0{ii}));
+            QAP.obj0(j,ii+1) = sum(sum(Atrn(:,:,j).*AQAP_inds0{ii},QAP_inds0{ii}))); %norm(Atrn(:,:,j) - A(QAP_inds0{ii},QAP_inds0{ii}));
             QAP.work0(j,ii)= QAP.obj0(j,ii+1) <= QAP.obj0(j,1); % check that QAP works
         end
         
-        [~,~,~,iter1,fs1,QAP_inds1]=sfw(Atrn(:,:,j+n_MC),-A,alg.QAP_max_iters,alg.QAP_init);
+        [~,~,~,iter1,~,QAP_inds1]=sfw(Atrn(:,:,j+n_MC),-A,alg.QAP_max_iters,alg.QAP_init);
         QAP.obj1(j,1)  = sum(sum(Atrn(:,:,j+n_MC).*A)); %norm(Atrn(:,:,j+n_MC)-A);
         for ii=1:iter1
-            QAP.obj1(j,ii+1) = fs1(ii); %sum(sum(Atrn(:,:,j+n_MC).*A(QAP_inds1{ii},QAP_inds1{ii}))); %norm(Atrn(:,:,j+n_MC) - A(QAP_inds1{ii},QAP_inds1{ii}));
+            QAP.obj1(j,ii+1) = norm(Atrn(:,:,j+n_MC) - A(QAP_inds1{ii},QAP_inds1{ii}));
             QAP.work1(j,ii)= QAP.obj1(j,ii+1) <= QAP.obj1(j,1); % check that QAP works
         end
         
@@ -133,7 +133,7 @@ if LAP.do
 end
 
 if QAP.do
-    for ii=1:alg.QAP_max_iters+0.5;
+    for ii=1:alg.QAP_max_iters
         corrects = QAP.correct(:,ii);
         keeper   = ~isnan(corrects);
         corrects = corrects(keeper);

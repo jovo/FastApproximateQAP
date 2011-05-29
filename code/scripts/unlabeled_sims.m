@@ -3,12 +3,12 @@ clear; clc
 
 alg.datadir = '../../data/';
 alg.figdir  = '../../figs/';
-alg.fname   = 'hetero';    % different names will generate different simulations
+alg.fname   = 'homo_kidney_egg';    % different names will generate different simulations
 
 n   = 10;                           % # of vertices
-S   = 100;                          % # of samples
+n_MC= 100;                          % # of samples
 
-alg.save    = 1;                    % whether to save/print results
+alg.save    = 0;                    % whether to save/print results
 alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
 alg.truth_start = false;                % start LAP and QAP at truth
 
@@ -28,53 +28,64 @@ switch alg.fname
         
         E1=p*ones(n);   % params in class 1
         E1(egg,egg)=q1; % egg params in class 1
-                
-        params.n=n; params.p=p; params.q0=q0; params.q1=q1; params.egg=egg; params.S=S; params.E0=E0; params.E1=E1;
+        
+        params.n=n; params.p=p; params.q0=q0; params.q1=q1; params.egg=egg; params.S=n_MC; params.E0=E0; params.E1=E1;
         
     case 'hetero'
-         
+        
         E0=rand(n);     % params in class 0
         E1=rand(n);     % params in class 1
-                
-        params.n=n; params.S=S; params.E0=E0; params.E1=E1;
+        
+        params.n=n; params.S=n_MC; params.E0=E0; params.E1=E1;
         
     case 'hetero_kidney_egg'
-         
+        
         E0=rand(n);     % params in class 0
         E1=rand(n);     % params in class 1
         egg = 1:5;      % vertices in egg
         E1(egg,egg)=E0(egg,egg);
         
-        params.n=n; params.S=S; params.E0=E0; params.E1=E1;
-
+        params.n=n; params.S=n_MC; params.E0=E0; params.E1=E1;
+        
     case 'hard_hetero'
-         
+        
         E0=rand(n);         % params in class 0
         E1=E0+randn(n)*.1;  % params in class 1
         E1(E1>=1)=1-1e-3;   % don't let prob be >1
         E1(E1<=0)=1e-3;     % or <0
-                
-        params.n=n; params.S=S; params.E0=E0; params.E1=E1;
+        
+        params.n=n; params.S=n_MC; params.E0=E0; params.E1=E1;
 end
 
-S0 = S/2; % # of samples in class 0
-S1 = S/2; % # of samples in class 1
+S0 = n_MC; % # of samples in class 0
+S1 = n_MC; % # of samples in class 1
 
 A0 = repmat(E0,[1 1 S0]) > rand(n,n,S0);    % class 0 samples
 A1 = repmat(E1,[1 1 S1]) > rand(n,n,S1);    % class 1 samples
 
-adjacency_matrices(:,:,1:S0)=A0;            % create adjacency_matrices to store all sampled graphs
-adjacency_matrices(:,:,S0+1:S)=A1;          % add class 1 samples
+Atrn=nan(n,n,2*n_MC);
+Atrn(:,:,1:S0)=A0;            % create adjacency_matrices to store all sampled graphs
+Atrn(:,:,(S0+1):2*n_MC)=A1;          % add class 1 samples
 class_labels=[zeros(1,S0) ones(1,S1)];      % vector of class labels
 
-save([alg.datadir alg.fname],'adjacency_matrices','class_labels','params','alg')
+if alg.save
+    save([alg.datadir alg.fname],'adjacency_matrices','class_labels','params','alg')
+end
 
 %% performance tests
 
-trn_ind = [1:S0/2,      S0+1:S0+S1/2];  % let half of the samples from each class be training
-tst_ind = [S0/2+1:S0,   S0+S1/2+1:S];   % the other half is for testing
 
-ytst = class_labels(tst_ind);           % class labes for test data
+ytst=round(rand(n_MC,1));
+
+ytst1=find(ytst==1);
+len1=sum(ytst);
+
+ytst0=find(ytst==0);
+len0=n_MC-len1;
+
+Atst=nan(n,n,n_MC);
+Atst(:,:,ytst1)=repmat(E1,[1 1 len1]) > rand(n,n,len1);    % class 0 samples
+Atst(:,:,ytst0)=repmat(E0,[1 1 len0]) > rand(n,n,len0);    % class 0 samples
 
 % parameters for naive bayes classifiers
 P.lnE0  = log(params.E0);
@@ -82,40 +93,44 @@ P.ln1E0 = log(1-params.E0);
 P.lnE1  = log(params.E1);
 P.ln1E1 = log(1-params.E1);
 
-P.lnprior0 = log(S0/S);
-P.lnprior1 = log(S1/S);
+P.lnprior0 = log(S0/n_MC);
+P.lnprior1 = log(S1/n_MC);
 
 %% when not trying to solve QAP
 
 % make data unlabeled
-adj_mat=0*adjacency_matrices;
-for i=S
+adj_mat=0*Atst;
+for i=n_MC
     q=randperm(n);
-    A=adjacency_matrices(:,:,i);
+    A=Atst(:,:,i);
     adj_mat(:,:,i)=A(q,q);
 end
 
-Atst=adj_mat(:,:,tst_ind);
+% Atst2=adj_mat(:,:,tst_ind);
 
-[Lhat Lstd] = naive_bayes_classify(Atst,ytst,P);
+[Lhat Lstd] = naive_bayes_classify(adj_mat,ytst,P);
 Lhats.rand  = Lhat.all;
 Lstds.rand  = Lstd.all;
+Lsems.rand  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_MC);
 
 %% performance using true parameters and labels
-
-Atst=adjacency_matrices(:,:,tst_ind);
 
 [Lhat Lstd] = naive_bayes_classify(Atst,ytst,P);
 Lhats.star  = Lhat.all;
 Lstds.star  = Lstd.all;
+Lsems.star  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_MC);
 
 %% test using hold-out training data
 
-Atrn=adjacency_matrices(:,:,trn_ind);
+alg.classifier = '1NN';
+alg.QAP_max_iters=0.5;
+
 
 [LAP QAP] = classify_unlabeled_graphs(Atrn,Atst,ytst,P,alg);
 
-save([alg.datadir alg.fname '_results'],'adjacency_matrices','class_labels','params','alg','Lhat','LAP','QAP')
+if alg.save
+    save([alg.datadir alg.fname '_results'],'adjacency_matrices','class_labels','params','alg','Lhat','LAP','QAP')
+end
 
 %% plot model
 
@@ -160,22 +175,44 @@ if alg.save
     saveas(gcf,figname)
 end
 
+
+%% plot objective functions for QAP
+
+figure(4), clf, hold all
+
+errorbar(0:alg.QAP_max_iters,QAP.obj0_avg,QAP.obj0_var,'k','linewidth',2)
+errorbar(0:alg.QAP_max_iters,QAP.obj1_avg,QAP.obj1_var,'r','linewidth',2)
+
+legend('class 0','class 1')
+
+ylabel('objective function')
+xlabel('# of interations','interp','none')
+
+if alg.save
+    wh=[6 2];   %width and height
+    set(gcf,'PaperSize',wh,'PaperPosition',[0 0 wh],'Color','w');
+    figname=[alg.figdir alg.fname '_obj'];
+    print('-dpdf',figname)
+    print('-deps',figname)
+    saveas(gcf,figname)
+end
+
 %% plot Lhat & errorbars
 
 figure(3), clf, hold all
 ms=16;
 
 % rand
-errorbar(0.5,Lhats.rand,Lstds.rand,'g','linewidth',2,'Marker','.','Markersize',ms)
+errorbar(0.5,Lhats.rand,Lsems.rand,'g','linewidth',2,'Marker','.','Markersize',ms)
 
 % LAP
 if strcmp(alg.names(1),'LAP'),
-    errorbar(1.1,LAP.Lhat,LAP.Lstd,'k','linewidth',2,'Marker','.','Markersize',ms)
+    errorbar(1.1,LAP.Lhat,LAP.Lsem,'k','linewidth',2,'Marker','.','Markersize',ms)
 end
 
 % QAP
 if strcmp(alg.names(2),'QAP'),
-    errorbar(1:alg.QAP_max_iters+.2,QAP.Lhat,QAP.Lstd,'linewidth',2,'Marker','.','Markersize',ms)
+    errorbar(1:alg.QAP_max_iters+.2,QAP.Lhat,QAP.Lsem,'linewidth',2,'Marker','.','Markersize',ms)
 end
 
 % L*
@@ -198,23 +235,3 @@ if alg.save
 end
 
 
-%% plot objective functions for QAP
-
-figure(4), clf, hold all
-
-errorbar(0:alg.QAP_max_iters,QAP.obj0_avg,QAP.obj0_var,'k','linewidth',2)
-errorbar(0:alg.QAP_max_iters,QAP.obj1_avg,QAP.obj1_var,'r','linewidth',2)
-
-legend('class 0','class 1')
-
-ylabel('objective function')
-xlabel('# of interations','interp','none')
-
-if alg.save
-    wh=[6 2];   %width and height
-    set(gcf,'PaperSize',wh,'PaperPosition',[0 0 wh],'Color','w');
-    figname=[alg.figdir alg.fname '_obj'];
-    print('-dpdf',figname)
-    print('-deps',figname)
-    saveas(gcf,figname)
-end
