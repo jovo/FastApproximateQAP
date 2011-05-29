@@ -123,7 +123,7 @@ Lsems.star  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_MC);
 %% test using hold-out training data
 
 alg.classifier = '1NN';
-alg.QAP_max_iters=0.5;
+alg.QAP_max_iters=9.5;
 
 
 [LAP QAP] = classify_unlabeled_graphs(Atrn,Atst,ytst,P,alg);
@@ -180,8 +180,8 @@ end
 
 figure(4), clf, hold all
 
-errorbar(0:alg.QAP_max_iters,QAP.obj0_avg,QAP.obj0_var,'k','linewidth',2)
-errorbar(0:alg.QAP_max_iters,QAP.obj1_avg,QAP.obj1_var,'r','linewidth',2)
+errorbar(0:QAP.max_iters,QAP.obj0_avg,QAP.obj0_var,'k','linewidth',2)
+errorbar(0:QAP.max_iters,QAP.obj1_avg,QAP.obj1_var,'r','linewidth',2)
 
 legend('class 0','class 1')
 
@@ -212,14 +212,14 @@ end
 
 % QAP
 if strcmp(alg.names(2),'QAP'),
-    errorbar(1:alg.QAP_max_iters+.2,QAP.Lhat,QAP.Lsem,'linewidth',2,'Marker','.','Markersize',ms)
+    errorbar(0:QAP.max_iters,[Lhats.rand QAP.Lhat],[Lsems.rand QAP.Lsem],'linewidth',2,'Marker','.','Markersize',ms)
 end
 
 % L*
-errorbar(alg.QAP_max_iters+1,Lhats.star,Lstds.star,'r','linewidth',2,'Marker','.','Markersize',ms)
+errorbar(QAP.max_iters+1,Lhats.star,Lstds.star,'r','linewidth',2,'Marker','.','Markersize',ms)
 
 legend('rand','LAP','QAP','L^*')
-% axis([-0.5 alg.QAP_max_iters+1.5 0 0.5])
+% axis([-0.5 QAP.max_iters+1.5 0 0.5])
 axis('tight')
 
 ylabel('$\hat{L}$','interp','latex','Rotation',0)
@@ -233,5 +233,3 @@ if alg.save
     print('-deps',figname)
     saveas(gcf,figname)
 end
-
-

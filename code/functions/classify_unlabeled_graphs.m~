@@ -48,12 +48,13 @@ end
 if strcmp(alg.names(2),'QAP'),
     QAP.time    = 0;
     QAP.do      = true;
-    QAP.yhat    = NaN(n_MC,alg.QAP_max_iters);
-    QAP.correct = NaN(n_MC,alg.QAP_max_iters);
-    QAP.work0   = NaN(n_MC,alg.QAP_max_iters);
-    QAP.work1   = NaN(n_MC,alg.QAP_max_iters);
-    QAP.obj0    = NaN(n_MC,alg.QAP_max_iters);
-    QAP.obj1    = NaN(n_MC,alg.QAP_max_iters);
+    QAP.max_iters = ceil(alg.QAP_max_iters);
+    QAP.yhat    = NaN(n_MC,QAP.max_iters);
+    QAP.correct = NaN(n_MC,QAP.max_iters);
+    QAP.work0   = NaN(n_MC,QAP.max_iters);
+    QAP.work1   = NaN(n_MC,QAP.max_iters);
+    QAP.obj0    = NaN(n_MC,QAP.max_iters);
+    QAP.obj1    = NaN(n_MC,QAP.max_iters);
     QAP.classifier = alg.classifier;
 else QAP.do = false;
 end
@@ -70,18 +71,20 @@ for j=1:n_MC
     if LAP.do
         starttime = cputime;
         LAP_ind0 = munkres(-Atrn(:,:,j)*A');     %Note that sum(sum(-A(LAP,:).*Atst))==f
-        LAP.work0(j)=norm(Atrn(:,:,j)-A(LAP_ind0,:)) <= norm(Atrn(:,:,j)-A); % check that LAP work
-        
         LAP_ind1 = munkres(-Atrn(:,:,j+n_MC)*A');     %Note that sum(sum(-A(LAP,:).*A))==f
-        LAP.work1(j)=norm(Atrn(:,:,j+n_MC)-A(LAP_ind1,:)) <= norm(Atrn(:,:,j+n_MC)-A); % check that LAP work
+        
+        A0=A(LAP_ind0,:);
+        A1=A(LAP_ind1,:);
+        
+        LAP.work0(j)=norm(Atrn(:,:,j)-A0) <= norm(Atrn(:,:,j)-A); % check that LAP work
+        LAP.work1(j)=norm(Atrn(:,:,j+n_MC)-A1) <= norm(Atrn(:,:,j+n_MC)-A); % check that LAP work
         
         if strcmp(LAP.classifier,'BPI')
-            LAP_lik0=sum(sum(A(LAP_ind0,:).*P.lnE0+(1-A(LAP_ind0,:)).*P.ln1E0));
-            LAP_lik1=sum(sum(A(LAP_ind1,:).*P.lnE1+(1-A(LAP_ind1,:)).*P.ln1E1));
-            
+            LAP_lik0=get_lik(A0,P.lnE0,P.ln1E0);
+            LAP_lik1=get_lik(A1,P.lnE1,P.ln1E1);
         elseif strcmp(LAP.classifier,'1NN')
-            LAP_lik0=-sum(sum(abs(A(LAP_ind0,:)-Atrn(:,:,j))));
-            LAP_lik1=-sum(sum(abs(A(LAP_ind1,:)-Atrn(:,:,j+n_MC))));
+            LAP_lik0=-sum(sum(abs(A0-Atrn(:,:,j))));
+            LAP_lik1=-sum(sum(abs(A1-Atrn(:,:,j+n_MC))));
         end
         [~, bar] = sort([LAP_lik0, LAP_lik1]);
         LAP.yhat(j)=bar(2)-1;
@@ -93,28 +96,32 @@ for j=1:n_MC
     if QAP.do
         
         starttime = cputime;
-        [~,~,~,iter0,~,QAP_inds0]=sfw(Atrn(:,:,j),-A,alg.QAP_max_iters,alg.QAP_init);
+        [~,~,~,iter0,fs0,QAP_inds0]=sfw(Atrn(:,:,j),-A,QAP.max_iters,alg.QAP_init);
         
-        QAP.obj0(j,1) = sum(sum(Atrn(:,:,j).*A)); %norm(Atrn(:,:,j)-A);
+        QAP.obj0(j,1) = sum(sum(Atrn(:,:,j).*A));
+        QAP.obj0(j,2:iter0+1)=fs0;
         for ii=1:iter0
-            QAP.obj0(j,ii+1) = sum(sum(Atrn(:,:,j).*AQAP_inds0{ii},QAP_inds0{ii}))); %norm(Atrn(:,:,j) - A(QAP_inds0{ii},QAP_inds0{ii}));
+%             QAP.obj0(j,ii+1) = fs0(ii); %sum(sum(Atrn(:,:,j).*Atemp))); %norm(Atrn(:,:,j) - Atemp));
             QAP.work0(j,ii)= QAP.obj0(j,ii+1) <= QAP.obj0(j,1); % check that QAP works
         end
         
-        [~,~,~,iter1,~,QAP_inds1]=sfw(Atrn(:,:,j+n_MC),-A,alg.QAP_max_iters,alg.QAP_init);
+        [~,~,~,iter1,fs1,QAP_inds1]=sfw(Atrn(:,:,j+n_MC),-A,QAP.max_iters,alg.QAP_init);
         QAP.obj1(j,1)  = sum(sum(Atrn(:,:,j+n_MC).*A)); %norm(Atrn(:,:,j+n_MC)-A);
+        QAP.obj0(j,2:iter0+)=fs0;
         for ii=1:iter1
-            QAP.obj1(j,ii+1) = norm(Atrn(:,:,j+n_MC) - A(QAP_inds1{ii},QAP_inds1{ii}));
+%             QAP.obj1(j,ii+1) = fs1(ii); %sum(sum(Atrn(:,:,j+n_MC).*A1)); %norm(Atrn(:,:,j+n_MC) - A1);
             QAP.work1(j,ii)= QAP.obj1(j,ii+1) <= QAP.obj1(j,1); % check that QAP works
         end
         
         for ii=1:min(iter0,iter1)
+            A0=A(QAP_inds0{ii},QAP_inds0{ii});
+            A1=A(QAP_inds1{ii},QAP_inds1{ii});
             if strcmp(LAP.classifier,'BPI')
-                QAP_lik0=sum(sum(A(QAP_inds0{ii},QAP_inds0{ii}).*P.lnE0+(1-A(QAP_inds0{ii},QAP_inds0{ii})).*P.ln1E0));
-                QAP_lik1=sum(sum(A(QAP_inds1{ii},QAP_inds1{ii}).*P.lnE1+(1-A(QAP_inds1{ii},QAP_inds1{ii})).*P.ln1E1));
+                QAP_lik0=get_lik(A0,P.lnE0,P.ln1E0);
+                QAP_lik1=get_lik(A1,P.lnE1,P.ln1E1);
             elseif strcmp(LAP.classifier,'1NN')
-                QAP_lik0=-sum(sum(abs(A(QAP_inds0{ii},QAP_inds0{ii})-Atrn(:,:,j))));
-                QAP_lik1=-sum(sum(abs(A(QAP_inds1{ii},QAP_inds1{ii})-Atrn(:,:,j+n_MC))));
+                QAP_lik0=-sum(sum(abs(A0-Atrn(:,:,j))));
+                QAP_lik1=-sum(sum(abs(A1-Atrn(:,:,j+n_MC))));
             end
             [~, bar] = sort([QAP_lik0, QAP_lik1]);
             QAP.yhat(j,ii)=bar(2)-1;
@@ -133,7 +140,7 @@ if LAP.do
 end
 
 if QAP.do
-    for ii=1:alg.QAP_max_iters
+    for ii=1:QAP.max_iters
         corrects = QAP.correct(:,ii);
         keeper   = ~isnan(corrects);
         corrects = corrects(keeper);
@@ -153,3 +160,13 @@ if QAP.do
     QAP.obj0_var(+1) = var(QAP.obj0(:,+1));
     QAP.obj1_var(+1) = var(QAP.obj1(:,+1));
 end
+
+end
+
+function lik = get_lik(A,lnE,ln1E)
+
+lik = sum(sum(0.*lnE+(1-A).*ln1E));
+
+end
+
+

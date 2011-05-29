@@ -8,7 +8,7 @@ function [f,myp,x,iter,fs,myps]=sfw(A,B,IMAX,x0)
 % Convergence is declared if a fix point is encountered or if the projected
 % gradient has 2-norm of 1.0e-4 or less.
 % IMAX is optional with a default value of 30 iterations.
-%     If IMAX is set to 0 then one iteration of FW is performed with no
+%     If IMAX is set to 0.5 then one iteration of FW is performed with no
 %     line search.  This is Carey Priebe's LAP approximation to the QAP.
 % The starting point is optional as well and its default value is
 % ones(n)/n, the flat doubly stochastic matrix.
