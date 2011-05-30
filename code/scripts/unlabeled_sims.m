@@ -238,11 +238,11 @@ end
 %% plot permutations
 
 figure(5), clf
-subplot(321), imagesc(LAP.ind0)
-subplot(322), imagesc(LAP.ind1)
-subplot(323), imagesc(squeeze(QAP.inds0(:,1,:)))
+subplot(321), imagesc(LAP.ind0), title('Class 0'), ylabel('LAP')
+subplot(322), imagesc(LAP.ind1), title('Class 1')
+subplot(323), imagesc(squeeze(QAP.inds0(:,1,:))), ylabel('QAP')
 subplot(324), imagesc(squeeze(QAP.inds1(:,1,:)))
-subplot(325), samesame=LAP.ind0==squeeze(QAP.inds0(:,1,:)); imagesc(samesame), title(sum(samesame(:))/numel(samesame))
+subplot(325), samesame=LAP.ind0==squeeze(QAP.inds0(:,1,:)); imagesc(samesame), title(sum(samesame(:))/numel(samesame)), ylabel('not equal')
 subplot(326), samesame=LAP.ind1==squeeze(QAP.inds1(:,1,:)); imagesc(samesame), title(sum(samesame(:))/numel(samesame))
 
 if alg.save
