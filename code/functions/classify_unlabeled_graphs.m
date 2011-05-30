@@ -80,11 +80,11 @@ for j=1:n_MC
         
         starttime = cputime;
         
-        [~,~,~,iter0,fs0,QAP.inds0(j,:,:)]=sfw(-Atrn(:,:,j),A',QAP.max_iters,alg.QAP_init);
+        [~,~,~,iter0,fs0,QAP.inds0(j,:,:)]=sfw(-Atrn(:,:,j),A',alg.QAP_max_iters,alg.QAP_init);
         QAP.obj0(j,1) = sum(sum(Atrn(:,:,j).*A));
         QAP.obj0(j,2:iter0+1)=fs0;
         
-        [~,~,~,iter1,fs1,QAP.inds1(j,:,:)]=sfw(-Atrn(:,:,j+n_MC),A',QAP.max_iters,alg.QAP_init);
+        [~,~,~,iter1,fs1,QAP.inds1(j,:,:)]=sfw(-Atrn(:,:,j+n_MC),A',alg.QAP_max_iters,alg.QAP_init);
         QAP.obj1(j,1)  = sum(sum(Atrn(:,:,j+n_MC).*A));
         QAP.obj1(j,2:iter1+1)=fs1;
         

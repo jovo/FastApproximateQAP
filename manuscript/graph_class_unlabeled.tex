@@ -209,23 +209,27 @@ The Frank-Wolfe (FW) algorithm is a successive linear programming algorithm for 
 \begin{align} \label{eq:grad}
 	\nabla_Q^{(j)} = \partial f / \partial Q^{(j)} =  A Q^{(j)} B\T + A\T Q^{(j)} B.
 \end{align}
-Instead of directly ascending this gradient, we traverse the direction of the doubly stochastic matrix closest to this gradient. Noting that that direction may be computed by the dot-product operator, we have:
+Instead of directly ascending this gradient, we search for the direction of the doubly stochastic matrix closest to this gradient. Noting that that direction may be computed by the dot-product operator, we have:
 \begin{align}\label{eq:dir}
 	W^{(j)} = \argmin_{W^{(j)} \in \mc{D}} \langle \nabla_Q^{(j)},W^{(j)} \rangle. %  \sum_{i,j=1}^m 	\left( 	\nabla_Q^{(j)}\circ W^{(j)} \right)_{ij}.
 \end{align}
-Although $W^{(j)}$ is constrained only to be a doubly stochastic matrix, it is guaranteed to be a permutation, because the permutation matrices are the vertices of the set of doubly stochastic matrices (and minima are necessarily at the vertices).  Note that Eq. \eqref{eq:dir} is a linear assignment problem (LAP) \cite{Burkard2009}.  The Hungarian algorithm is an efficient algorithm for finding the global optimum of any LAP in $\mc{O}(n_V^3)$ \cite{Burkard2009}.\footnote{More efficient algorithms are available for certain special cases, that is, whenever the matrix-vector multiplication operation is fast (for example, when both $A$ and $B$ are sparse).} Given this direction, one can then perform a line search to find the doubly stochastic matrix that minimizes the objective function along that direction:
+Although $W^{(j)}$ is constrained only to be a doubly stochastic matrix, it is guaranteed to be a permutation, because the permutation matrices are the vertices of the set of doubly stochastic matrices (and minima are necessarily at the vertices).  Note that Eq. \eqref{eq:dir} is a linear assignment problem (LAP) \cite{Burkard2009} (see below for details).  The Hungarian algorithm is an efficient algorithm for finding the global optimum of any LAP in $\mc{O}(n_V^3)$ \cite{Burkard2009}.\footnote{More efficient algorithms are available for certain special cases, that is, whenever the matrix-vector multiplication operation is fast (for example, when both $A$ and $B$ are sparse).} Given $W^{(j)}$, the new direction is given by:
 \begin{align}
-	\alpha^{(j)} = \argmin_{\alpha \in [0,1]} f(Q^{(j)} + \alpha^{(j)} W^{(j)})
+	d^{(j)}=W^{(j)}-Q^{(j)}.
+\end{align}
+Given this direction, one can then perform a line search to find the doubly stochastic matrix that minimizes the objective function along that direction:
+\begin{align}
+	\alpha^{(j)} = \argmin_{\alpha \in [0,1]} f(Q^{(j)} + \alpha^{(j)} d^{(j)}).
 \end{align}
 This can be performed exactly, because $f$ is a quadratic function.  Finally, the new estimated doubly stochastic matrix is given by:
 \begin{align}\label{eq:update}
-	Q^{(j+1)} = Q^{(j)} + \alpha^{(j)} W^{(j)}
+	Q^{(j+1)} = Q^{(j)} + \alpha^{(j)} d^{(j)}.
 \end{align}
-Eqs. \eqref{eq:grad}--\eqref{eq:update} are iterated until convergence, computational budget limits, or some other stopping criterion is met.  Note that while $Q^{(j+1)}$ is not a permutation matrix, we do not project $Q^{(j+1)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time. At convergence, however, we have $\mh{Q}_{AQAP}$, which we project onto the set of permutation matrices:
-\begin{align}
+Eqs. \eqref{eq:grad}--\eqref{eq:update} are iterated until convergence, computational budget limits, or some other stopping criterion is met.  Note that while $Q^{(j+1)}$ is not a permutation matrix, we do not project $Q^{(j+1)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time. After the final iteration, however, we have $\mh{Q}_{AQAP}$, which we project onto the set of permutation matrices:
+\begin{align} \label{eq:proj}
 	\mh{Q}_{QAP} = \argmin_{Q \in \mc{Q}} \langle \mh{Q}_{AQAP}, Q \rangle,
 \end{align}
-which is our approximate solution to QAP.  Note that FW will not generally achieve the global optimal even of Eq. \eqref{eq:tqap}, because $f$ is not necessarily positive definite.  This is clear upon computing the Hessian of $f$  with respect to $Q$:
+which is our approximate solution to QAP.  Eq. \eqref{eq:proj} can also be cast as a LAP, and so we use the Hungarian algorithm to solve it as well.  Note that FW will not generally achieve the global optimal even of Eq. \eqref{eq:tqap}, because $f$ is not necessarily positive definite.  This is clear upon computing the Hessian of $f$  with respect to $Q$:
 \begin{align}
 	\nabla_Q^2  =  B \otimes A + B\T \otimes A\T,
 \end{align}
@@ -256,7 +260,7 @@ First, one could implement a nearest neighbor style classifiers, such as the $k_
 
 Alternately, one could implement an interpoint-dissimilarity matrix based algorithm \cite{Duin2011}. This strategy has the advantage of using all available information to generate a class prediction, but a disadvantage that it requires $(n+1)^2$ graph dissimilarity computations. Moreover, it may be more sensitive to outliers.
 
-For simplicity, we only consider the $k$NN strategy here.  Specifically, given a test adjacency matrix, $A$, find $\mh{Q}_i^A=\mh{Q}_{QAP}(A,B_i)$ for all $n$ training adjacency matrices, $\{B_i\}_{i \in [n]}$.  Given these solutions, let $\mt{A}_i=\mh{Q}_i^A A {\mh{Q}_i^A}{}\T$ for all $i$. Given a suitable dissimilarity $d: \mc{A}^{n_V\times n_V} \times \mc{A}^{n_V\times n_V} \mapsto \Real_+$, one can compute $d(\mt{A}_i,B_i)$ for all $i \in [n]$, and sort them: $d_{(1)} \leq d_{(2)} \leq \cdots \leq d_{(n)}$.  Let the $k_n$ nearest neighbors of $A$ be the graphs with the $k_n$ smallest distances, $\{d_{(1)},\ldots, d_{(j)}\}$.  The estimated class of the training sample $A$ is then the plurality class of the $k_n$ nearest neighbors: $\mh{y}=\argmax_{y} \II\{\sum_{i \in [k_n]} y_{(i)} = y \}$. Call this algorithm \texttt{$k$NN} $\circ$ \texttt{QAP}.
+For simplicity, we only consider the $k$NN strategy here.  Specifically, given a test adjacency matrix, $A$, find $\mh{Q}_i^A=\mh{Q}_{QAP}(A,B_i)$ for all $n$ training adjacency matrices, $\{B_i\}_{i \in [n]}$.  Given these solutions, let $\mt{A}_i=\mh{Q}_i^A A {\mh{Q}_i^A}{}\T$ for all $i$. Given a suitable dissimilarity $d: \mc{A} \times \mc{A} \mapsto \Real_+$, one can compute $d(\mt{A}_i,B_i)$ for all $i \in [n]$, and sort them: $d_{(1)} \leq d_{(2)} \leq \cdots \leq d_{(n)}$.  Let the $k_n$ nearest neighbors of $A$ be the graphs with the $k_n$ smallest distances, $\{d_{(1)},\ldots, d_{(j)}\}$.  The estimated class of the training sample $A$ is then the plurality class of the $k_n$ nearest neighbors: $\mh{y}=\argmax_{y} \II\{\sum_{i \in [k_n]} y_{(i)} = y \}$. Call this algorithm \texttt{$k$NN} $\circ$ \texttt{QAP}.
 
 % subsubsection _k_nn_circ_qap (end)
 
@@ -357,6 +361,30 @@ We first compare the performance of \qapn with recent state-of-the-art approache
 While Fig. \ref{fig:homo_subfig2} shows the QAP objective function decreasing with each iteration, Fig. \ref{fig:homo_subfig3} shows that classification performance does not decrease.  We found similar numerical results in two additional simulations: a heterogeneous-kidney-egg model (Figure \ref{fig:hke}) and a fully heterogeneous model (Figure \ref{fig:hetero}). Note that in all simulations $L_{chance} \geq \mh{L}_{QAP} \geq L_*$, as it must be.  Multiple iterations not improving classification performance led us to investigate the relationship between QAP and the Linear Assignment Problem (LAP).
 
 
+
+
+\subsection{LAP vs. QAP} % (fold)
+\label{sub:lap_vs_qap}
+
+The LAP approximation for this class problem is given by the following equation:
+\begin{align} \label{eq:LAP}
+	\mh{Q}_{\text{LAP}} = \argmin_{Q \in \mc{Q}} \norm{QA\T - B }^2_F,
+\end{align}
+which is quite similar to QAP, except $A$ is only post-multiplied by $Q$, instead of also being pre-multiplied by $Q$. LAP can be solved exactly as a quadratic problem with linear constraints (as above, one can relax the constraint to the set of doubly stochastic matrices, and still be guaranteed to obtain a permuation matrix). Thus, one can use gradient ascent to to solve a LAP.  The gradient of $f'(Q)=\norm{AQ\T-B}_F^2$ is %:
+% \begin{align} \label{eq:grad2}
+	$\partial f'/\partial Q = 2A B\T$. 
+% \end{align}
+Comparing this gradient to that of QAP (Eq. \eqref{eq:grad}), one can see that when $Q^{(j)}$ is the identity matrix, the two gradients are identical.  Thus, if QAP is initialized at the identity matrix, the first permutation matrix (output of Eq. \eqref{eq:dir}) is be identical to $\mh{Q}_{LAP}$; although the line search will make $Q^{(1)} \neq \mh{Q}_{LAP}$, in general.  Moreoever, projecting a matrix onto the closest permutation matrix can be written as a LAP because of the following relationship:
+\begin{align}
+	\argmin_{Q \in \mc{Q}} \norm{QA\T - I}_F^2 &= \argmin_{Q \in \mc{Q}} (QA\T-I)\T (QA\T-I) 
+\nonumber\\ &=\argmin_{Q \in \mc{Q}} AQ\T QA\T -2QA\T - II = \argmin_{Q \in \mc{Q}}  -\langle Q, A\T \rangle  
+\end{align}
+
+This suggests that for certain problems, LAP is both an efficient and useful approximation to graph matching.  We confirm this intuition by substituting QAP with LAP in the above simulations (black line).  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic time complexity, will often suffice.
+
+
+% subsection lap_vs_qap (end)
+
 \begin{figure}[ht]
 \centering
 \subfigure[]{
@@ -374,8 +402,6 @@ While Fig. \ref{fig:homo_subfig2} shows the QAP objective function decreasing wi
 \label{fig:homo}
 \caption{Homogeneous-kidney-egg model simulation results. (a) Model: Each edge in the ``kidney'' in both classes has probability $0.5$; in the egg, class 0 edges are sampled with probability $0.25$, and class 1 edges are sampled with probability $0.75$. (b) QAP objective function improves with each iteration of \texttt{QAP}$_1$. (c) But classification performance does not improve.}
 \end{figure}
-
-
 
 \begin{figure}[ht]
 \centering
@@ -414,23 +440,7 @@ While Fig. \ref{fig:homo_subfig2} shows the QAP objective function decreasing wi
 \caption{hetero model}
 \end{figure}
 
-
-\subsection{LAP vs. QAP} % (fold)
-\label{sub:lap_vs_qap}
-
-The LAP approximation for this class problem is given by the following equation:
-\begin{align} \label{eq:LAP}
-	\mh{Q}_{\text{LAP}} = \argmin_{Q \in \mc{Q}} \norm{A Q\T - B }^2_F,
-\end{align}
-which is quite similar to QAP, except $A$ is only post-multiplied by $Q$, instead of also being pre-multiplied by $Q$. LAP can be solved exactly as a quadratic problem with linear constraints (as above, one can relax the constraint to the set of doubly stochastic matrices, and still be guaranteed to obtain a permuation matrix). Thus, one can use gradient ascent to to solve a LAP.  The gradient of $f'(Q)=\norm{AQ\T-B}_F^2$ is %:
-% \begin{align} \label{eq:grad2}
-	$\partial f'/\partial Q = 2A B\T$. 
-% \end{align}
-Comparing this gradient to that of QAP (Eq. \eqref{eq:grad}), one can see that when $Q^{(j)}$ is the identity matrix, the two gradients are identical.  Thus, if QAP is initialized at the identity matrix, the first iteration is identical to LAP.  This suggests that for certain problems, LAP is both an efficient and useful approximation to graph matching.  We confirm this intuition by substituting QAP with LAP in the above simulations (black line).  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic time complexity, will often suffice.
-
-
-% subsection lap_vs_qap (end)
-
+\clearpage
 \subsection{Connectome Classification} % (fold)
 \label{sub:connectome_classification}
 

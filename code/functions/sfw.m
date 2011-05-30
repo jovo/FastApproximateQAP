@@ -73,7 +73,7 @@ end;
 stoptol=1.0e-4;
 myp=[];
 iter=0; stop=0;
-myps=nan(IMAX,n);
+myps=nan(ceil(IMAX),n);
 while ( (iter < IMAX) && (stop==0))
     % ---- fun+grad ------
     [f0,g] = fungrad(x,A,B);
