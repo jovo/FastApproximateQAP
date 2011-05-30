@@ -10,17 +10,17 @@ n_MC= 100;                          % # of samples
 
 alg.save    = 0;                    % whether to save/print results
 alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
-alg.truth_start = false;                % start LAP and QAP at truth
+alg.truth_start = false;            % start QAP at truth
 
-alg.QAP_max_iters   = 10;            % max # of iterations when using QAP approx
-alg.QAP_init        = eye(n); %ones(n)/n;       % starting value for QAP (see sfw comments for explanation)
+alg.QAP_max_iters   = 10;           % max # of iterations when using QAP
+alg.QAP_init        = eye(n);       % starting value for QAP 
 
-switch alg.fname
+switch alg.fname                    % choose simulation parameters
     case 'homo_kidney_egg'
         
         p   = 0.5;      % prob of connection for kidney
-        q0  = 0.2;     % prob of connection for egg
-        q1  = 0.8;     % prob of connection for egg
+        q0  = 0.2;      % prob of connection for egg
+        q1  = 0.8;      % prob of connection for egg
         egg = 1:5;      % vertices in egg
         
         E0=p*ones(n);   % params in class 0
@@ -57,25 +57,19 @@ switch alg.fname
         params.n=n; params.S=n_MC; params.E0=E0; params.E1=E1;
 end
 
+% training data
 S0 = n_MC; % # of samples in class 0
 S1 = n_MC; % # of samples in class 1
 
 A0 = repmat(E0,[1 1 S0]) > rand(n,n,S0);    % class 0 samples
 A1 = repmat(E1,[1 1 S1]) > rand(n,n,S1);    % class 1 samples
 
-Atrn=nan(n,n,2*n_MC);
-Atrn(:,:,1:S0)=A0;            % create adjacency_matrices to store all sampled graphs
-Atrn(:,:,(S0+1):2*n_MC)=A1;          % add class 1 samples
-class_labels=[zeros(1,S0) ones(1,S1)];      % vector of class labels
-
-if alg.save
-    save([alg.datadir alg.fname],'adjacency_matrices','class_labels','params','alg')
-end
-
-%% performance tests
+Atrn = cat(3,A0,A1);                        % concatenate to get all training samples
+class_labels    = [zeros(1,S0) ones(1,S1)]; % vector of class labels
 
 
-ytst=round(rand(n_MC,1));
+% test data
+ytst=round(rand(n_MC,1));                   % sample classes iid where P[Y=1]=1/2
 
 ytst1=find(ytst==1);
 len1=sum(ytst);
@@ -96,7 +90,12 @@ P.ln1E1 = log(1-params.E1);
 P.lnprior0 = log(S0/n_MC);
 P.lnprior1 = log(S1/n_MC);
 
-%% when not trying to solve QAP
+if alg.save
+    save([alg.datadir alg.fname],'adjacency_matrices','class_labels','params','alg')
+end
+
+
+%% unlabel and don't try to do any assignment; this gives us L_chance
 
 % make data unlabeled
 adj_mat=0*Atst;
@@ -106,30 +105,32 @@ for i=n_MC
     adj_mat(:,:,i)=A(q,q);
 end
 
-% Atst2=adj_mat(:,:,tst_ind);
-
-[Lhat Lstd] = naive_bayes_classify(adj_mat,ytst,P);
+% naive bayes classify
+Lhat = naive_bayes_classify(adj_mat,ytst,P);
 Lhats.rand  = Lhat.all;
-Lstds.rand  = Lstd.all;
 Lsems.rand  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_MC);
 
-%% performance using true parameters and labels
+%% performance using true parameters and labels; this gives us L_*
 
-[Lhat Lstd] = naive_bayes_classify(Atst,ytst,P);
+Lhat = naive_bayes_classify(Atst,ytst,P);
 Lhats.star  = Lhat.all;
-Lstds.star  = Lstd.all;
 Lsems.star  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_MC);
 
-%% test using hold-out training data
+%% test classifier using only 2 unlabeled training samples
 
-alg.classifier = 'BPI';
-alg.QAP_max_iters=0.5;
-
+alg.classifier = 'BPI'; % could be BPI=bayes plugin or 1NN
+alg.QAP_max_iters=0.5;  % meaning don't do line search in QAP
 
 [LAP QAP] = classify_unlabeled_graphs(Atrn,Atst,ytst,P,alg);
 
+Lhats.LAP=LAP.Lhat;
+Lsems.LAP=LAP.Lsem;
+
+Lhats.QAP=QAP.Lhat;
+Lsems.QAP=QAP.Lsem;
+
 if alg.save
-    save([alg.datadir alg.fname '_results'],'adjacency_matrices','class_labels','params','alg','Lhat','LAP','QAP')
+    save([alg.datadir alg.fname '_results'])
 end
 
 %% plot model
@@ -202,21 +203,21 @@ end
 figure(3), clf, hold all
 ms=16;
 
-% rand
+% L_chance
 errorbar(0.5,Lhats.rand,Lsems.rand,'g','linewidth',2,'Marker','.','Markersize',ms)
 
-% LAP
+% L_LAP
 if strcmp(alg.names(1),'LAP'),
-    errorbar(1.1,LAP.Lhat,LAP.Lsem,'k','linewidth',2,'Marker','.','Markersize',ms)
+    errorbar(1.1,Lhats.LAP,Lsems.LAP,'k','linewidth',2,'Marker','.','Markersize',ms)
 end
 
-% QAP
+% L_QAP
 if strcmp(alg.names(2),'QAP'),
-    errorbar(0:QAP.max_iters,[Lhats.rand QAP.Lhat],[Lsems.rand QAP.Lsem],'linewidth',2,'Marker','.','Markersize',ms)
+    errorbar(0:QAP.max_iters,[Lhats.rand Lhats.QAP],[Lsems.rand Lsems.QAP],'linewidth',2,'Marker','.','Markersize',ms)
 end
 
-% L*
-errorbar(QAP.max_iters+1,Lhats.star,Lstds.star,'r','linewidth',2,'Marker','.','Markersize',ms)
+% L_*
+errorbar(QAP.max_iters+1,Lhats.star,Lsems.star,'r','linewidth',2,'Marker','.','Markersize',ms)
 
 legend('rand','LAP','QAP','L^*')
 % axis([-0.5 QAP.max_iters+1.5 0 0.5])
@@ -243,3 +244,12 @@ subplot(323), imagesc(squeeze(QAP.inds0(:,1,:)))
 subplot(324), imagesc(squeeze(QAP.inds1(:,1,:)))
 subplot(325), samesame=LAP.ind0==squeeze(QAP.inds0(:,1,:)); imagesc(samesame), title(sum(samesame(:))/numel(samesame))
 subplot(326), samesame=LAP.ind1==squeeze(QAP.inds1(:,1,:)); imagesc(samesame), title(sum(samesame(:))/numel(samesame))
+
+if alg.save
+    wh=[2 6];   %width and height
+    set(gcf,'PaperSize',wh,'PaperPosition',[0 0 wh],'Color','w');
+    figname=[alg.figdir alg.fname '_perms'];
+    print('-dpdf',figname)
+    print('-deps',figname)
+    saveas(gcf,figname)
+end
