@@ -181,40 +181,55 @@ if alg.save
 end
 
 %% plot model
+% load([alg.datadir alg.fname '_results'])
 
 figure(2), clf
 fs=10;  % fontsize
 
+yticklabel=[0 25 50 75 100]/100;
+if strcmp(alg.fname,'poiss')
+    yticklabel=yticklabel*100;
+    tit0='Class 0 Rate';
+    tit1='Class 1 Rate';
+else
+    tit0='Class 0 Probability';
+    tit1='Class 1 Probability';
+    P.E0=exp(P.lnE0);
+    P.E1=exp(P.lnE1);
+end
+
 emax=max(max([P.E0(:) P.E1(:) abs(P.E0(:)-P.E1(:))]));
 
+
 % class 0
-subplot(131)
+subplot(121)
 image(60*P.E0/emax)
 colormap('gray')
-title('class 0 mean','fontsize',fs)
+title(tit0,'fontsize',fs)
 xlabel('vertices','fontsize',fs)
 ylabel('vertices','fontsize',fs)
 set(gca,'fontsize',fs,'DataAspectRatio',[1 1 1])
 
 % class 1
-subplot(132)
+subplot(122)
 image(60*P.E1/emax)
-title('class 1 mean','fontsize',fs)
+title(tit1,'fontsize',fs)
 set(gca,'fontsize',fs)
 set(gca,'fontsize',fs,'DataAspectRatio',[1 1 1])
 
-% difference
-subplot(133)
-image(60*abs(P.E0-P.E1)/emax)
-colormap('gray')
-title('difference','fontsize',fs)
-set(gca,'fontsize',fs)
-set(gca,'fontsize',fs,'DataAspectRatio',[1 1 1])
-colorbar('Position',[.925 .3 .02 .4],'YTick',[0 15 30 45 60],'YTickLabel',[0 25 50 75 100],'fontsize',fs)
+
+% % difference
+% subplot(133)
+% image(60*abs(P.E0-P.E1)/emax)
+% colormap('gray')
+% title('difference','fontsize',fs)
+% set(gca,'fontsize',fs)
+% set(gca,'fontsize',fs,'DataAspectRatio',[1 1 1])
+colorbar('Position',[.925 .3 .02 .4],'YTick',linspace(0,64.5,5),'YTickLabel',yticklabel,'fontsize',fs-2)
 
 
 if alg.save
-    wh=[6 2];   %width and height
+    wh=[5 2.3];   %width and height
     set(gcf,'PaperSize',wh,'PaperPosition',[0 0 wh],'Color','w');
     figname=[alg.figdir alg.fname '_model'];
     print('-dpdf',figname)
@@ -230,6 +245,20 @@ gray2=0.25*[1 1 1];
 fs=18;
 ms=16;
 
+if strcmp(alg.fname,'poiss')
+    LAPmark=1.3;
+    QAPmark=[2.2 Lhats.QAP(2)*0.9];
+    QAPf=[2.5,QAP.obj_avg(3)];
+    text(10.5,Lhats.star+.01,'L_*','fontsize',fs)
+    errorbar(QAP.max_iters+0.5,Lhats.star,Lsems.star,'k','linewidth',2,'Marker','.','Markersize',ms)
+    xlim=[0 11];
+else
+    LAPmark=1.3;
+    QAPmark=[2.2 Lhats.QAP(2)*1.1];
+    QAPf=[3.5,QAP.obj_avg(4)];
+    xlim=[0 10];
+end
+
 X=0:QAP.max_iters;
 Y1=[Lhats.rand Lhats.QAP];
 Y2=QAP.obj_avg;
@@ -239,33 +268,31 @@ title('QAP Performance Statistics','fontsize',fs)
 
 % y1 stuff
 set(get(AX(1),'Ylabel'),'String','Misclassification rate','color','k','fontsize',fs)
-set(AX(1),'YColor','k','YLim',[0 0.5],'YTick',[0 0.25 0.5],'fontsize',fs)
+set(AX(1),'YColor','k','YLim',[0 0.5],'YTick',[0 0.25 0.5],'XLim',xlim,'fontsize',fs)
 set(fig, 'CurrentAxes', AX(1));
 hold on;
 h(1)=errorbar(0:QAP.max_iters,[Lhats.rand Lhats.QAP],[Lsems.rand Lsems.QAP]);
 set(h(1),'linewidth',2,'Marker','.','Markersize',ms,'Color','k')
-text(0.2,0.46,'L_c_h_a_n_c_e','fontsize',fs)
+% text(0.2,0.46,'L_c_h_a_n_c_e','fontsize',fs)
+
 
 errorbar(1.1,Lhats.LAP,Lsems.LAP,'color',gray2,'linewidth',2,'Marker','.','Markersize',ms)
-text(1.2,Lhats.LAP*1.1,'L_L_A_P','fontsize',fs,'color',gray2)
-text(2.1,Lhats.QAP(2)*1.1,'L_Q_A_P','fontsize',fs,'color','k')
+text(LAPmark,Lhats.LAP,'L_L_A_P','fontsize',fs,'color',gray2)
+text(QAPmark(1),QAPmark(2),'L_Q_A_P','fontsize',fs,'color','k')
 
-% text(9.5,Lhats.star+.05,'L_*','fontsize',fs)
-% errorbar(QAP.max_iters,Lhats.star,Lsems.star,'k','linewidth',2,'Marker','.','Markersize',ms)
 
 % set y2 stuff
-set(get(AX(2),'Ylabel'),'String','QAP objective function','color',gray,'fontsize',fs)
-set(AX(2),'YColor',gray,'fontsize',fs)
+set(get(AX(2),'Ylabel'),'String','QAP objective function (a.u.)','color',gray,'fontsize',fs)
+set(AX(2),'YColor',gray,'YLim',[min(Y2) Y2(2)],'XLim',xlim,'fontsize',fs)
 set(fig, 'CurrentAxes', AX(2));
 hold on;
 h(2)=errorbar(0:QAP.max_iters,QAP.obj_avg,QAP.obj_sem);
 set(h(2),'linewidth',2,'Marker','.','Markersize',ms,'Color',gray)
-text(2.1,QAP.obj_avg(2)*1.5,'f_Q_A_P','fontsize',fs,'color',gray)
+text(QAPf(1),QAPf(2),'f_Q_A_P','fontsize',fs,'color',gray)
 
 
 if alg.save
-    set(gcf,'Color','w',...
-        'PaperSize',[9 7]); %,...
+    set(gcf,'Color','w','PaperSize',[9 7],'PaperPosition',[0 0 9 7]); %,...
     figname=[alg.figdir alg.fname '_performance'];
     print('-dpdf',figname)
     %     print('-deps',figname)

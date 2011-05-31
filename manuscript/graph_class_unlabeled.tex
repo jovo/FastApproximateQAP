@@ -408,15 +408,15 @@ We first compare the performance of \qapn with recent state-of-the-art approache
 
 
 
-\subsection{Kidney-Egg Simulation}
+\subsection{Simple Graph Simulation}
 
-\texttt{QAP}$_n$'s near perfect performance gave us hope for using \qap as part of an unlabeled graph classifier.  To investigate further, we generated some simulations using the following assumptions.  First, assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}}p_{uv|y}^{a_{uv}} (1-p_{uv|y})^{(1-a_{uv|y})}$, where $\{p_{uv|y}\}$ are the likelihood parameters.  Then, assume class prior probabilities are equal, $\PP[Y=1]=\PP[Y=0]=1/2$.  For simplicity, we sample one graph from each class, meaning $n=2$, and a single training graph sampled according the class priors. Thus, each simulation is defined by $\mc{M}=(P_0,P_1,n_V)$, where $P_0$ and $P_1$ are the class-conditional likelihoods, and $n_V$ is the number of vertices per graph.  Given a model, $\mc{M}$, we generate $n_{MC}$ Monte Carlo trials.  For each model, $L_{chance}\approx 0.5$, as estimated by using BPI to classify without first implementing \texttt{QAP}.  We estimate Bayes error, $L_*$, by using the true parameters and a Bayes plugin classifier (that is, we use all the labels).  We then implement \texttt{BPI}$\circ$\texttt{QAP}$_1$, and plot both the misclassification rate and objective function $f(Q^{(j)})$ as a function of iteration number (not number of restarts, which we hold fixed at one). Figure \ref{fig:homo} shows a model (right panel) and results (left panel) of one such simulation. Intriguingly, the first iteration of \qapa seems to basically do the trick.  This led us to investigate the relationship between LAP and QAP.
+\texttt{QAP}$_n$'s near perfect performance gave us hope for using \qap as part of an unlabeled graph classifier.  To investigate further, we generated some simulations using the following assumptions.  First, assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}} F_{uv|y}$.  For this simple graph scenario, each edge is a Bernoulli random variable, $F_{uv|y}=\text{Bern}(a_{uv}; p_{uv|y})$, where $\{p_{uv|y}\}$ are the likelihood parameters.  Then, assume class prior probabilities are equal, $\PP[Y=1]=\PP[Y=0]=1/2$.  For simplicity, we sample one graph from each class, meaning $n=2$, and a single training graph sampled according the class priors. Thus, each simulation is defined by $\mc{M}=(P_0,P_1,n_V)$, where $P_0$ and $P_1$ are the class-conditional likelihoods, and $n_V$ is the number of vertices per graph.  Given a model, $\mc{M}$, we generate $n_{MC}$ Monte Carlo trials.  For each model, $L_{chance}\approx 0.5$, as estimated by using BPI to classify without first implementing \texttt{QAP}.  We estimate Bayes error, $L_*$, by using the true parameters and a Bayes plugin classifier (that is, we use all the labels).  We then implement \texttt{BPI}$\circ$\texttt{QAP}$_1$, and plot both the misclassification rate and objective function $f(Q^{(j)})$ as a function of iteration number (not number of restarts, which we hold fixed at one). Figure \ref{fig:homo} shows a model (right panel) and results (left panel) of one such simulation. Intriguingly, the first iteration of \qapa seems to basically do the trick.  This led us to investigate the relationship between LAP and QAP.
 
 \begin{figure}[htbp]
 	\centering			
 	\includegraphics[width=0.5\linewidth]{../figs/homo_kidney_egg_model}
 	\includegraphics[width=0.4\linewidth]{../figs/homo_kidney_egg_performance}
-	\caption{Homogeneous-kidney-egg model simulation results. The top panel shows the model: each edge in the ``kidney'' in both classes has probability $0.5$; in the egg, class 0 edges are sampled with probability $0.25$, and class 1 edges are sampled with probability $0.75$. The bottom panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number.  }
+	\caption{Homogeneous-kidney-egg model simulation. The left and middle panels show the model parameters for class 0 and 1, respectively.  Each edge in the ``kidney'' in both classes has probability $0.5$; in the egg, class 0 edges are sampled with probability $0.25$, and class 1 edges are sampled with probability $0.75$. The right panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number. LAP does approximately as well as QAP on this (and other) simple graph simulation.  Note that $L_{chance}\approx 0.5$ and $L_* \approx 0$ for this simulation. The units of the right-side ordinate are arbitrary. The QAP objective function evaluation prior to any QAP iterations is beyond the bounds of this figure.}
 	\label{fig:homo}
 \end{figure}
 
@@ -444,27 +444,28 @@ Letting $f_{LAP}(Q)=tr(QA B\T)$, the gradient is:
 % % \begin{align} \label{eq:grad2}
 % 	$\partial f'/\partial Q = 2A B\T$. 
 % % \end{align}
-Comparing this gradient to that of QAP (Eq. \eqref{eq:grad}), one can see that when $Q^{(j)}$ is the identity matrix, the two gradients are identical.  Thus, if QAP is initialized at the identity matrix, the first permutation matrix (output of Eq. \eqref{eq:dir}) is be identical to $\mh{Q}_{LAP}$; although the line search will make $Q^{(1)} \neq \mh{Q}_{LAP}$, in general.  %Moreoever, projecting a matrix onto the closest permutation matrix can be written as a LAP because of the following relationship:
+Comparing this gradient to that of QAP---Eq. \eqref{eq:grad}---one can see that when $Q^{(j)}$ is the identity matrix, the two gradients are identical.  Thus, if QAP is initialized at the identity matrix, the first permutation matrix---output of Step 2---is identical to $\mh{Q}_{LAP}$; although the line search will make $Q^{(1)} \neq \mh{Q}_{LAP}$, in general.  %Moreoever, projecting a matrix onto the closest permutation matrix can be written as a LAP because of the following relationship:
 % \begin{align}
 % 	\argmin_{Q \in \mc{Q}} \norm{QA\T - I}_F^2 &= \argmin_{Q \in \mc{Q}} (QA\T-I)\T (QA\T-I) 
 % \nonumber\\ &=\argmin_{Q \in \mc{Q}} AQ\T QA\T -2QA\T - II = \argmin_{Q \in \mc{Q}}  -\langle Q, A\T \rangle  
 % \end{align}
-In the above simulation, the first iteration of \qap is essentially the only useful one.  Thus, we compare the performance of \texttt{BPI}$\circ$\texttt{LAP} (dark gray).  The performance of LAP and QAP are not statistically different for this simulation.  This suggests that for certain problems, LAP (which is $\mc{O}(n^3)$) is both an efficient and useful approximation to solving NP-hard graph matching problems.  %We confirm this intuition by substituting QAP with LAP in the above simulations (black line).  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic time complexity, will often suffice.
+In the above simulation, the first iteration of \qap is essentially the only useful one.  Thus, we compare the performance of \texttt{BPI}$\circ$\texttt{LAP} (dark gray).  The performance of LAP and QAP are not statistically different for this simulation.  This suggests that for certain problems, LAP (which is $\mc{O}(n^3)$) is both an efficient and useful approximation to solving NP-hard graph matching problems. We were unable to find a model for simple graphs in which multiple iterations of \qap improved performance over LAP. %We confirm this intuition by substituting QAP with LAP in the above simulations (black line).  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic time complexity, will often suffice.
 
 
 % subsection lap_vs_qap (end)
 
 
-\subsection{Heterogeneous simulation} % (fold)
+\subsection{Multi-Graph simulation} % (fold)
 \label{sub:heterogeneous_simulation}
 
+Because \qapa works for both weighted and unweighted, we next simulated multi-graphs.  The below simulation is identical to the above except for $F_{uv|y}$---the edge random variable---was Bernoulli before and is now Poisson:  $F_{uv|y}=\text{Poisson}(a_{uv}; \lambda_{uv|y})$.  Figure \ref{fig:poiss} shows misclassification rate steadily decreasing with each iteration.
 
 \begin{figure}[htbp]
 	\centering			
-	\includegraphics[width=0.5\linewidth]{../figs/hetero_model}
-	\includegraphics[width=0.4\linewidth]{../figs/hetero_performance}
-	\caption{Heterogeneous model simulation results. The top panel shows the model: each edge in the ``kidney'' in both classes has probability $0.5$; in the egg, class 0 edges are sampled with probability $0.25$, and class 1 edges are sampled with probability $0.75$. The bottom panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number.  }
-	\label{fig:hetero}
+	\includegraphics[width=0.5\linewidth]{../figs/poiss_model}
+	\includegraphics[width=0.4\linewidth]{../figs/poiss_performance}
+	\caption{Multigraph model simulation. The left and middle panels show the parameters for class 0 and  1, respectively.  The right panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number; both clearly descending.  For comparison, both $\mh{L}_{LAP}$ and $\mh{L}_*$ are shown.    }
+	\label{fig:poiss}
 \end{figure}
 
 % subsection heterogeneous_simulation (end)
