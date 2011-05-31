@@ -61,6 +61,8 @@ end
 %% do Monte Carlo classifications
 for j=1:n_MC
     
+    disp(j)
+    
     if alg.truth_start == false
         A = Atst(tst_ind(j,:),tst_ind(j,:),j);
     else
@@ -152,9 +154,14 @@ end
             A1=A(ind1,ind1);
         end
         
-        if strcmp(alg.classifier,'BPI')
-            loss0 = get_lik(A0,P.lnE0,P.ln1E0);
-            loss1 = get_lik(A1,P.lnE1,P.ln1E1);
+        if strcmp(alg.classifier,'BPI')        
+            if strcmp(alg.model,'bern')
+                loss0 = sum(sum(A0.*P.lnE0+(1-A0).*P.ln1E0))+P.lnprior0; %get_lik(A0,P.lnE0,P.ln1E0);
+                loss1 = sum(sum(A1.*P.lnE1+(1-A1).*P.ln1E1))+P.lnprior1; %get_lik(A1,P.lnE1,P.ln1E1);
+            elseif strcmp(alg.model,'poiss')
+                loss0=sum(sum(A0.*P.lnE0 - P.E0))+P.lnprior0;
+                loss1=sum(sum(A1.*P.lnE1 - P.E1))+P.lnprior1;
+            end
         elseif strcmp(alg.classifier,'1NN')
             loss0 = -sum(sum((A0-Atrn0).^2));
             loss1 = -sum(sum((A1-Atrn1).^2));
@@ -165,12 +172,5 @@ end
         correct=(yhat==ytst);
         
     end
-
-end
-
-%% the likelihood function
-function lik = get_lik(A,lnE,ln1E)
-
-lik = sum(sum(A.*lnE+(1-A).*ln1E));
 
 end

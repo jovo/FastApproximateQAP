@@ -334,14 +334,14 @@ Regardless of how a canonical labeling is chosen per class, given this canonical
 \subsection{A graph invariant approach: \texttt{CW}$\circ$\texttt{GI} } % (fold)
 \label{sub:graph_invariant_approach}
 
-Define an embedding of graphs into finite dimensional Euclidean space: $T: (\mc{V},\mc{E},\mc{A}) \mapsto \EE^d$.  Unfortunately, there is no known set of graph invariants that collectively solve the graph isomorphism problem \cite{Conte2004}.  Fortunately, some recent theoretical work shows that certain graph invariants have greater discriminability with regard to certain graph inference tasks \cite{Ruhkhin2011}. With that in mind, in this work, we generalize a standard set of unweighted graph invariants---described fully in \cite{CPP11}---developing their weighted graph invariant counterparts. We describe each briefly:
+To use graph invariants to classify, one first must choose as set of graph invariants.  Unfortunately, there is no known set of graph invariants that collectively solve the graph isomorphism problem \cite{Conte2004}.  Fortunately, some recent theoretical work shows that certain graph invariants have greater discriminability with regard to certain graph inference tasks \cite{Ruhkhin2011}. With that in mind, we generalize a standard set of unweighted graph invariants---described fully in \cite{CPP11}---developing their weighted graph invariant counterparts. We describe each briefly:
 \begin{itemize}
 	\item $T_{weight}$: total weight of all the edges in the graph
 	\item $T_{maxweight}$, is the max over $d(v)$ for all $v \in \mc{V}$, where $d(v)$ is the sum of all weights incident to vertex $v$	
 	\item $T_{MAW_g}$: a greedy approximation of the maximum average weight (MAW), akin to maximum average degree
 	\item $T_{MAW_e}$: an eigenvalue approximation of MAW
-	\item $T_{wS_1}$: the maximum weighted locality statistic, varying from the typical scan statistic  only by summing the weight of edges in each neighborhood rather than just the number of edges.
-	\item $T_{dijkstra}$: the average Dijkstra path distance between each pair of vertices
+	\item $T_{wS_1}$: the maximum weighted locality statistic, akin to the typical scan statistic, but sums the weight of edges in each neighborhood rather than just the number of edges.
+	\item $T_{Dijkstra}$: the average Dijkstra path distance between each pair of vertices
 	% \item $T_{size}$ is the number of edges in the graph.
 	% \item $T_{maxdegree}$ is the $\max_v d(v)$ for all $v \in \mc{V}$, where $d(v)$ is the degree of vertex $v$.
 	% \item $T_{MAD_g}$ is a greedy approximation of the maximum average degree.
@@ -352,10 +352,10 @@ Define an embedding of graphs into finite dimensional Euclidean space: $T: (\mc{
 	% \item $T_{averagepathlength}$, $T_{closeness}$, and $T_{betweenness}$ are all measures of the path lengths required to traverse between arbitrary vertices or edges.
 \end{itemize}
 
-For each graph $G_i$ in the training set, we compute a graph invariant vector: $\mb{T}_i: \mc{G} \mapsto \Real^d$.  We stack these $n$ $d$-dimensional vectors to form a matrix $\mb{T} \in \Real^{n \times d}$. We then normalize each element of this matrix to be between zero and one. Let $T_{ij}$ indicate the $i^{th}$ graph invariant of the $j^{th}$ graph, and normalize according to:  $T_{ij} \leftarrow \frac{T_{ij} - \min_i (T_{ij})}{\max_i(T_{ij}) - \min_i(T_{ij})}$.
+For each graph $G_i$ in the training set, we compute a graph invariant vector: $\mb{T}_i: \mc{G} \mapsto \Real^d$.  We stack these $n$ $d$-dimensional vectors to form a matrix $\mb{T} \in \Real^{n \times d}$.  Letting $T_{ij}$ indicate the $i^{th}$ graph invariant of the $j^{th}$ graph, and normalize each element to be between zero and one according to:  $T_{ij} \leftarrow \frac{T_{ij} - \min_i (T_{ij})}{\max_i(T_{ij}) - \min_i(T_{ij})}$.
 
 % We then whiten this matrix to control for the divergence means and scales of the various graph invariants, $\mb{T} \rightarrow \mb{E}\mb{\Lambda}^{-1/2}\mb{E}\T \mb{T}$, where $\mb{E}\mb{\Lambda}\mb{E}\T$ is the eigenvalue decomposition of the covariance matrix,$\EE[\mb{T}\mb{T}\T]$ \cite{Hyvarinen2000}.  
-Now, to estimate the class of a test graph, we first compute its invariant vector, $\mb{t}$, and normalize it appropriately.  We then applied a variety of machine learning algorithms, including $k$NN, linear classifiers, and SVMs.  For the below connectome data, the best performing algorithm is the exact confidence weighted classifier \cite{Crammer2008}.  Call this algorithm \texttt{CW}$\circ$\texttt{GI}.
+Now, to estimate the class of a test graph, we first compute its invariant vector, $\mb{t}$, and normalize it appropriately.  We then apply a variety of machine learning algorithms, including $k$NN, linear classifiers, and SVMs.  For the below connectome data, the best performing algorithm is the exact confidence weighted classifier \cite{Crammer2008}.  Call this algorithm \texttt{CW}$\circ$\texttt{GI}.
 
 % subsection graph_invariant_approach (end)
 
@@ -461,8 +461,8 @@ In the above simulation, the first iteration of \qap is essentially the only use
 
 \begin{figure}[htbp]
 	\centering			
-	\includegraphics[width=1\linewidth]{../figs/hetero_model}
-	\includegraphics[width=1\linewidth]{../figs/hetero_performance}
+	\includegraphics[width=0.5\linewidth]{../figs/hetero_model}
+	\includegraphics[width=0.4\linewidth]{../figs/hetero_performance}
 	\caption{Heterogeneous model simulation results. The top panel shows the model: each edge in the ``kidney'' in both classes has probability $0.5$; in the egg, class 0 edges are sampled with probability $0.25$, and class 1 edges are sampled with probability $0.75$. The bottom panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number.  }
 	\label{fig:hetero}
 \end{figure}
@@ -489,8 +489,6 @@ In the above simulation, the first iteration of \qap is essentially the only use
 % \end{figure}
 
 
-
-\clearpage
 \subsection{Connectome Classification} % (fold)
 \label{sub:connectome_classification}
 
