@@ -221,7 +221,7 @@ Eq. \eqref{eq:dir} can be solved as a Linear Assignment Problem (LAP).  More spe
 \end{align}
 which, when $B=I$, can be simplified:
 \begin{align} \label{eq:proja}
-	Q_{\text{LAP}}(A,I) \argmin_{Q \in \mc{Q}} \norm{QA - I}_F^2 &= \argmin_{Q \in \mc{Q}} (QA-I)\T (QA\T-I) 
+	Q_{\text{LAP}}(A,I) \argmin_{Q \in \mc{Q}} \norm{QA - I}_F^2 &= \argmin_{Q \in \mc{Q}} (QA-I)\T (QA-I) 
 \nonumber\\ &=\argmin_{Q \in \mc{Q}} A\T Q\T QA -2QA - II = \argmin_{Q \in \mc{Q}}  -\langle Q, A \rangle.  
 \end{align}
 In other words, letting $B=I$, the projection of a matrix onto its nearest doubly stochastic matrix is a LAP problem.  While Eq. \eqref{eq:proja} cannot be solved directly, as above, we can relax the permutation matrix constraint to the doubly stochastic matrix constraint:
@@ -267,7 +267,7 @@ Finally, the new estimated doubly stochastic matrix is given by:
 \paragraph{The grand finale} % (fold)
 \label{par:the_final_iteration}
 
-Steps 1--5 are iterated until convergence, computational budget limits, or some other stopping criterion is met.  These 5 steps collective comprise the FW algorithm.  Note that while $Q^{(j+1)}$ will generally not be a permutation matrix, we do not project $Q^{(j+1)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time. After the final iteration, however, we have $\mh{Q}_{AQAP}$, which we project onto the set of permutation matrices:
+Steps 1--5 are iterated until convergence, computational budget limits, or some other stopping criterion is met.  These 5 steps collective comprise the FW algorithm.  Note that while $Q^{(j)}$ will generally not be a permutation matrix, we do not project $Q^{(j)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time. After the final iteration, however, we have $\mh{Q}_{AQAP}$, which we project onto the set of permutation matrices:
 \begin{align} \label{eq:proj}
 	\mh{Q}_{QAP} = \argmin_{Q \in \mc{Q}} \langle \mh{Q}_{AQAP}, Q \rangle,
 \end{align}
@@ -299,16 +299,16 @@ A graph invariant (GI) is any function that maps a graph to a scalar whose value
 \section{Unlabeled Graph Classification Algorithms} % (fold)
 \label{sec:algorithms}
 
-Below we provide an example, and briefly discuss, three complementary approaches to solving unlabeled graph classification problems, that is, graph classification problems in which the vertex labels are unknown.  Each strategy uses one of the two above approaches as a subroutine.
+Below we provide an example, and briefly discuss, three complementary approaches to solving unlabeled graph classification problems.  Each strategy uses one of the two above approaches to dealing with the graph isomorphism problem as a subroutine.
 
 \subsection{A graph dissimilarity approach: \texttt{$k$NN} $\circ$ \qap} % (fold)
 \label{ssub:_k_nn_circ_qap}
 
-Define a dissimilarity on graph spaces: $d: \mc{G} \times \mc{G} \mapsto \Real_+$, in which one can compute the dissimilarity between any pair of graphs. Given an adjacency matrix representation, many such dissimilarities are possible (e.g., graph edit distance, Hamming distance, etc.).\footnote{It is becoming increasingly popular to use a \emph{graph kernel}, $\kappa(G,G')=\langle \phi(G), \phi(G') \rangle$, as the dissimilarity \cite{Bunke2011} ($\langle \cdot, \cdot \rangle$ indicates a dot-product, and $\phi(\cdot)$ is defined in the main text).  Graph kernels have a number of desirable properties, perhaps most notably, that one can then use standard \emph{kernel machines} to classify \cite{Vapnik1998}}	Given such a dissimilarity, one can apply at least two different kinds of classifiers.
+Define a dissimilarity on graph spaces: $d: \mc{G} \times \mc{G} \mapsto \Real_+$, in which one can compute the dissimilarity between any pair of graphs. Given an adjacency matrix representation, many such dissimilarities are possible (e.g., graph edit distance, Hamming distance, etc.).  It is becoming increasingly popular to use a \emph{graph kernel}, $\kappa(G,G')=\langle \phi(G), \phi(G') \rangle$, where $\phi(\cdot): \mc{G} \mapsto \EE$, as the dissimilarity \cite{Bunke2011}.  Graph kernels have a number of desirable properties, perhaps most notably, that one can then use standard \emph{kernel machines} to classify \cite{Vapnik1998}.	Regardless, given any dissimilarity, one can apply at least two different kinds of classifiers.
 
 % : nearest neighbor style classifiers and interpoint-dissimilarity based classifiers \cite{Duin2011}.  
 
-First, one could implement a nearest neighbor style classifiers, such as the $k_n$ nearest neighbor ($k$NN) classifier.  In addition to being universally consistent\footnote{A sequence of $k$NN classifiers is guaranteed to converge to the Bayes optimal classifier  if  as $n \conv \infty$, $k \conv \infty$ but $k/n \conv 0$ \cite{Devroye1997}.}, $k$NN classifiers are relatively efficient, in that they only require $n+1$ graph dissimilarity computations (assuming a single test graph).  
+First, one could implement a nearest neighbor style classifiers, such as the $k_n$ nearest neighbor ($k$NN) classifier.  In addition to being universally consistent\footnote{A sequence of $k$NN classifiers is guaranteed to converge to the Bayes optimal classifier  if  as $n \conv \infty$, $k \conv \infty$ but $k/n \conv 0$ \cite{Devroye1997}.}, $k$NN classifiers are computationally efficient, in that they only require $n+1$ graph dissimilarity computations (assuming a single test graph).  
 
 Alternately, one could implement an interpoint-dissimilarity matrix based algorithm \cite{Duin2011}. This strategy has the advantage of using all available information to generate a class prediction, but a disadvantage that it requires $(n+1)^2$ graph dissimilarity computations. Moreover, it may be more sensitive to outliers.
 
@@ -320,12 +320,11 @@ For simplicity, we only consider the $k$NN strategy here.  Specifically, given a
 \subsection{A graph model approach: \texttt{BPI}$\circ$\qap} % (fold)
 \label{ssub:bayes_plugin_circ_qap}
 
+First assume a model, $\mc{F}_{\GG,Y}$.  The model of graphs and classes may be factorized into (i) a class-conditional random graph model: $\mc{F}_{\GG  | Y} = \{F_{\GG|Y}[\cdot; \bth_Y] : \bth_Y \in \bTh\}$, and (ii) a class prior model, $\mc{F}_Y = \{F_Y[\cdot; \pi_Y] : \pi_Y \in (0,1)\}$.  Given such a factorization, one could then, for instance, estimate $\{\bth,\pi\}$ and then use standard model-based classifiers, such as the Bayes plugin (BPI) classifier.  
 
-The joint distribution on graphs and classes may be factorized into (i) a class-conditional random graph model: $\mc{F}_{\GG  | Y} = \{F_{\GG|Y}[\cdot; \bth_Y] : \bth_Y \in \bTh\}$, and (ii) a class prior, $F_Y[\cdot; \pi_Y] \in \mc{F}_Y$.  Given such a factorization, one could then, for instance, estimate $\{\bth,\pi\}$ and then use standard model-based classifiers, such as the Bayes plugin (BPI) classifier. 
+However, if all the training graphs are unlabeled, unless the class-conditional signal is independent of the vertex labels, one must somehow deal with the absent labels.  Sometimes a ``canonical'' labeling is somehow natural, and can be searched for.  Otherwise, one could \qap all the training graphs to the test graph.  This approach has the unfortunate consequence of making all the training graphs more similar to one another, disregarding the class labels.  Another option would be to select a ``prototype'' from each class. Although several prototype selection strategies have been studied, prototype selection is still problematic \cite{Bunke2011}.  Finally, one could generate prototype for each class, using all available information.  This approach is intriguing but complicated.  Each of these alternatives essentially defines a canonical labeling per class.
 
-To utilize a BPI classifier with \texttt{QAP}, one must first assume a model, $\mc{F}_{\GG,Y}$.  Given the model, one could then use training data to estimate the model parameters.  However, if all the training graphs are unlabeled, unless the class-conditional signal is independent of the vertex labels, one must somehow deal with the absent labels.  Sometimes a ``canonical'' labeling is somehow natural, and can be searched for.  Otherwise, could \qap all the training graphs to the test graph.  This approach has the unfortunate consequence of making all the training graphs more similar to one another, disregarding the class labels.  Another option would be to select a ``prototype'' from each class. Although several prototype selection strategies have been studied, it is still problematic \cite{Bunke2011}.  Finally, one could generate prototype for each class, using all available information.  This approach is intriguing but complicated.  Each of these alternatives essentially defines a canonical labeling per class.
-
-Regardless of how a canonical labeling is chosen per class, given this canonical labeling, one then aligns each graph in each class appropriately using \texttt{QAP}$_1$.  Once aligned, the likelihood parameters, $\{p_{uv|y}\}$, may be estimated, yielding a likelihood matrix for each class, $P_y$. Because \qap natively handles weighted graphs, one can then simply \qapa the test graph to each $P_y$.  Then, compute the likelihood of $A$ coming from each class, using the estimated parameters.  Because class-prior probabilities are $1/2$, the likelihood is equal to the posterior, so $\mh{y}=\argmax_y \PP[Y=y | \mt{A}; P_y]$. Call this algorithm \texttt{BPI} $\circ$ \texttt{QAP}.
+Regardless of how a canonical labeling is chosen per class, given this canonical labeling, a graph model approach takes the following steps.  First, align each graph in each class to its class prototype using \texttt{QAP}$_n$.  Second, estimate the likelihood parameters for each class, $\{\bth_Y\}_{Y \in \{0,1\}}$, as well as the class-priors. Third, the test graph can then be \texttt{QAP}ed to the prototype of each class.  Fourth, compute the posterior probability of the test graph coming from each class, by plugging in the parameters to the Bayes classifier.  Finally, let the estimated class be the \emph{maximum a posteriori} class.  Call this algorithm \texttt{BPI} $\circ$ \texttt{QAP}.
 
 
 % subsubsection bayes_plugin_circ_qap (end)
@@ -335,23 +334,28 @@ Regardless of how a canonical labeling is chosen per class, given this canonical
 \subsection{A graph invariant approach: \texttt{CW}$\circ$\texttt{GI} } % (fold)
 \label{sub:graph_invariant_approach}
 
-Define an embedding of graphs into finite dimensional Euclidean space: $T: (\mc{V},\mc{E},\mc{A}) \mapsto \EE^d$.  Unfortunately, there is no known set of graph invariants that collectively solve the graph isomorphism problem \cite{Conte2004}.  Fortunately, some recent theoretical work shows that certain graph invariants have greater discriminability with regard to certain graph inference tasks \cite{Ruhkhin2011}. With that in mind, in this work, we use a standard set of unweighted graph invariant measures, described fully in \cite{CPP11} and \cite{} [Borges11]. Importantly, this means that we discard all weighting information and calculate these invariants on the simple, unweighted graph with no self loops. For brevity, we only present the intuition behind each invariant, leaving the specific formulas for each to their respective papers.
+Define an embedding of graphs into finite dimensional Euclidean space: $T: (\mc{V},\mc{E},\mc{A}) \mapsto \EE^d$.  Unfortunately, there is no known set of graph invariants that collectively solve the graph isomorphism problem \cite{Conte2004}.  Fortunately, some recent theoretical work shows that certain graph invariants have greater discriminability with regard to certain graph inference tasks \cite{Ruhkhin2011}. With that in mind, in this work, we generalize a standard set of unweighted graph invariants---described fully in \cite{CPP11}---developing their weighted graph invariant counterparts. We describe each briefly:
 \begin{itemize}
-	\item $T_{size}$ is the number of edges in the graph.
-	\item $T_{maxdegree}$ is the $\max_v d(v)$ for all $v \in \mc{V}$, where $d(v)$ is the degree of vertex $v$.
-	\item $T_{MAD_g}$ is a greedy approximation of the maximum average degree.
-	\item $T_{MAD_e}$ is an eigenvalue approximation of the same.
-	\item $T_{S_1}$ is the maximum locality statistic, as described in \cite{Priebe}.
-	\item $T_{triangles}$ is the number of triangles (paths of length 3) in the graph.
-	\item $T_{cc}$ is the average clustering coefficient.
-	\item $T_{averagepathlength}$, $T_{closeness}$, and $T_{betweenness}$ are all measures of the path lengths required to traverse between arbitrary vertices or edges.
+	\item $T_{weight}$: total weight of all the edges in the graph
+	\item $T_{maxweight}$, is the max over $d(v)$ for all $v \in \mc{V}$, where $d(v)$ is the sum of all weights incident to vertex $v$	
+	\item $T_{MAW_g}$: a greedy approximation of the maximum average weight (MAW), akin to maximum average degree
+	\item $T_{MAW_e}$: an eigenvalue approximation of MAW
+	\item $T_{wS_1}$: the maximum weighted locality statistic, varying from the typical scan statistic  only by summing the weight of edges in each neighborhood rather than just the number of edges.
+	\item $T_{dijkstra}$: the average Dijkstra path distance between each pair of vertices
+	% \item $T_{size}$ is the number of edges in the graph.
+	% \item $T_{maxdegree}$ is the $\max_v d(v)$ for all $v \in \mc{V}$, where $d(v)$ is the degree of vertex $v$.
+	% \item $T_{MAD_g}$ is a greedy approximation of the maximum average degree.
+	% \item $T_{MAD_e}$ is an eigenvalue approximation of the same.
+	% \item $T_{S_1}$ is the maximum locality statistic, as described in \cite{Priebe}.
+	% \item $T_{triangles}$ is the number of triangles (paths of length 3) in the graph.
+	% \item $T_{cc}$ is the average clustering coefficient.
+	% \item $T_{averagepathlength}$, $T_{closeness}$, and $T_{betweenness}$ are all measures of the path lengths required to traverse between arbitrary vertices or edges.
 \end{itemize}
 
-Let $T_{ij}$ indicate the $i^{th}$ graph invariant of the $j^{th}$ graph.  We normalize each value $T_{ij}$ according to $ T_{ij} \leftarrow \frac{T_{ij} - \min(T_i)}{\max(T_i) - \min(T_i)}$,
-yielding a value between 0 and 1.
+For each graph $G_i$ in the training set, we compute a graph invariant vector: $\mb{T}_i: \mc{G} \mapsto \Real^d$.  We stack these $n$ $d$-dimensional vectors to form a matrix $\mb{T} \in \Real^{n \times d}$. We then normalize each element of this matrix to be between zero and one. Let $T_{ij}$ indicate the $i^{th}$ graph invariant of the $j^{th}$ graph, and normalize according to:  $T_{ij} \leftarrow \frac{T_{ij} - \min_i (T_{ij})}{\max_i(T_{ij}) - \min_i(T_{ij})}$.
 
-% In the graph invariant (GI) approach, we first define a set of $d$ graph invariants: (i) , (ii) , (iii)....  
-For each graph $G_i$ in the training set, we compute a graph invariant vector: $\mb{T}_i: \mc{G} \mapsto \Real^d$.  We stack these $n$ $d$-dimensional vectors to form a matrix $\mb{T} \in \Real^{n \times d}$. We then whiten this matrix to control for the divergence means and scales of the various graph invariants, $\mb{T} \rightarrow \mb{E}\mb{\Lambda}^{-1/2}\mb{E}\T \mb{T}$, where $\mb{E}\mb{\Lambda}\mb{E}\T$ is the eigenvalue decomposition of the covariance matrix,$\EE[\mb{T}\mb{T}\T]$ \cite{Hyvarinen2000}.  Now, to estimate the class of a test graph, we first compute its invariant vector, $\mb{t}$, and normalize it appropriately.  We then applied a variety of machine learning algorithms, including $k$NN, linear classifiers, and SVMs.  For the below connectome data, the best performing algorithm is the confidence weighted classifier.  Call this algorithm \texttt{CW}$\circ$\texttt{GI}.
+% We then whiten this matrix to control for the divergence means and scales of the various graph invariants, $\mb{T} \rightarrow \mb{E}\mb{\Lambda}^{-1/2}\mb{E}\T \mb{T}$, where $\mb{E}\mb{\Lambda}\mb{E}\T$ is the eigenvalue decomposition of the covariance matrix,$\EE[\mb{T}\mb{T}\T]$ \cite{Hyvarinen2000}.  
+Now, to estimate the class of a test graph, we first compute its invariant vector, $\mb{t}$, and normalize it appropriately.  We then applied a variety of machine learning algorithms, including $k$NN, linear classifiers, and SVMs.  For the below connectome data, the best performing algorithm is the exact confidence weighted classifier \cite{Crammer2008}.  Call this algorithm \texttt{CW}$\circ$\texttt{GI}.
 
 % subsection graph_invariant_approach (end)
 
@@ -362,7 +366,7 @@ For each graph $G_i$ in the training set, we compute a graph invariant vector: $
 
 \subsection{QAP benchmarks vs. PATH algorithm}
 
-We first compare the performance of \qapn with recent state-of-the-art approaches on the QAP benchmark library \cite{Burkard1997}.  Specifically, \cite{Zaslavskiy2009} reported improved performance in all but two cases, in which the QPB method of Cremers et al. \cite{Schellewald2001} achieved a lower minimum.  We compare \qapn with the previous best performing algorithm.  In \emph{all} cases, \texttt{QAP}$_3$ outperforms the previous best result, often by orders of magnitude in terms of relative error. In three cases, \qapb achieves the minimum.  In 12 out of 16 cases $75\%$, the simple \qapa algorithm outperforms the others (starting with the flat doubly stochastic matrix).  See Figure \ref{fig:fwpath} for quantitative comparisons.
+We first compare the performance of \qapn with recent state-of-the-art approaches on the QAP benchmark library \cite{Burkard1997}.  Specifically, \cite{Zaslavskiy2009} reported improved performance in all but two cases, in which the QPB method of Cremers et al. \cite{Schellewald2001} achieved a lower minimum.  We compare \qapn with the previous best performing algorithm.  In \emph{all} cases, \texttt{QAP}$_3$ outperforms the previous best result, often by orders of magnitude in terms of relative error. In three cases, \qapb achieves the absolute minimum.  In 12 out of 16 cases, $75\%$, the simple \qapa algorithm outperforms the others (starting with the flat doubly stochastic matrix).  See Figure \ref{fig:fwpath} for quantitative comparisons.
 
 
 % \begin{table}[h!]
@@ -404,13 +408,21 @@ We first compare the performance of \qapn with recent state-of-the-art approache
 
 
 
-\subsection{Simulations}
+\subsection{Kidney-Egg Simulation}
 
-\texttt{QAP}$_n$'s near perfect performance gave us hope for using \qap as part of an unlabeled graph classifier.  To investigate further, we generated some simulations using the following assumptions.  First, assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}}p_{uv|y}^{a_{uv}} (1-p_{uv|y})^{(1-a_{uv|y})}$, where $\{p_{uv|y}\}$ are the likelihood parameters.  Then, assume class prior probabilities are equal, $\PP[Y=1]=\PP[Y=0]=1/2$.  For simplicity, we sample one graph from each class, meaning $n=2$, and a single training graph sampled according the class priors. Thus, each simulation is defined by $\mc{M}=(P_0,P_1,n_V)$, where $P_0$ and $P_1$ are the class-conditional likelihoods, and $n_V$ is the number of vertices per graph.  Given a model, $\mc{M}$, we generate $n_{MC}$ Monte Carlo trials.  For each model, $L_{chance}=0.5$.  We estimate Bayes error, $L_*$, by using the true parameters and a Bayes plugin classifier.  We then implement \texttt{$1$NN} $\circ$ \texttt{QAP}$_1$, and plot both the misclassification rate and objective function $f(Q^{(j)})$ as a function of of iteration number (not number of restarts, which we hold fixed at one). Figure \ref{fig:homo} shows the result of one such simulation.  
+\texttt{QAP}$_n$'s near perfect performance gave us hope for using \qap as part of an unlabeled graph classifier.  To investigate further, we generated some simulations using the following assumptions.  First, assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}}p_{uv|y}^{a_{uv}} (1-p_{uv|y})^{(1-a_{uv|y})}$, where $\{p_{uv|y}\}$ are the likelihood parameters.  Then, assume class prior probabilities are equal, $\PP[Y=1]=\PP[Y=0]=1/2$.  For simplicity, we sample one graph from each class, meaning $n=2$, and a single training graph sampled according the class priors. Thus, each simulation is defined by $\mc{M}=(P_0,P_1,n_V)$, where $P_0$ and $P_1$ are the class-conditional likelihoods, and $n_V$ is the number of vertices per graph.  Given a model, $\mc{M}$, we generate $n_{MC}$ Monte Carlo trials.  For each model, $L_{chance}\approx 0.5$, as estimated by using BPI to classify without first implementing \texttt{QAP}.  We estimate Bayes error, $L_*$, by using the true parameters and a Bayes plugin classifier (that is, we use all the labels).  We then implement \texttt{BPI}$\circ$\texttt{QAP}$_1$, and plot both the misclassification rate and objective function $f(Q^{(j)})$ as a function of iteration number (not number of restarts, which we hold fixed at one). Figure \ref{fig:homo} shows a model (right panel) and results (left panel) of one such simulation. Intriguingly, the first iteration of \qapa seems to basically do the trick.  This led us to investigate the relationship between LAP and QAP.
+
+\begin{figure}[htbp]
+	\centering			
+	\includegraphics[width=0.5\linewidth]{../figs/homo_kidney_egg_model}
+	\includegraphics[width=0.4\linewidth]{../figs/homo_kidney_egg_performance}
+	\caption{Homogeneous-kidney-egg model simulation results. The top panel shows the model: each edge in the ``kidney'' in both classes has probability $0.5$; in the egg, class 0 edges are sampled with probability $0.25$, and class 1 edges are sampled with probability $0.75$. The bottom panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number.  }
+	\label{fig:homo}
+\end{figure}
 
 % described above with $n_V=10$ vertices and $n=1000$ total samples, 500 from each class.  First, we generated a simulated homogeneous-kidney-egg problem, as depicted in Figure \ref{fig:homo_subfig1}.  Then, we run the Bayes Plugin \qapa algorithm described above.  Note that \qapa is an \emph{iterative} algorithm, so we can evaluate the performance of each iteration (not restart). 
 
-While Fig. \ref{fig:homo_subfig2} shows the QAP objective function decreasing with each iteration, Fig. \ref{fig:homo_subfig3} shows that classification performance does not decrease.  We found similar numerical results in two additional simulations: a heterogeneous-kidney-egg model (Figure \ref{fig:hke}) and a fully heterogeneous model (Figure \ref{fig:hetero}). Note that in all simulations $L_{chance} \geq \mh{L}_{QAP} \geq L_*$, as it must be.  Multiple iterations not improving classification performance led us to investigate the relationship between QAP and the Linear Assignment Problem (LAP).
+% While Fig. \ref{fig:homo_subfig2} shows the QAP objective function decreasing with each iteration, Fig. \ref{fig:homo_subfig3} shows that classification performance does not decrease.  We found similar numerical results in two additional simulations: a heterogeneous-kidney-egg model (Figure \ref{fig:hke}) and a fully heterogeneous model (Figure \ref{fig:hetero}). Note that in all simulations $L_{chance} \geq \mh{L}_{QAP} \geq L_*$, as it must be.  Multiple iterations not improving classification performance led us to investigate the relationship between QAP and the Linear Assignment Problem (LAP).
 
 
 
@@ -418,41 +430,44 @@ While Fig. \ref{fig:homo_subfig2} shows the QAP objective function decreasing wi
 \subsection{LAP vs. QAP} % (fold)
 \label{sub:lap_vs_qap}
 
-The LAP approximation for this class problem is given by the following equation:
-\begin{align} \label{eq:LAP}
-	\mh{Q}_{\text{LAP}} = \argmin_{Q \in \mc{Q}} \norm{QA\T - B }^2_F,
-\end{align}
-which is quite similar to QAP, except $A$ is only post-multiplied by $Q$, instead of also being pre-multiplied by $Q$. LAP can be solved exactly as a quadratic problem with linear constraints (as above, one can relax the constraint to the set of doubly stochastic matrices, and still be guaranteed to obtain a permuation matrix). Thus, one can use gradient ascent to to solve a LAP.  The gradient of $f'(Q)=\norm{AQ\T-B}_F^2$ is %:
-% \begin{align} \label{eq:grad2}
-	$\partial f'/\partial Q = 2A B\T$. 
-% \end{align}
-Comparing this gradient to that of QAP (Eq. \eqref{eq:grad}), one can see that when $Q^{(j)}$ is the identity matrix, the two gradients are identical.  Thus, if QAP is initialized at the identity matrix, the first permutation matrix (output of Eq. \eqref{eq:dir}) is be identical to $\mh{Q}_{LAP}$; although the line search will make $Q^{(1)} \neq \mh{Q}_{LAP}$, in general.  Moreoever, projecting a matrix onto the closest permutation matrix can be written as a LAP because of the following relationship:
+Much like the QAP objective function from Eq. \eqref{eq:QAP} can be simplified to Eq. \eqref{eq:qap}, the LAP objective function can be similarly simplified:
 \begin{align}
-	\argmin_{Q \in \mc{Q}} \norm{QA\T - I}_F^2 &= \argmin_{Q \in \mc{Q}} (QA\T-I)\T (QA\T-I) 
-\nonumber\\ &=\argmin_{Q \in \mc{Q}} AQ\T QA\T -2QA\T - II = \argmin_{Q \in \mc{Q}}  -\langle Q, A\T \rangle  
+	\argmin_{Q \in \mc{Q}} \norm{QA-B}_F^2 = \argmin_{Q \in \mc{Q}} tr(QA B\T).
 \end{align}
-
-This suggests that for certain problems, LAP is both an efficient and useful approximation to graph matching.  We confirm this intuition by substituting QAP with LAP in the above simulations (black line).  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic time complexity, will often suffice.
+Letting $f_{LAP}(Q)=tr(QA B\T)$, the gradient is:
+\begin{align}
+	% f_{QAP}(Q)	&= -tr(B\T QAQ\T) -tr(QAQ\T B)  &f_{LAP}(Q)&=-tr(AQ\T B\T) \\
+	% \nabla_{QAP}&= AQB\T+A\T QB               	&
+	\nabla_{LAP}&=2A B\T.
+\end{align}
+% Thus, when $Q=I$, the gradient of the QAP objective function is identical to that of the LAP objective function. Thus, one can use gradient ascent to to solve a LAP.  The gradient of $f'(Q)=\norm{AQ\T-B}_F^2$ is %:
+% % \begin{align} \label{eq:grad2}
+% 	$\partial f'/\partial Q = 2A B\T$. 
+% % \end{align}
+Comparing this gradient to that of QAP (Eq. \eqref{eq:grad}), one can see that when $Q^{(j)}$ is the identity matrix, the two gradients are identical.  Thus, if QAP is initialized at the identity matrix, the first permutation matrix (output of Eq. \eqref{eq:dir}) is be identical to $\mh{Q}_{LAP}$; although the line search will make $Q^{(1)} \neq \mh{Q}_{LAP}$, in general.  %Moreoever, projecting a matrix onto the closest permutation matrix can be written as a LAP because of the following relationship:
+% \begin{align}
+% 	\argmin_{Q \in \mc{Q}} \norm{QA\T - I}_F^2 &= \argmin_{Q \in \mc{Q}} (QA\T-I)\T (QA\T-I) 
+% \nonumber\\ &=\argmin_{Q \in \mc{Q}} AQ\T QA\T -2QA\T - II = \argmin_{Q \in \mc{Q}}  -\langle Q, A\T \rangle  
+% \end{align}
+In the above simulation, the first iteration of \qap is essentially the only useful one.  Thus, we compare the performance of \texttt{BPI}$\circ$\texttt{LAP} (dark gray).  The performance of LAP and QAP are not statistically different for this simulation.  This suggests that for certain problems, LAP (which is $\mc{O}(n^3)$) is both an efficient and useful approximation to solving NP-hard graph matching problems.  %We confirm this intuition by substituting QAP with LAP in the above simulations (black line).  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic time complexity, will often suffice.
 
 
 % subsection lap_vs_qap (end)
 
 
-\begin{figure}[htbp]
-	\centering			
-	\includegraphics[width=1\linewidth]{../figs/homo_kidney_egg_model}
-	\includegraphics[width=1\linewidth]{../figs/homo_kidney_egg_performance}
-	\caption{Homogeneous-kidney-egg model simulation results. The top panel shows the model: each edge in the ``kidney'' in both classes has probability $0.5$; in the egg, class 0 edges are sampled with probability $0.25$, and class 1 edges are sampled with probability $0.75$. The bottom panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number.  }
-	\label{fig:fwpath}
-\end{figure}
+\subsection{Heterogeneous simulation} % (fold)
+\label{sub:heterogeneous_simulation}
+
 
 \begin{figure}[htbp]
 	\centering			
 	\includegraphics[width=1\linewidth]{../figs/hetero_model}
 	\includegraphics[width=1\linewidth]{../figs/hetero_performance}
 	\caption{Heterogeneous model simulation results. The top panel shows the model: each edge in the ``kidney'' in both classes has probability $0.5$; in the egg, class 0 edges are sampled with probability $0.25$, and class 1 edges are sampled with probability $0.75$. The bottom panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number.  }
-	\label{fig:fwpath}
+	\label{fig:hetero}
 \end{figure}
+
+% subsection heterogeneous_simulation (end)
 
 
 % \begin{figure}[ht]

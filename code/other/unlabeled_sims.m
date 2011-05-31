@@ -1,19 +1,9 @@
 %% simulate independent edge models and classify using or not using the vertex names
 clear; clc
 
-alg.datadir = '../../data/';
-alg.figdir  = '../../figs/';
-alg.fname   = 'celegans';    % different names will generate different simulations
-
+n_MC= 1000;                           % # of samples
 n   = 20;                           % # of vertices
-n_MC= 10;                           % # of samples
-
-alg.save    = 1;                    % whether to save/print results
-alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
-alg.truth_start = false;            % start QAP at truth
-
-alg.QAP_max_iters   = 10;           % max # of iterations when using QAP
-alg.QAP_init        = eye(n);       % starting value for QAP
+alg.fname   = 'celegans';    % different names will generate different simulations
 
 switch alg.fname                    % choose simulation parameters
     case 'homo_kidney_egg'
@@ -86,6 +76,17 @@ switch alg.fname                    % choose simulation parameters
         
         params.n=n; params.S=n_MC; params.E0=E0; params.E1=E1;
 end
+
+alg.datadir = '../../data/';
+alg.figdir  = '../../figs/';
+
+alg.save    = 1;                    % whether to save/print results
+alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
+alg.truth_start = false;            % start QAP at truth
+
+alg.QAP_max_iters   = 10;           % max # of iterations when using QAP
+alg.QAP_init        = eye(n);       % starting value for QAP
+
 
 % training data
 S0 = n_MC; % # of samples in class 0
