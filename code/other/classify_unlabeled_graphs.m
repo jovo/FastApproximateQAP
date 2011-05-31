@@ -57,6 +57,8 @@ if strcmp(alg.names(2),'QAP'),
 else QAP.do = false;
 end
 
+
+%% do Monte Carlo classifications
 for j=1:n_MC
     
     if alg.truth_start == false
@@ -96,32 +98,50 @@ for j=1:n_MC
     end
 end
 
+%% get statistics
+
 if LAP.do
     LAP.Lhat = 1-mean(LAP.correct);
     LAP.Lsem = sqrt(LAP.Lhat*(1-LAP.Lhat))/sqrt(n_MC);
 end
 
 if QAP.do
+
+    % get stats prior to QAP'ing
+    QAP.obj0_avg(1) = mean(QAP.obj0(:,1));
+    QAP.obj1_avg(1) = mean(QAP.obj1(:,1));
+    QAP.obj0_var(1) = var(QAP.obj0(:,1));
+    QAP.obj1_var(1) = var(QAP.obj1(:,1));
+    
+    QAP.obj_avg(1)  = (QAP.obj0_avg(1)+QAP.obj1_avg(1))/2;
+    QAP.obj_sem(1)   = std([QAP.obj0(:,1); QAP.obj1(:,1)])/sqrt(n_MC);
+
+    % get stats for each iteration
     for ii=1:QAP.max_iters
+        
+        % remove nans
         corrects = QAP.correct(:,ii);
         keeper   = ~isnan(corrects);
         corrects = corrects(keeper);
         
-        QAP.Lhat(ii)= 1-mean(corrects);
-        QAP.Lsem(ii)= sqrt(QAP.Lhat(ii)*(1-QAP.Lhat(ii)))/sqrt(n_MC);
-        QAP.num(ii) = length(corrects);
-        QAP.obj0_avg(ii+1) = mean(QAP.obj0(keeper,ii+1));
-        QAP.obj1_avg(ii+1) = mean(QAP.obj1(keeper,ii+1));
-        QAP.obj0_var(ii+1) = var(QAP.obj0(keeper,ii+1));
-        QAP.obj1_var(ii+1) = var(QAP.obj1(keeper,ii+1));
-    end
-    QAP.obj0_avg(+1) = mean(QAP.obj0(:,+1));
-    QAP.obj1_avg(+1) = mean(QAP.obj1(:,+1));
-    QAP.obj0_var(+1) = var(QAP.obj0(:,+1));
-    QAP.obj1_var(+1) = var(QAP.obj1(:,+1));
+        % get means 
+        QAP.Lhat(ii)        = 1-mean(corrects);
+        QAP.obj0_avg(ii+1)  = mean(QAP.obj0(keeper,ii+1));
+        QAP.obj1_avg(ii+1)  = mean(QAP.obj1(keeper,ii+1));
+        QAP.obj_avg(ii+1)   = (QAP.obj0_avg(ii+1)+QAP.obj1_avg(ii+1))/2;
+
+        % get vars/stds/sems
+        QAP.num(ii)         = length(corrects);
+        QAP.Lsem(ii)        = sqrt(QAP.Lhat(ii)*(1-QAP.Lhat(ii)))/sqrt(QAP.num(ii));
+        QAP.obj0_var(ii+1)  = var(QAP.obj0(keeper,ii+1));
+        QAP.obj1_var(ii+1)  = var(QAP.obj1(keeper,ii+1));
+        QAP.obj_sem(ii+1)   = std([QAP.obj0(keeper,ii+1); QAP.obj1(keeper,ii+1)])/sqrt(QAP.num(ii));
+        
+    end    
 end
 
 
+%% the classifier functions
     function [yhat correct] = do_classify(A,ind0,ind1,ytst,AP,P,Atrn0,Atrn1)
         
         if strcmp(AP,'LAP')
@@ -143,13 +163,12 @@ end
         [~, bar] = sort([loss0, loss1]);
         yhat=bar(2)-1;
         correct=(yhat==ytst);
-                
+        
     end
 
 end
 
-
-
+%% the likelihood function
 function lik = get_lik(A,lnE,ln1E)
 
 lik = sum(sum(A.*lnE+(1-A).*ln1E));
