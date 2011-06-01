@@ -401,14 +401,14 @@ We first compare the performance of \qapn with recent state-of-the-art approache
 \begin{figure}[htbp]
 	\centering			
 	\includegraphics[width=1.0\linewidth]{../figs/benchmarks.pdf}
-	\caption{\texttt{QAP}$_3$ outperforms PSOA on all 16 benchmark graph matching problems.  Moreoever, \qapa outperforms PSOA on 12 of 16 tests.  For 3 of 16 tests, \qapb achieves the minimum (none of the other algorithms ever find the absolute minimum), as indicated by a black dot.  Let $f_*$ be the minimum and $\mh{f}_x$ be the minimum achieved by algorithm $x$.  Error is $f_*/\mh{f}_x-1$.  }
+	\caption{\texttt{QAP}$_3$ outperforms PSOA on all 16 benchmark graph matching problems.  Moreover, \qapa outperforms PSOA on 12 of 16 tests.  For 3 of 16 tests, \qapb achieves the minimum (none of the other algorithms ever find the absolute minimum), as indicated by a black dot.  Let $f_*$ be the minimum and $\mh{f}_x$ be the minimum achieved by algorithm $x$.  Error is $f_*/\mh{f}_x-1$.  }
 	\label{fig:fwpath}
 \end{figure}
 
 
 
 
-\subsection{Simple Graph Simulation}
+\subsection{Unweighted Graph Simulation}
 
 \texttt{QAP}$_n$'s near perfect performance gave us hope for using \qap as part of an unlabeled graph classifier.  To investigate further, we generated some simulations using the following assumptions.  First, assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}} F_{uv|y}$.  For this simple graph scenario, each edge is a Bernoulli random variable, $F_{uv|y}=\text{Bern}(a_{uv}; p_{uv|y})$, where $\{p_{uv|y}\}$ are the likelihood parameters.  Then, assume class prior probabilities are equal, $\PP[Y=1]=\PP[Y=0]=1/2$.  For simplicity, we sample one graph from each class, meaning $n=2$, and a single training graph sampled according the class priors. Thus, each simulation is defined by $\mc{M}=(P_0,P_1,n_V)$, where $P_0$ and $P_1$ are the class-conditional likelihoods, and $n_V$ is the number of vertices per graph.  Given a model, $\mc{M}$, we generate $n_{MC}$ Monte Carlo trials.  For each model, $L_{chance}\approx 0.5$, as estimated by using BPI to classify without first implementing \texttt{QAP}.  We estimate Bayes error, $L_*$, by using the true parameters and a Bayes plugin classifier (that is, we use all the labels).  We then implement \texttt{BPI}$\circ$\texttt{QAP}$_1$, and plot both the misclassification rate and objective function $f(Q^{(j)})$ as a function of iteration number (not number of restarts, which we hold fixed at one). Figure \ref{fig:homo} shows a model (right panel) and results (left panel) of one such simulation. Intriguingly, the first iteration of \qapa seems to basically do the trick.  This led us to investigate the relationship between LAP and QAP.
 
@@ -455,10 +455,10 @@ In the above simulation, the first iteration of \qap is essentially the only use
 % subsection lap_vs_qap (end)
 
 
-\subsection{Multi-Graph simulation} % (fold)
+\subsection{Weighted simulation} % (fold)
 \label{sub:heterogeneous_simulation}
 
-Because \qapa works for both weighted and unweighted, we next simulated multi-graphs.  The below simulation is identical to the above except for $F_{uv|y}$---the edge random variable---was Bernoulli before and is now Poisson:  $F_{uv|y}=\text{Poisson}(a_{uv}; \lambda_{uv|y})$.  Figure \ref{fig:poiss} shows misclassification rate steadily decreasing with each iteration.
+Because \qapa works for both weighted and unweighted, we next simulated multi-graphs (that is, integer valued weights).  The below simulation is identical to the above except for $F_{uv|y}$---the edge random variable---was Bernoulli before and is now Poisson:  $F_{uv|y}=\text{Poisson}(a_{uv}; \lambda_{uv|y})$.  Figure \ref{fig:poiss} shows misclassification rate steadily decreasing with each iteration.
 
 \begin{figure}[htbp]
 	\centering			
