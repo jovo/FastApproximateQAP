@@ -80,10 +80,11 @@ Address \\
 \newcommand{\II}{\mathbb{I}}           % indicator function
 \newcommand{\QQ}{\mathbb{Q}}           
 \newcommand{\SSS}{\mathbb{S}}           
-
-\newcommand{\bth}{\ve{\theta}}
-\newcommand{\bTh}{\ve{\Theta}}
-\newcommand{\hbth}{\widehat{\thet}}
+\newcommand{\GG}{\mathbb{G}}
+\newcommand{\YY}{\mathbb{Y}}
+\newcommand{\Aa}{\mathbb{A}}
+\newcommand{\VV}{\mathbb{V}}
+\newcommand{\LL}{\mathbb{L}}
 
 \providecommand{\mc}[1]{\mathcal{#1}}
 \providecommand{\mb}[1]{\boldsymbol{#1}}
@@ -95,6 +96,10 @@ Address \\
 \providecommand{\mhb}[1]{\hat{\boldsymbol{#1}}}
 \providecommand{\mvb}[1]{\vec{\boldsymbol{#1}}}
 \providecommand{\mtb}[1]{\widetilde{\boldsymbol{#1}}}
+
+\newcommand{\bth}{\mb{\theta}}
+\newcommand{\bTh}{\mb{\Theta}}
+\newcommand{\hbth}{\widehat{\thet}}
 
 \newcommand{\Real}{\mathbb{R}}
 \newcommand{\conv}{\rightarrow}
@@ -113,7 +118,6 @@ Address \\
 \newcommand{\hatL}{\widehat{L}}
 \newcommand{\mhP}{\widehat{\PP}}
 \newcommand{\tildeA}{\widetilde{A}}
-\newcommand{\GG}{\mathbb{G}}
 \newcommand{\qap}{\texttt{QAP} }
 \newcommand{\qapa}{\texttt{QAP}$_1$ }
 \newcommand{\qapn}{\texttt{QAP$_n$} }
@@ -134,7 +138,7 @@ Because graphs can encode more information in their structure than vectors, they
 \section{Introduction}
 
 
-The statistical analysis of collections of graphs is becoming an increasingly popular desideratum \cite{Bunke2011}.  Specifically, we consider the following idealized and simplified scenario. Let $\GG: \Omega \mapsto \mc{G}$ be a graph-valued random variable taking values $G\in \mc{G}$. Each graph is a 4-tuple: $G=(\mc{V},\mc{E},\mc{L},\mc{A})$, where $\mc{V}$ is a set of $|\mc{V}|=n_V$ vertices, $\mc{E}$ is a set of $|\mc{E}|=E$ edges, $\mc{L}=\{1,\ldots,n_V\}=[n_V]$ is a set of vertex labels (one per vertex), and $\mc{A}$ is a set of edge attributes.  Elements of $\mc{A}$ could be binary matrices (for unweighted graphs) or higher-order tensors (for mult-graphs).  Let $Y$ be a Bernoulli random variable, $Y: \Omega \mapsto \{0,1\}$, such that each graph has an associated class.  Given a collection of graphs and classes,  we assume they were jointly sampled independently and identically from some true but unknown distribution, $\{(\GG_i,Y_i)\}_{i \in [n]} \iid F_{\GG,Y}(\cdot; \theta)$.  Note that $F_{\GG,Y}(\cdot; \bth)$ is but one of a (possibly infinite) set of distributions, collectively comprising the model: $\mc{F_{\GG,Y}}=\{F_{\GG,Y}(\cdot; \bth) : \theta \in \bTh\}$, where $\bTh$ is the set of feasible parameters.  The goal of such an analysis is to learn about the relationship between $\GG$ and $Y$.   Standard classification techniques fail in this domain as they typically require classifying objects that live in finite dimensional Euclidean space, whereas the object of interest here are graphs (even finite ones do not natively live in Euclidean space).  In this work, therefore, we propose novel extensions of several classification algorithms appropriate for the graph domain.
+The statistical analysis of collections of graphs is becoming an increasingly popular desideratum \cite{Bunke2011}.  Specifically, we consider the following idealized scenario. Let $\GG: \Omega \mapsto \mc{G}$ be a graph-valued random variable taking values $G\in \mc{G}$.  Let $\YY$ be a Bernoulli random variable, $\YY: \Omega \mapsto \{0,1\}$, such that each graph has an associated class.  Given a collection of graphs and classes,  we assume they were jointly sampled independently and identically from some true but unknown joint distribution, $\{(\GG_i,\YY_i)\}_{i \in [n]} \iid F_{\GG,\YY}[\cdot; \bth]$, where $\bth$ is a set of parameters.  Note that $F_{\GG,\YY}[\cdot; \bth]$ is but one of a (possibly infinite) set of distributions, collectively comprising the model: $\mc{F_{\GG,\YY}}=\{F_{\GG,\YY}[\cdot; \bth] : \bth \in \bTh\}$, where $\bTh$ is the set of feasible parameters.  The goal of such an analysis is to learn about the relationship between the random variables $\GG$ and $\YY$.   Most standard classification techniques fail in this domain as they typically require classifying objects that live in finite dimensional Euclidean space, $\Real^d$, whereas the object of interest here live in graph space, $\mc{G}$ (even finite graphs do not natively live in Euclidean space).  In this work, therefore, we propose novel extensions of several classification algorithms appropriate for the graph domain.
 
 
 
@@ -142,13 +146,13 @@ The statistical analysis of collections of graphs is becoming an increasingly po
 \label{sec:graph_classification}
 
 
-The graph classification problem may be stated thusly: given training data $\mc{T}_n=\{(\GG_i,Y_i)\}_{i \in [n]}$, and a new graph, $\GG$, estimate the new graph's corresponding class, $Y$, assuming each graph/class pair was sampled identically and independently from some true but unknown distribution, $\mc{T}_n,(\GG,Y) \iid F_{\GG,Y}(\cdot; \theta)$ .  Given an appropriately defined loss-function, such as misclassification rate: $L_h=\PP[h(\GG) \neq Y]$, one can then search for the function $h^* \in \mc{H}$ that minimizes the loss function of interest:
+The graph classification problem may be stated thusly: given training data $\mc{T}_n=\{(\GG_i,\YY_i)\}_{i \in [n]}$, and a new graph, $\GG$, estimate the new graph's corresponding class, $\YY$, assuming each graph/class pair was sampled identically and independently from some true but unknown distribution, $\mc{T}_n,(\GG,\YY) \iid F_{\GG,\YY}[\cdot; \bth]$ .  Given an appropriately defined risk -function, such as misclassification rate: $R_h=\PP[h(\GG) \neq \YY]$, one can then search for the function $h^* \in \mc{H}$ that minimizes the loss function of interest:
 \begin{align}
-	h^* = \argmin_{h \in \mc{H}} \PP[h(\GG) \neq Y].
+	h^* = \argmin_{h \in \mc{H}} \PP[h(\GG) \neq \YY].
 \end{align}
-In general, $h^*$ is unavailable and dependent on the model, $\mc{F}_{\GG,Y}$ (which includes the vertex labels).  When $h^*$ is unavailable, one can utilize training data, $\mc{T}_n$, to obtain $\mh{h}$, an approximation to $h^*$:
+In general, $h^*$ is unavailable and dependent on the true but unknown distribution,  $F=F_{\GG,\YY}$ (which includes the vertex labels).  When $h^*$ is unavailable, one can utilize training data, $\mc{T}_n$, to obtain $\mh{h}$, an approximation to $h^*$:
 \begin{align}
-	\mh{h} \approx \argmin_{h \in \mc{H}} \PP[h(\GG) \neq Y | \mc{T}_n],
+	\mh{h} \approx \argmin_{h \in \mc{H}} \PP[h(\GG) \neq \YY | \mc{T}_n],
 \end{align}
 where $\approx$ indicates that in general, we will not be able to find the actual minimum in the set $\mc{H}$. Regardless, any approach necessarily estimates a decision boundary in the space of graphs separating them into two classes.  %We consider a few distinct such approaches to constructing such a decision boundary:
 
@@ -160,7 +164,35 @@ where $\approx$ indicates that in general, we will not be able to find the actua
 
 
 % % section graph_classification (end)
-% \section{Unlabeled sticky wicket}
+\section{Sources of variability}
+
+Let a graph be a 4-tuple consisting of a set of (i) $n_V$ vertices, (ii) $n_E$ edges, (iii) $n_V$ vertex labels, and (iv) $n_E$ edge attributes. %, such that $\GG=(\VV,\EE,\LL,\Aa): \Omega \mapsto \mc{G}=(\mc{V},\mc{E},\mc{L},\mc{A})$.  Therefore, one can expand the joint distribution: $F_{\GG,\YY}=F_{\VV,\EE,\LL,\Aa, \YY}$.  
+Assume that in our collection of graphs, each graph has the same set of vertices.  Moreover, assume that edge attributes can be represented as scalar quantities, so the edges and edge attributes of a random graph are jointly encoded in an adjacency matrix representation.  Thus, the joint distribution on graphs and classes can be expanded and factorized:
+\begin{align}
+	F_{\GG,\YY}=F_{\LL,\Aa,\YY}=F_{\LL,\Aa | \YY} F_{\YY}
+\end{align}
+where $\LL: \Omega \mapsto \mc{L}$ is a random vertex labeling, and $\Aa: \Omega \mapsto \mc{A} \subseteq \Real^{V \times V}$.  Within a class, therefore, there are two sources of variability, $\LL$ and $\Aa$.  
+
+\subsection{Random Vertex Labelings} % (fold)
+\label{sub:random_vertex_labelings}
+
+ Let $Q \in \mc{Q}$ be a permutation matrix.  A graph can then be considered a set, $G=\{QAQ\T : Q \in \mc{Q}\}$.  The permutation matrix $Q$ essentially defines a vertex labeling.  Classical graph isomorphism deals with determining whether a pair of graphs are the same, given that only the adjacency matrices are observed, but not the permutation matrices.  To cast this problem into the above statistical framework, consider the following two-class classification problem.  As above, we observe $\{\GG_i,\YY_i\}_{i \in [n]} \iid F_{\GG,\YY}$.  However, the class-specific adjacency matrices are deterministic.  In other words, $F_{\Aa,\YY}$ is a Bernoulli random variable, where $F_{\Aa | \YY=0} \neq F_{\Aa | \YY=1}$, but each $F_{\Aa | \YY}$ is a point-mass. Thus, the joint graph/class distribution simplifies and factorizes: $F_{\GG,\YY}=F_{\LL | \YY} F_{\YY}$.  The task in this scenario is to find a vertex labeling for an unclassified graph.  If the unclassified graph is isomorphic to any graph in a class, then it is isomorphic to all graphs in that class, and it is not isomorphic to any graph in the other class.  Thus, one can proceed by trying to solve the graph isomorphism problem for the unclassified graph, relative to any graph with each class. 
+
+% subsection random_vertex_labelings (end)
+
+\subsection{Random Adjacency Matrices} % (fold)
+\label{sub:random_adjacency_matrices}
+
+
+
+
+% subsection random_adjacency_matrices (end)
+
+
+\subsection{Older} % (fold)
+\label{sub:older}
+
+% subsection older (end)
 
 In certain graph classification problems the vertex labels are unknown.  In other words, instead of observing $(\mc{V},\mc{E},\mc{L},\mc{A})$ for each graph, we only observe the triple, $(\mc{V},\mc{E},\mc{A})$, which we refer to as an \emph{unlabeled graph}.  In such scenarios, one is essentially faced with a graph isomorphism problem, which can be approached in at least two ways.  First, one could try to \emph{graph match}, that is, find a common set of labels for the vertices of the graphs, so that the graphs have the same adjacency matrix. Second, one can project the graphs into a quotient space that is invariant to the labels.  This can be a negative check for isomorphisms: if a set of graphs have different representations in the quotient space, then they are not isomorphic to one another.  We consider both approaches as possible subroutines as part of a classification function.
 
@@ -320,11 +352,11 @@ For simplicity, we only consider the $k$NN strategy here.  Specifically, given a
 \subsection{A graph model approach: \texttt{BPI}$\circ$\qap} % (fold)
 \label{ssub:bayes_plugin_circ_qap}
 
-First assume a model, $\mc{F}_{\GG,Y}$.  The model of graphs and classes may be factorized into (i) a class-conditional random graph model: $\mc{F}_{\GG  | Y} = \{F_{\GG|Y}[\cdot; \bth_Y] : \bth_Y \in \bTh\}$, and (ii) a class prior model, $\mc{F}_Y = \{F_Y[\cdot; \pi_Y] : \pi_Y \in (0,1)\}$.  Given such a factorization, one could then, for instance, estimate $\{\bth,\pi\}$ and then use standard model-based classifiers, such as the Bayes plugin (BPI) classifier.  
+First assume a model, $\mc{F}_{\GG,\YY}$.  The model of graphs and classes may be factorized into (i) a class-conditional random graph model: $\mc{F}_{\GG  | \YY} = \{F_{\GG|\YY}[\cdot; \bth_{\YY}] : \bth_{\YY} \in \bTh\}$, and (ii) a class prior model, $\mc{F}_{\YY} = \{F_{\YY}[\cdot; \pi_{\YY}] : \pi_{\YY} \in (0,1)\}$.  Given such a factorization, one could then, for instance, estimate $\{\bth,\pi\}$ and then use standard model-based classifiers, such as the Bayes plugin (BPI) classifier.  
 
 However, if all the training graphs are unlabeled, unless the class-conditional signal is independent of the vertex labels, one must somehow deal with the absent labels.  Sometimes a ``canonical'' labeling is somehow natural, and can be searched for.  Otherwise, one could \qap all the training graphs to the test graph.  This approach has the unfortunate consequence of making all the training graphs more similar to one another, disregarding the class labels.  Another option would be to select a ``prototype'' from each class. Although several prototype selection strategies have been studied, prototype selection is still problematic \cite{Bunke2011}.  Finally, one could generate prototype for each class, using all available information.  This approach is intriguing but complicated.  Each of these alternatives essentially defines a canonical labeling per class.
 
-Regardless of how a canonical labeling is chosen per class, given this canonical labeling, a graph model approach takes the following steps.  First, align each graph in each class to its class prototype using \texttt{QAP}$_n$.  Second, estimate the likelihood parameters for each class, $\{\bth_Y\}_{Y \in \{0,1\}}$, as well as the class-priors. Third, the test graph can then be \texttt{QAP}ed to the prototype of each class.  Fourth, compute the posterior probability of the test graph coming from each class, by plugging in the parameters to the Bayes classifier.  Finally, let the estimated class be the \emph{maximum a posteriori} class.  Call this algorithm \texttt{BPI} $\circ$ \texttt{QAP}.
+Regardless of how a canonical labeling is chosen per class, given this canonical labeling, a graph model approach takes the following steps.  First, align each graph in each class to its class prototype using \texttt{QAP}$_n$.  Second, estimate the likelihood parameters for each class, $\{\bth_{\YY}\}_{\YY \in \{0,1\}}$, as well as the class-priors. Third, the test graph can then be \texttt{QAP}ed to the prototype of each class.  Fourth, compute the posterior probability of the test graph coming from each class, by plugging in the parameters to the Bayes classifier.  Finally, let the estimated class be the \emph{maximum a posteriori} class.  Call this algorithm \texttt{BPI} $\circ$ \texttt{QAP}.
 
 
 % subsubsection bayes_plugin_circ_qap (end)
@@ -410,19 +442,19 @@ We first compare the performance of \qapn with recent state-of-the-art approache
 
 \subsection{Unweighted Graph Simulation}
 
-\texttt{QAP}$_n$'s near perfect performance gave us hope for using \qap as part of an unlabeled graph classifier.  To investigate further, we generated some simulations using the following assumptions.  First, assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}} F_{uv|y}$.  For this simple graph scenario, each edge is a Bernoulli random variable, $F_{uv|y}=\text{Bern}(a_{uv}; p_{uv|y})$, where $\{p_{uv|y}\}$ are the likelihood parameters.  Then, assume class prior probabilities are equal, $\PP[Y=1]=\PP[Y=0]=1/2$.  For simplicity, we sample one graph from each class, meaning $n=2$, and a single training graph sampled according the class priors. Thus, each simulation is defined by $\mc{M}=(P_0,P_1,n_V)$, where $P_0$ and $P_1$ are the class-conditional likelihoods, and $n_V$ is the number of vertices per graph.  Given a model, $\mc{M}$, we generate $n_{MC}$ Monte Carlo trials.  For each model, $L_{chance}\approx 0.5$, as estimated by using BPI to classify without first implementing \texttt{QAP}.  We estimate Bayes error, $L_*$, by using the true parameters and a Bayes plugin classifier (that is, we use all the labels).  We then implement \texttt{BPI}$\circ$\texttt{QAP}$_1$, and plot both the misclassification rate and objective function $f(Q^{(j)})$ as a function of iteration number (not number of restarts, which we hold fixed at one). Figure \ref{fig:homo} shows a model (right panel) and results (left panel) of one such simulation. Intriguingly, the first iteration of \qapa seems to basically do the trick.  This led us to investigate the relationship between LAP and QAP.
+\texttt{QAP}$_n$'s near perfect performance gave us hope for using \qap as part of an unlabeled graph classifier.  To investigate further, we generated some simulations using the following assumptions.  First, assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}} F_{uv|y}$.  For this simple graph scenario, each edge is a Bernoulli random variable, $F_{uv|y}=\text{Bern}(a_{uv}; p_{uv|y})$, where $\{p_{uv|y}\}$ are the likelihood parameters.  Then, assume class prior probabilities are equal, $\PP[\YY=1]=\PP[\YY=0]=1/2$.  For simplicity, we sample one graph from each class, meaning $n=2$, and a single training graph sampled according the class priors. Thus, each simulation is defined by $\mc{M}=(P_0,P_1,n_V)$, where $P_0$ and $P_1$ are the class-conditional likelihoods, and $n_V$ is the number of vertices per graph.  Given a model, $\mc{M}$, we generate $n_{MC}$ Monte Carlo trials.  For each model, $R_{chance}\approx 0.5$, as estimated by using BPI to classify without first implementing \texttt{QAP}.  We estimate Bayes error, $R_*$, by using the true parameters and a Bayes plugin classifier (that is, we use all the labels).  We then implement \texttt{BPI}$\circ$\texttt{QAP}$_1$, and plot both the misclassification rate and objective function $f(Q^{(j)})$ as a function of iteration number (not number of restarts, which we hold fixed at one). Figure \ref{fig:homo} shows a model (right panel) and results (left panel) of one such simulation. Intriguingly, the first iteration of \qapa seems to basically do the trick.  This led us to investigate the relationship between LAP and QAP.
 
 \begin{figure}[htbp]
 	\centering			
 	\includegraphics[width=0.5\linewidth]{../figs/homo_kidney_egg_model}
 	\includegraphics[width=0.4\linewidth]{../figs/homo_kidney_egg_performance}
-	\caption{Homogeneous-kidney-egg model simulation. The left and middle panels show the model parameters for class 0 and 1, respectively.  Each edge in the ``kidney'' in both classes has probability $0.5$; in the egg, class 0 edges are sampled with probability $0.25$, and class 1 edges are sampled with probability $0.75$. The right panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number. LAP does approximately as well as QAP on this (and other) simple graph simulation.  Note that $L_{chance}\approx 0.5$ and $L_* \approx 0$ for this simulation. The units of the right-side ordinate are arbitrary. The QAP objective function evaluation prior to any QAP iterations is beyond the bounds of this figure.}
+	\caption{Homogeneous-kidney-egg model simulation. The left and middle panels show the model parameters for class 0 and 1, respectively.  Each edge in the ``kidney'' in both classes has probability $0.5$; in the egg, class 0 edges are sampled with probability $0.25$, and class 1 edges are sampled with probability $0.75$. The right panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number. LAP does approximately as well as QAP on this (and other) simple graph simulation.  Note that $R_{chance}\approx 0.5$ and $R_* \approx 0$ for this simulation. The units of the right-side ordinate are arbitrary. The QAP objective function evaluation prior to any QAP iterations is beyond the bounds of this figure.}
 	\label{fig:homo}
 \end{figure}
 
 % described above with $n_V=10$ vertices and $n=1000$ total samples, 500 from each class.  First, we generated a simulated homogeneous-kidney-egg problem, as depicted in Figure \ref{fig:homo_subfig1}.  Then, we run the Bayes Plugin \qapa algorithm described above.  Note that \qapa is an \emph{iterative} algorithm, so we can evaluate the performance of each iteration (not restart). 
 
-% While Fig. \ref{fig:homo_subfig2} shows the QAP objective function decreasing with each iteration, Fig. \ref{fig:homo_subfig3} shows that classification performance does not decrease.  We found similar numerical results in two additional simulations: a heterogeneous-kidney-egg model (Figure \ref{fig:hke}) and a fully heterogeneous model (Figure \ref{fig:hetero}). Note that in all simulations $L_{chance} \geq \mh{L}_{QAP} \geq L_*$, as it must be.  Multiple iterations not improving classification performance led us to investigate the relationship between QAP and the Linear Assignment Problem (LAP).
+% While Fig. \ref{fig:homo_subfig2} shows the QAP objective function decreasing with each iteration, Fig. \ref{fig:homo_subfig3} shows that classification performance does not decrease.  We found similar numerical results in two additional simulations: a heterogeneous-kidney-egg model (Figure \ref{fig:hke}) and a fully heterogeneous model (Figure \ref{fig:hetero}). Note that in all simulations $R_{chance} \geq \mh{R}_{QAP} \geq R_*$, as it must be.  Multiple iterations not improving classification performance led us to investigate the relationship between QAP and the Linear Assignment Problem (LAP).
 
 
 
@@ -464,7 +496,7 @@ Because \qapa works for both weighted and unweighted, we next simulated multi-gr
 	\centering			
 	\includegraphics[width=0.5\linewidth]{../figs/poiss_model}
 	\includegraphics[width=0.4\linewidth]{../figs/poiss_performance}
-	\caption{Multigraph model simulation. The left and middle panels show the parameters for class 0 and  1, respectively.  The right panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number; both clearly descending.  For comparison, both $\mh{L}_{LAP}$ and $\mh{L}_*$ are shown.    }
+	\caption{Multigraph model simulation. The left and middle panels show the parameters for class 0 and  1, respectively.  The right panel shows the QAP objective function (gray) and misclassification rate (black) as a function of iteration number; both clearly descending.  For comparison, both $\mh{R}_{LAP}$ and $\mh{R}_*$ are shown.    }
 	\label{fig:poiss}
 \end{figure}
 

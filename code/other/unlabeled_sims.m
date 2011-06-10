@@ -1,18 +1,18 @@
 %% simulate independent edge models and classify using or not using the vertex names
 clear; clc
 
-n_MC= 1000;                           % # of samples
-n   = 10;                           % # of vertices
+n_MC= 100;                           % # of samples
+n   = 70;                           % # of vertices
 alg.model = 'bern';
 
-alg.fname   = 'poiss';    % different names will generate different simulations
-switch alg.fname                    % choose simulation parameters
+fname   = 'hetero';    % different names will generate different simulations
+switch fname                    % choose simulation parameters
     case 'homo_kidney_egg'
         
         p   = 0.5;      % prob of connection for kidney
         q0  = 0.2;      % prob of connection for egg
         q1  = 0.8;      % prob of connection for egg
-        egg = 1:5;      % vertices in egg
+        egg = 1:15;      % vertices in egg
         
         E0=p*ones(n);   % params in class 0
         E0(egg,egg)=q0; % egg params in class 0
@@ -24,8 +24,8 @@ switch alg.fname                    % choose simulation parameters
         
     case 'hetero'
         
-        E0=rand(n)*0.5+0.2;     % params in class 0
-        E1=rand(n)*0.5;     % params in class 1
+        E0=rand(n);     % params in class 0
+        E1=rand(n);     % params in class 1
         
         P.n=n; P.S=n_MC; P.E0=E0; P.E1=E1;
         
@@ -53,7 +53,7 @@ switch alg.fname                    % choose simulation parameters
     case 'hard_hetero'
         
         E0=rand(n);         % params in class 0
-        E1=E0+randn(n)*.1;  % params in class 1
+        E1=E0+randn(n)*.005;  % params in class 1
         E1(E1>=1)=1-1e-3;   % don't let prob be >1
         E1(E1<=0)=1e-3;     % or <0
         
@@ -90,6 +90,8 @@ end
 
 alg.datadir = '../../data/';
 alg.figdir  = '../../figs/';
+alg.fname   = [fname '_n' num2str(n) '_MC' num2str(n_MC)];
+
 
 alg.save    = 1;                    % whether to save/print results
 alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
@@ -283,7 +285,7 @@ text(QAPmark(1),QAPmark(2),'L_Q_A_P','fontsize',fs,'color','k')
 
 % set y2 stuff
 set(get(AX(2),'Ylabel'),'String','QAP objective function (a.u.)','color',gray,'fontsize',fs)
-set(AX(2),'YColor',gray,'YLim',[min(Y2) Y2(2)],'XLim',xlim,'fontsize',fs)
+set(AX(2),'YColor',gray,'YLim',[min(Y2) Y2(1)],'XLim',xlim,'fontsize',fs)
 set(fig, 'CurrentAxes', AX(2));
 hold on;
 h(2)=errorbar(0:QAP.max_iters,QAP.obj_avg,QAP.obj_sem);
