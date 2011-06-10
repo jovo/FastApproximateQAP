@@ -52,8 +52,8 @@ if strcmp(alg.names(2),'QAP'),
     QAP.correct = NaN(n_MC,QAP.max_iters);
     QAP.obj0    = NaN(n_MC,QAP.max_iters);
     QAP.obj1    = NaN(n_MC,QAP.max_iters);
-    QAP.ind0    = NaN(n_MC,QAP.max_iters,n_V);
-    QAP.ind1    = NaN(n_MC,QAP.max_iters,n_V);
+    QAP.inds0    = NaN(n_MC,QAP.max_iters,n_V);
+    QAP.inds1    = NaN(n_MC,QAP.max_iters,n_V);
 else QAP.do = false;
 end
 
