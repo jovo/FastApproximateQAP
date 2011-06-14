@@ -166,6 +166,18 @@ alg.QAP_init        = eye(n);       % starting value for QAP
 alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
 alg.truth_start = false;            % start QAP at truth
 
+symmetric=true;
+if symmetric
+   for i=1:2*n_MC
+       A=Atrn(:,:,i);
+       Atrn(:,:,i)=A+A';
+   end
+   for i=1:n_MC
+      A=Atst(:,:,i);
+      Atst(:,:,i)=A+A';
+   end
+end
+
 [LAP QAP] = classify_unlabeled_graphs(Atrn,Atst,ytst,P,alg);
 
 Lhats.LAP=LAP.Lhat;
@@ -184,12 +196,12 @@ figure(1), clf
 subplot(231), imagesc(LAP.ind0)
 subplot(232), imagesc(squeeze(QAP.inds0))
 diff0=LAP.ind0==squeeze(QAP.inds0);
-subplot(233), imagesc(diff0), title(sum(diff0(:)))
+subplot(233), imagesc(diff0), title(sum(diff0(:))/numel(diff0))
 
 subplot(234), imagesc(LAP.ind1)
 subplot(235), imagesc(squeeze(QAP.inds1))
 diff1=LAP.ind1==squeeze(QAP.inds1);
-subplot(236), imagesc(diff1), title(sum(diff1(:)))
+subplot(236), imagesc(diff1), title(sum(diff1(:))/numel(diff1))
 
 
 %% plot model

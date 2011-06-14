@@ -118,19 +118,18 @@ In \emph{unlabeled} graph classification, the labels are assumed to be uninforma
 \subsection{Latent Labeled Graph Classification} % (fold)
 \label{sub:latent_labeled_graph_classification}
 
-In \emph{latent labeled} graph classification, the labels latent, and it is unknown whether they contain any class-conditional signal.  In this context, the likelihood term of Eq. \eqref{eq:gc} does not necessarily factorize. Moreover, we observe $\Aa, \{(\Aa_i,\YY_i)\}_{i \in [n]} \iid F_{\LL, \Aa,\YY}$, and we desire to know $\YY$, the class of the as yet unclassified unlabeled graph, and we have not observed any labels, although they may contain class-conditional signal (they may not).  Given such a scenario, one could consider at least two complementary approaches:
-\begin{enumerate}
-	\item Try to impute the missing labels, and use a labeled graph classifier, $h_{\LL,\Aa}$.
-	\item Ignore the missing labels, and use an unlabeled graph classifier, $h_{\Aa}$.
-\end{enumerate}
-The preferred strategy will depend on the assumed model and the data.  Specifically, if one has good reason to believe that the vertex labels lack much class-conditional signal, then one ``should'' ignore them.  Alternately, if one believes that the vertex labels might contain some class-conditional signal, then one ``could'' try to use them.  However, whether those efforts are fruitful will depend on a bias-variance trade-off.  Certainly, the class-conditional entropy for the joint vertex labels and edge attributes is at least as great as the class-conditional entropy for the edge attributes alone, $\mc{I}(\LL,\Aa | \YY) \geq \mc{I}(\Aa | \YY)$.   But if the vertex have labels, ignoring them will induce more bias.  
+In \emph{latent labeled} graph classification, the labels latent, and it is unknown whether they contain any class-conditional signal.  In this context, the likelihood term of Eq. \eqref{eq:gc} does not necessarily factorize. Moreover, we observe $\Aa, \{(\Aa_i,\YY_i)\}_{i \in [n]} \iid F_{\LL, \Aa,\YY}$, and we desire to know $\YY$, the class of the as yet unclassified unlabeled graph, and we have not observed any labels, although they may contain class-conditional signal (they may not).  Given such a scenario, one could consider at least two complementary approaches: (i) a graph \emph{matching} approach, or (ii) a graph \emph{invariant} approach.
+%  %Try to impute the missing labels, and use a labeled graph classifier, $h_{\LL,\Aa}$.
+% 	\item a graph invariant approach. % Ignore the missing labels, and use an unlabeled graph classifier, $h_{\Aa}$.
+% \end{enumerate}
+
+The preferred approach will depend on the assumed model and the data.  Specifically, if one has good reason to believe that the vertex labels lack much class-conditional signal, then one ``should'' ignore them.  Alternately, if one believes that the vertex labels might contain some class-conditional signal, then one ``could'' try to use them.  However, whether those efforts are fruitful will depend on a bias-variance trade-off.  Certainly, the class-conditional entropy for the joint vertex labels and edge attributes is at least as great as the class-conditional entropy for the edge attributes alone, $\mc{I}(\LL,\Aa | \YY) \geq \mc{I}(\Aa | \YY)$.   But if the vertex have labels, ignoring them will induce more bias.  
 
 Another view of how to determine whether to try using the labels concerns the relative effective signal-to-noise-ratios.  Specifically, if given the vertex labels, the adjacency matrices are all very similar, then $F_{\Aa | \LL, \YY}$ has relatively low entropy.  Therefore, one can try to impute the missing labels with perhaps great success.  Alternately, if $F_{\Aa | \LL, \YY}$ has relatively high entropy, then imputing the missing labels might be too difficult, and we are better off using only $F_{\AA | \YY}$.
 
-It is our contention that many interesting graph classification problems can be cast as latent labeled graph classification problems.
+It is our contention that many interesting graph classification problems can be cast as latent (or noisy) labeled graph classification problems.  For instance, in the MR connectome situation, labels are assigned to vertices using (nonlinear) image registration, which works well, but struggles in certain cases (for example, the boundaries of the regions).  Further, in the chemical compound classification setting, one could perhaps use the vertex labels (each vertex is a specific element), to enhance classification performance.  
 
-
-The sequel considers this latent labeled graph classification setting from a statistical perspective.  We propose two complementary approaches, one that tries to impute the missing labels, and one that does not.  Via synthetic data analysis, we demonstrate scenarios in which the above intuition regarding the bias-variance trade-off suggests which strategy is likely more effective.
+The sequel considers two complementary approaches to solving latent labeled graph classification problems. Via synthetic data analysis, we demonstrate scenarios in which the above intuition regarding the bias-variance trade-off suggests which approach is likely more effective.
 
 
 % subsection latent_labeled_graph_classification (end)
@@ -151,17 +150,9 @@ The sequel considers this latent labeled graph classification setting from a sta
 \section{Latent labeled Graph Classifiers} % (fold)
 \label{sec:algorithms}
 
-
-\subsection{Trying to use the labels} % (fold)
-\label{sub:trying_to_use_the_labels}
-
-
-Deciding the try to use the labels to classify
-
-% subsection trying_to_use_the_labels (end)
-
-\subsubsection{Graph Matching} % (fold)
+\subsection{Graph Matching Classifiers} % (fold)
 \label{sec:quadratic_assignment_problem}
+
 
 A graph can be represented by its adjacency matrix, $A$, assuming the edge attributes are univariate.  Unlabeled graphs, on the other hand, can be represented by a set of adjacency matrices, $\{QAQ\T : Q \in \mc{Q}\}$, where $Q$ is any permutation matrix.  Given a pair of unlabeled graphs, determining whether they are isomorphic with respect to one another is equivalent to determining whether one can find an adjacency matrix of one graph that is identical to the other's.  This problem can be cast as a \emph{quadratic assignment problem} (QAP):
  \begin{align} \label{eq:QAP}
@@ -257,20 +248,12 @@ where $\otimes$ indicates the Kronecker product. This means that the initializat
 % paragraph putting_it_all_together (end)
 
 
-\subsection{Graph Invariants} % (fold)
-\label{sub:graph_invariants}
-
-A graph invariant (GI) is any function that maps a graph to a scalar whose value is independent of the vertex labels, $T: (\mc{V},\mc{E},\mc{A}) \mapsto \Real$ (note that often graph invariants are defined to operate only on unweighted graphs, that is, $T: (\mc{V},\mc{E}) \mapsto \Real$).  By defining a set of GIs, one can embed a collection of graphs into a quotient space invariant to vertex labels.  Whenever this quotient space is a subset of finite dimensional Euclidean space, all standard machine learning classifiers may be implemented to solve the classification problem.  
-
-% subsection graph_invariants (end)
-
-
-\section{Unlabeled Graph Classification Algorithms} % (fold)
+\subsubsection{Unlabeled Graph Classification Algorithms} % (fold)
 \label{sec:algorithms}
 
 Below we provide an example, and briefly discuss, three complementary approaches to solving unlabeled graph classification problems.  Each strategy uses one of the two above approaches to dealing with the graph isomorphism problem as a subroutine.
 
-\subsection{A graph dissimilarity approach: \texttt{$k$NN} $\circ$ \qap} % (fold)
+\subsubsection{A graph dissimilarity approach: \texttt{$k$NN} $\circ$ \qap} % (fold)
 \label{ssub:_k_nn_circ_qap}
 
 Define a dissimilarity on graph spaces: $d: \mc{G} \times \mc{G} \mapsto \Real_+$, in which one can compute the dissimilarity between any pair of graphs. Given an adjacency matrix representation, many such dissimilarities are possible (e.g., graph edit distance, Hamming distance, etc.).  It is becoming increasingly popular to use a \emph{graph kernel}, $\kappa(G,G')=\langle \phi(G), \phi(G') \rangle$, where $\phi(\cdot): \mc{G} \mapsto \EE$, as the dissimilarity \cite{Bunke2011}.  Graph kernels have a number of desirable properties, perhaps most notably, that one can then use standard \emph{kernel machines} to classify \cite{Vapnik1998}.	Regardless, given any dissimilarity, one can apply at least two different kinds of classifiers.
@@ -286,7 +269,7 @@ For simplicity, we only consider the $k$NN strategy here.  Specifically, given a
 % subsubsection _k_nn_circ_qap (end)
 
 
-\subsection{A graph model approach: \texttt{BPI}$\circ$\qap} % (fold)
+\subsubsection{A graph model approach: \texttt{BPI}$\circ$\qap} % (fold)
 \label{ssub:bayes_plugin_circ_qap}
 
 First assume a model, $\mc{F}_{\GG,\YY}$.  The model of graphs and classes may be factorized into (i) a class-conditional random graph model: $\mc{F}_{\GG  | \YY} = \{F_{\GG|\YY}[\cdot; \bth_{\YY}] : \bth_{\YY} \in \bTh\}$, and (ii) a class prior model, $\mc{F}_{\YY} = \{F_{\YY}[\cdot; \pi_{\YY}] : \pi_{\YY} \in (0,1)\}$.  Given such a factorization, one could then, for instance, estimate $\{\bth,\pi\}$ and then use standard model-based classifiers, such as the Bayes plugin (BPI) classifier.  
@@ -296,12 +279,11 @@ However, if all the training graphs are unlabeled, unless the class-conditional 
 Regardless of how a canonical labeling is chosen per class, given this canonical labeling, a graph model approach takes the following steps.  First, align each graph in each class to its class prototype using \texttt{QAP}$_n$.  Second, estimate the likelihood parameters for each class, $\{\bth_{\YY}\}_{\YY \in \{0,1\}}$, as well as the class-priors. Third, the test graph can then be \texttt{QAP}ed to the prototype of each class.  Fourth, compute the posterior probability of the test graph coming from each class, by plugging in the parameters to the Bayes classifier.  Finally, let the estimated class be the \emph{maximum a posteriori} class.  Call this algorithm \texttt{BPI} $\circ$ \texttt{QAP}.
 
 
-% subsubsection bayes_plugin_circ_qap (end)
+\subsection{Graph Invariant Classifiers} % (fold)
+\label{sub:graph_invariants}
 
-% subsection graph_isomorphism_approach (end)
+A graph invariant (GI) is any function that maps a graph to a scalar whose value is independent of the vertex labels, $T: (\mc{V},\mc{E},\mc{A}) \mapsto \Real$ (note that often graph invariants are defined to operate only on unweighted graphs, that is, $T: (\mc{V},\mc{E}) \mapsto \Real$).  By defining a set of GIs, one can embed a collection of graphs into a quotient space invariant to vertex labels.  Whenever this quotient space is a subset of finite dimensional Euclidean space, all standard machine learning classifiers may be implemented to solve the classification problem.  
 
-\subsection{A graph invariant approach: \texttt{CW}$\circ$\texttt{GI} } % (fold)
-\label{sub:graph_invariant_approach}
 
 To use graph invariants to classify, one first must choose as set of graph invariants.  Unfortunately, there is no known set of graph invariants that collectively solve the graph isomorphism problem \cite{Conte2004}.  Fortunately, some recent theoretical work shows that certain graph invariants have greater discriminability with regard to certain graph inference tasks \cite{Ruhkhin2011}. With that in mind, we generalize a standard set of unweighted graph invariants---described fully in \cite{CPP11}---developing their weighted graph invariant counterparts. We describe each briefly:
 \begin{itemize}
@@ -326,7 +308,16 @@ For each graph $G_i$ in the training set, we compute a graph invariant vector: $
 % We then whiten this matrix to control for the divergence means and scales of the various graph invariants, $\mb{T} \rightarrow \mb{E}\mb{\Lambda}^{-1/2}\mb{E}\T \mb{T}$, where $\mb{E}\mb{\Lambda}\mb{E}\T$ is the eigenvalue decomposition of the covariance matrix,$\EE[\mb{T}\mb{T}\T]$ \cite{Hyvarinen2000}.  
 Now, to estimate the class of a test graph, we first compute its invariant vector, $\mb{t}$, and normalize it appropriately.  We then apply a variety of machine learning algorithms, including $k$NN, linear classifiers, and SVMs.  For the below connectome data, the best performing algorithm is the exact confidence weighted classifier \cite{Crammer2008}.  Call this algorithm \texttt{CW}$\circ$\texttt{GI}.
 
-% subsection graph_invariant_approach (end)
+
+% subsection graph_invariants (end)
+
+
+
+% subsubsection bayes_plugin_circ_qap (end)
+
+% subsection graph_isomorphism_approach (end)
+
+
 
 % section algorithms (end)
 
