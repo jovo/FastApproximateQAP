@@ -72,7 +72,7 @@ The graph classification problem may be stated thusly: given training data $\mc{
 \begin{align}
 	h^* = \argmin_{h \in \mc{H}} \PP[h(\GG) \neq Y].
 \end{align}
-In general, $h^*$ is unavailable and dependent on the true but unknown distribution,  $F=F_{\GG,Y}$ (which includes the vertex labels).  When $h^*$ is unavailable, one can utilize training data, $\mc{T}_n$, to obtain $\mh{h}$, an approximation to $h^*$:
+In general, $h^*$ is unavailable and dependent on the true but unknown distribution,  $F=F_{\GG,Y}$ (which includes the vertex labels).  When $h^*$ is unavailable, one can utilize training data, $\mc{T}_n$, to induce a classifier, $\mh{h}: \mc{G} \times (\mc{G}\times\mc{Y})^n \mapsto \mc{Y}$:
 \begin{align}
 	\mh{h} \approx \argmin_{h \in \mc{H}} \PP[h(\GG) \neq Y | \mc{T}_n],
 \end{align}
@@ -93,37 +93,14 @@ Assume that each graph has the same set of vertices.  Moreover, assume that edge
 \begin{align} \label{eq:gc}
 	F_{\GG,Y}=F_{\LL,\Aa,Y}=F_{\LL,\Aa | Y} F_{Y}
 \end{align}
-where $\LL: \Omega \mapsto \mc{L} \subseteq \{L_1,L_2,\ldots,L_{n_v}\}=[L_{n_v}]$ is a random vertex labeling,  $\Aa: \Omega \mapsto \mc{A} \subseteq \Real^{n_v \times n_v}$ is a random adjacency matrix, and $n_v$ is the number of vertices in the graphs.  The class-conditional signal therefore derives from two possible sources of variability, $\LL$ and $\Aa$.  \emph{Labeled} graph classifiers therefore proceed accordingly, using the labels to facilitate classification (see \cite{Vogelstein2011}). \emph{Unlabeled} graph classifiers, however, assume that the labels carry no class-conditional signal, that is, they assume that $F_{\LL,\Aa | Y}=F_{\Aa | Y}$. In \emph{Latent labeled} graph classifiers, those under investigation here, the labels are not observed, yet they are not assumed to be wholly uninformative with respect to the task at hand.  
+where $\LL: \Omega \mapsto \mc{L} \subseteq \{L_1,L_2,\ldots,L_{n_v}\}=[L_{n_v}]$ is a random vertex labeling,  $\Aa: \Omega \mapsto \mc{A} \subseteq \Real^{n_v \times n_v}$ is a random adjacency matrix, and $n_v$ is the number of vertices in the graphs.  The class-conditional signal therefore derives from two possible sources of variability, $\LL$ and $\Aa$.  
+
+A \emph{Labeled} graph classifier $h_{\LL,\Aa}: \mc{L}\times\mc{A} \mapsto \mc{Y}$ therefore uses the labels to facilitate graph classification (see \cite{Vogelstein2011} for details). An \emph{unlabeled} graph classifier $h_{\Aa}: \mc{A} \mapsto \mc{Y}$ does not.  Let $h^*_{\LL,\Aa}$ indicate the Bayes optimal classifier using labels, with risk $R^*_{\LL,\Aa}$.  Similarly, let $h^*_{\Aa}$ indicate the Bayes optimal classifier not using labels, with risk $R^*_{\Aa}$.  
 
 
-Let $h_{\Aa}^*: \mc{A} \mapsto \mc{Y}$ be the \emph{edge attribute only} Bayes optimal classifier, and $R_{\Aa}^*$ be the risk associated with this classifier.  Similarly, let $h_{\LL,\Aa}^*: \mc{A} \times \mc{L} \mapsto \mc{Y}$ be the edge attribute and vertex label Bayes optimal classifier, and let $R_{\LL,\Aa}^*$ be its risk.  We are interested in parsing model space into those models for which $R_{\LL,\Aa}^* < R_{\Aa}^*$.  A vertices are \emph{stochastically equivalent} whenever
 
 
-
-% 
-% \subsection{Labeled Graph Classification} % (fold)
-% \label{sub:labeled_graph_classification}
-% 
-% In \emph{labeled} graph classification, we assume that $(\LL,\Aa,Y), \{(\LL_i,\Aa_i,Y_i)\}_{i \in [n]} \iid F_{\LL,\Aa,Y}$, and that we do not observe $Y$. An example of such a scenario is MR connectome classification, where the vertices correspond to macro-neuroanatomical regions, such as the visual cortex.   Because it is relatively easy to draw reasonable boundaries between regions, these inferred graphs have labeled vertices. And because the vertex labels of each graph are observed, we can compare adjacency matrices directly, and use graph classification techniques, such as those described in \cite{Vogelstein2011}.  This facilitates factorizing the likelihood term of Eq. \eqref{eq:gc}:  $F_{\LL,\Aa|Y}=F_{\Aa | \LL, Y} F_{\LL|Y} = F_{\Aa | \LL, Y}$.  Note that although adjacency matrices can be represented by objects in $\Real^{n_v \times n_v}$, the graphs are \emph{not} in finite Euclidean space; rather, the structure of the adjacency matrix may encode information.  In other words, simply vectorizing the adjacency matrix, and performing some standard classification techniques, might be discarding class-conditional signal.  A labeled graph classifier therefore maps from the joint vertex label and edge attribute space into the class space: $h_{\LL,\Aa}: \mc{L} \times \mc{A} \mapsto \mc{Y}$.
-% 
-% % subsection labeled_graph_classification (end)
-% 
-% \subsection{Unlabeled Graph Classification} % (fold)
-% \label{sub:unlabeled_graph_classification}
-% 
-% In \emph{unlabeled} graph classification, the labels are assumed to be unknown or uninformative with regard to our inference task; that is, no class-conditional signal is available from the labels. In this context, the likelihood term of Eq. \eqref{eq:gc} factorizes: $F_{\LL,\Aa|Y}=F_{\Aa | Y}$.  A common scenario in which this assumption is made is in classifying chemical compounds, where only graph structure is used \cite{Bunke2011}.  In this context we effectively assume that we have $(\Aa,Y), \{(\Aa_i,Y_i)\}_{i \in [n]} \iid F_{\Aa,Y}$, but we have not observed $Y$, the class of the as yet unclassified unlabeled graph.  Here, any arbitrary permutation of each of the adjacency matrices is equivalent to any other.  Letting $Q \in \mc{Q}$ be a permutation matrix, pre and post-multiplying an adjacency matrix by a permutation matrix yields another adjacency matrix representation, $\mt{A}=QAQ\T$.  Thus, in the unlabeled graph classification setting, each graph implies a quotient space,  $G=\{QAQ\T : Q \in \mc{Q}\}$. An unlabeled graph classifier therefore maps from this quotient space, which is just the edge attribute space, into the class space: $h_{\Aa}: \mc{A} \mapsto \mc{Y}$.
-% 
-% 
-% % subsection unlabeled_graph_classification (end)
-% 
-% 
-% 
-% \subsection{Latent-Labeled Graph Classification} % (fold)
-% \label{sub:latent_labeled_graph_classification}
-% 
-% In \emph{latent-labeled} graph classification the labels are latent.   In this context, the likelihood term of Eq. \eqref{eq:gc} does not necessarily factorize. %Moreover, we observe $\Aa, \{(\Aa_i,Y_i)\}_{i \in [n]} \iid F_{\LL, \Aa,Y}$, and we desire to know $Y$, the class of the as yet unclassified unlabeled graph, and we have not observed any labels, although they may contain class-conditional signal (they may not).  
-% 
-Given such a scenario, one could consider at least three complementary approaches: (i) a graph \emph{labeling} approach in which one effectively tries to estimate labels, or (ii) a graph \emph{invariant} approach in which one does not, and (iii) a graph \emph{dissimilarity} approach in which one could.
+Given such a scenario, consider at least three complementary approaches: (i) a graph \emph{labeling} approach in which one effectively tries to estimate labels, or (ii) a graph \emph{invariant} approach in which one does not, and (iii) a graph \emph{dissimilarity} approach in which one could.
 % %  %Try to impute the missing labels, and use a labeled graph classifier, $h_{\LL,\Aa}$.
 % % 	\item a graph invariant approach. % Ignore the missing labels, and use an unlabeled graph classifier, $h_{\Aa}$.
 % % \end{enumerate}
@@ -356,6 +333,8 @@ For concreteness and simplicity, consider the $k$NN strategy using the \qap obje
 \section{Results}
 \label{sec:results}
 
+We are interested in developing intuition with regard to when one can, at least in theory, use vertex labels to one's advantage.  To proceed, we define \emph{stochastic equivalent}: vertices are stochastically equivalent whenever $\PP[A_{i\cdot} | Y]=\PP[A_{j\cdot} | Y]$.
+
 
 \subsection{Theoretical results} % (fold)
 \label{sub:when_to_use_what}
@@ -381,33 +360,44 @@ For concreteness and simplicity, consider the $k$NN strategy using the \qap obje
 Information processing lemma....
 \end{proof}
 
- Specifically, if one has good reason to believe that the vertex labels lack much class-conditional signal, then one ``should'' ignore them and use a graph invariant approach.  Alternately, if one believes that the vertex labels might contain some class-conditional signal, then one ``could'' try to use them.  However, whether those efforts are fruitful will depend on a bias-variance trade-off.  Certainly, the class-conditional entropy for the joint vertex labels and edge attributes is at least as great as the class-conditional entropy for the edge attributes alone, $\mc{I}(\LL,\Aa | Y) \geq \mc{I}(\Aa | Y)$.   But if the vertex have labels, ignoring them will induce more bias.  
 
-Another view of how to determine whether to try using the labels concerns the relative effective signal-to-noise-ratios.  Specifically, if given the vertex labels, the adjacency matrices are all very similar, then $F_{\Aa | \LL, Y}$ has relatively low entropy.  Therefore, one can try to impute the missing labels with perhaps great success.  Alternately, if $F_{\Aa | \LL, Y}$ has relatively high entropy, then imputing the missing labels might be too difficult, and we are better off using only $F_{\Aa | Y}$.
+Although the lower bounds are the same, determining which GIs to use is not obvious.
 
-It is our contention that many interesting graph classification problems can be cast as latent (or noisy) labeled graph classification problems.  For instance, in the MR connectome situation, labels are assigned to vertices using (nonlinear) image registration, which works well, but struggles in certain cases (for example, the boundaries of the regions).  Further, in the chemical compound classification setting, one could perhaps use the vertex labels (each vertex is a specific element), to enhance classification performance.  
+%  Specifically, if one has good reason to believe that the vertex labels lack much class-conditional signal, then one ``should'' ignore them and use a graph invariant approach.  Alternately, if one believes that the vertex labels might contain some class-conditional signal, then one ``could'' try to use them.  However, whether those efforts are fruitful will depend on a bias-variance trade-off.  Certainly, the class-conditional entropy for the joint vertex labels and edge attributes is at least as great as the class-conditional entropy for the edge attributes alone, $\mc{I}(\LL,\Aa | Y) \geq \mc{I}(\Aa | Y)$.   But if the vertex have labels, ignoring them will induce more bias.  
+% 
+% Another view of how to determine whether to try using the labels concerns the relative effective signal-to-noise-ratios.  Specifically, if given the vertex labels, the adjacency matrices are all very similar, then $F_{\Aa | \LL, Y}$ has relatively low entropy.  Therefore, one can try to impute the missing labels with perhaps great success.  Alternately, if $F_{\Aa | \LL, Y}$ has relatively high entropy, then imputing the missing labels might be too difficult, and we are better off using only $F_{\Aa | Y}$.
+% 
+% It is our contention that many interesting graph classification problems can be cast as latent (or noisy) labeled graph classification problems.  For instance, in the MR connectome situation, labels are assigned to vertices using (nonlinear) image registration, which works well, but struggles in certain cases (for example, the boundaries of the regions).  Further, in the chemical compound classification setting, one could perhaps use the vertex labels (each vertex is a specific element), to enhance classification performance.  
+% 
+% The sequel considers these two complementary approaches to solving latent labeled graph classification problems. Via synthetic data analysis, we demonstrate scenarios in which the above intuition regarding the bias-variance trade-off suggests which approach is likely more effective.
+% 
+% \subsubsection{Graph labeling approachs} % (fold)
+% \label{ssub:graph_labeling_approachs}
+% 
+% % subsubsection graph_labeling_approachs (end)
+% 
+% Which one to use depends on whether we first assume there is a ``canonical labeling.''  A canonical labeling is vertex labeling that introduces a vertex ordering for an equivalence class of graphs (that is, all graphs isomorphic to one another).  In the absence of an assumed canonical labeling, a \emph{graph dissimilarity} approach seems more natural to us.  In the presence of an assumed canonical labeling, a \emph{graph model} approach seems more natural to us.
+% 
+% 
+% When a canonical labeling is assumed to exist, we can pursue a complementary strategy. Note that in the graph dissimilarity approach described above, the vertex labels of adjacency matrix $A$ is a pairwise property, $Q^A_i$, which changed for each $B_i$.  When a canonical labeling is assumed, we search a simple permutation matrix, $Q^A$, invariant with respect to all the other training samples.  Sometimes a canonical labeling is somehow known in advance. Alternately, one could choose a set of ``prototype'' graphs (possibly with cardinality one), and graph match all other graphs to that set (one).  While some efforts have been directed at choosing prototypes (see  \cite{Bunke2011}), it remains a bit of a sticky wicket.  Regardless, assuming a canonical labeling (somehow), a graph model approach proceeds as follows.   
+% 
+% Like the above $k$NN strategy, a straightforward implementation of a \emph{graph model} based approach depends on first choosing a particular graph onto which one implements the graph labeling function.  One option would be to label each training graph onto the test graph.  While simple, a disadvantage of this approach is that it might diminish the differences between the two classes.  An alternative strategy would be to choose a ``prototype'' from each class, 
+% 
+% % However, if all the training graphs are unlabeled, unless the class-conditional signal is independent of the vertex labels, one must somehow deal with the absent labels.  Sometimes a ``canonical'' labeling is somehow natural, and can be searched for.  Otherwise, one could \qap all the training graphs to the test graph.  This approach has the unfortunate consequence of making all the training graphs more similar to one another, disregarding the class labels.  Another option would be to select a ``prototype'' from each class. Although several prototype selection strategies have been studied, prototype selection is still problematic \cite{Bunke2011}.  Finally, one could generate prototype for each class, using all available information.  This approach is intriguing but complicated.  Each of these alternatives essentially defines a canonical labeling per class.
+% 
+% % Regardless of how a canonical labeling is chosen per class, given this canonical labeling, a graph model approach takes the following steps.
+% % subsection when_to_use_what (end)
 
-The sequel considers these two complementary approaches to solving latent labeled graph classification problems. Via synthetic data analysis, we demonstrate scenarios in which the above intuition regarding the bias-variance trade-off suggests which approach is likely more effective.
 
-\subsubsection{Graph labeling approachs} % (fold)
-\label{ssub:graph_labeling_approachs}
+\subsection{Numerical Results} % (fold)
+\label{sub:numerical_results}
 
-% subsubsection graph_labeling_approachs (end)
-
-Which one to use depends on whether we first assume there is a ``canonical labeling.''  A canonical labeling is vertex labeling that introduces a vertex ordering for an equivalence class of graphs (that is, all graphs isomorphic to one another).  In the absence of an assumed canonical labeling, a \emph{graph dissimilarity} approach seems more natural to us.  In the presence of an assumed canonical labeling, a \emph{graph model} approach seems more natural to us.
+example of estimating labels doing better and doing worse.
 
 
-When a canonical labeling is assumed to exist, we can pursue a complementary strategy. Note that in the graph dissimilarity approach described above, the vertex labels of adjacency matrix $A$ is a pairwise property, $Q^A_i$, which changed for each $B_i$.  When a canonical labeling is assumed, we search a simple permutation matrix, $Q^A$, invariant with respect to all the other training samples.  Sometimes a canonical labeling is somehow known in advance. Alternately, one could choose a set of ``prototype'' graphs (possibly with cardinality one), and graph match all other graphs to that set (one).  While some efforts have been directed at choosing prototypes (see  \cite{Bunke2011}), it remains a bit of a sticky wicket.  Regardless, assuming a canonical labeling (somehow), a graph model approach proceeds as follows.   
+% subsection numerical_results (end)
 
-Like the above $k$NN strategy, a straightforward implementation of a \emph{graph model} based approach depends on first choosing a particular graph onto which one implements the graph labeling function.  One option would be to label each training graph onto the test graph.  While simple, a disadvantage of this approach is that it might diminish the differences between the two classes.  An alternative strategy would be to choose a ``prototype'' from each class, 
-
-% However, if all the training graphs are unlabeled, unless the class-conditional signal is independent of the vertex labels, one must somehow deal with the absent labels.  Sometimes a ``canonical'' labeling is somehow natural, and can be searched for.  Otherwise, one could \qap all the training graphs to the test graph.  This approach has the unfortunate consequence of making all the training graphs more similar to one another, disregarding the class labels.  Another option would be to select a ``prototype'' from each class. Although several prototype selection strategies have been studied, prototype selection is still problematic \cite{Bunke2011}.  Finally, one could generate prototype for each class, using all available information.  This approach is intriguing but complicated.  Each of these alternatives essentially defines a canonical labeling per class.
-
-% Regardless of how a canonical labeling is chosen per class, given this canonical labeling, a graph model approach takes the following steps.
-% subsection when_to_use_what (end)
-
-
-\subsection{QAP benchmarks vs. PATH algorithm}
+\subsubsection{QAP benchmarks vs. PATH algorithm}
 
 We first compare the performance of \qapn with recent state-of-the-art approaches on the QAP benchmark library \cite{Burkard1997}.  Specifically, \cite{Zaslavskiy2009} reported improved performance in all but two cases, in which the QPB method of Cremers et al. \cite{Schellewald2001} achieved a lower minimum.  We compare \qapn with the previous best performing algorithm.  In \emph{all} cases, \texttt{QAP}$_3$ outperforms the previous best result, often by orders of magnitude in terms of relative error. In three cases, \qapb achieves the absolute minimum.  In 12 out of 16 cases, $75\%$, the simple \qapa algorithm outperforms the others (starting with the flat doubly stochastic matrix).  See Figure \ref{fig:fwpath} for quantitative comparisons.
 
@@ -451,7 +441,7 @@ We first compare the performance of \qapn with recent state-of-the-art approache
 
 
 
-\subsection{Unweighted Graph Simulation}
+\subsubsection{Unweighted Graph Simulation}
 
 \texttt{QAP}$_n$'s near perfect performance gave us hope for using \qap as part of an unlabeled graph classifier.  To investigate further, we generated some simulations using the following assumptions.  First, assume an independent edge random graph model for each class: $F_y=\prod_{(u,v) \in \mc{E}} F_{uv|y}$.  For this simple graph scenario, each edge is a Bernoulli random variable, $F_{uv|y}=\text{Bern}(a_{uv}; p_{uv|y})$, where $\{p_{uv|y}\}$ are the likelihood parameters.  Then, assume class prior probabilities are equal, $\PP[Y=1]=\PP[Y=0]=1/2$.  For simplicity, we sample one graph from each class, meaning $n=2$, and a single training graph sampled according the class priors. Thus, each simulation is defined by $\mc{M}=(P_0,P_1,n_v)$, where $P_0$ and $P_1$ are the class-conditional likelihoods, and $n_v$ is the number of vertices per graph.  Given a model, $\mc{M}$, we generate $n_{MC}$ Monte Carlo trials.  For each model, $R_{chance}\approx 0.5$, as estimated by using BPI to classify without first implementing \texttt{QAP}.  We estimate Bayes error, $R_*$, by using the true parameters and a Bayes plug-in classifier (that is, we use all the labels).  We then implement \texttt{BPI}$\circ$\texttt{QAP}$_1$, and plot both the misclassification rate and objective function $f(Q^{(j)})$ as a function of iteration number (not number of restarts, which we hold fixed at one). Figure \ref{fig:homo} shows a model (right panel) and results (left panel) of one such simulation. Intriguingly, the first iteration of \qapa seems to basically do the trick.  This led us to investigate the relationship between LAP and QAP.
 
@@ -470,7 +460,7 @@ We first compare the performance of \qapn with recent state-of-the-art approache
 
 
 
-\subsection{LAP vs. QAP} % (fold)
+\subsubsection{LAP vs. QAP} % (fold)
 \label{sub:lap_vs_qap}
 
 Much like the QAP objective function from Eq. \eqref{eq:QAP} can be simplified to Eq. \eqref{eq:qap}, the LAP objective function can be similarly simplified:
@@ -498,7 +488,7 @@ In the above simulation, the first iteration of \qap is essentially the only use
 % subsection lap_vs_qap (end)
 
 
-\subsection{Weighted simulation} % (fold)
+\subsubsection{Weighted simulation} % (fold)
 \label{sub:heterogeneous_simulation}
 
 Because \qapa works for both weighted and unweighted, we next simulated multi-graphs (that is, integer valued weights).  The below simulation is identical to the above except for $F_{uv|y}$---the edge random variable---was Bernoulli before and is now Poisson:  $F_{uv|y}=\text{Poisson}(a_{uv}; \lambda_{uv|y})$.  Figure \ref{fig:poiss} shows misclassification rate steadily decreasing with each iteration.
@@ -533,7 +523,7 @@ Because \qapa works for both weighted and unweighted, we next simulated multi-gr
 % \end{figure}
 
 
-\subsection{Connectome Classification} % (fold)
+\subsubsection{Connectome Classification} % (fold)
 \label{sub:connectome_classification}
 
 A ``connectome'' is a graph in which vertices correspond to biological neural units, and edges correspond to connections between the units.  Diffusion Magnetic Resonance (MR) Imaging and related technologies are making the acquisition of MR connectomes routine \cite{Hagmann2010}.  We use 49 subjects from the Baltimore Longitudinal Study on Aging, with acquisition and connectome inference details as reported in \cite{OHBM10}.  For each connectome, we obtain a $70 \times 70$ element adjacency matrix, where each element of the matrix encodes the number of streamlines between a pair of regions, ranging between 0 and about 65,000.  Associated with each graph is class label based on the gender of the individual (24 males, 25 females).  Because the vertices are labeled, we can compare the results of having the labels and not having the labels.  As such, we implement the following classification strategies.  In each case, we use a leave-one-out strategy to evaluate performance:
