@@ -5,3 +5,4 @@
 *.blg
 *.gz
 .graph_class*
+.*QAP.*
