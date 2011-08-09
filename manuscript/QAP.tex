@@ -1,3 +1,4 @@
+% \input{/Users/jovo/Research/latex/latex_paper.tex}
 
 \documentclass[10pt,journal,cspaper,compsoc]{IEEEtran}
 %
@@ -15,7 +16,8 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{url}
-
+% \usepackage{hyperref}
+% 
 \input{/Users/jovo/Research/latex/latex_commands.tex}
 \hyphenation{op-tical net-works semi-conduc-tor}
 % \newcommand{\Qqap}{\Qqap}
@@ -25,8 +27,6 @@
 \title{A Quadratic Assignment Problem Approach to Graph Matching: Applications in Statistical Connectomics}
 
 \author{Joshua T.~Vogelstein, John C.~Conroy, Lou Podrazik, Steve Kratzer, 
-		% Glen A.~Coppersmith, Mark Dredze, 
-		% William~R.~Gray,
         R.~Jacob~Vogelstein,
         and~Carey~E.~Priebe% <-this % stops a space
 \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.T. Vogelstein and C.E. Priebe are with the Department
@@ -321,7 +321,7 @@ Comparing this gradient to that of the QAP objective function---Eq. \eqref{eq:gr
 \subsection{Algorithm Complexity and leading constants} % (fold)
 \label{sub:algorithm_complexity_and_leading_constants}
 
-Both GM and its closely related counterpart, graph isomorphism (GI), are computationally difficult.  There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin96}.  While GM is known to be NP-hard, it remains unclear whether GI is in P, NP, or its own intermediate complexity class, NP-isomorphism (or isomorphism-complete).  Yet, for large classes of GI and GM problems linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GM or GI algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all graphs have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  We therefore decided to determine the average complexity of our algorithm \emph{and} the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\approx 10^{-6}$), making using this algorithm feasible for even reasonably large graphs.
+Both GM and its closely related counterpart, graph isomorphism (GI), are computationally difficult.  There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be NP-hard, it remains unclear whether GI is in P, NP, or its own intermediate complexity class, NP-isomorphism (or isomorphism-complete).  Yet, for large classes of GI and GM problems linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GM or GI algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all graphs have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  We therefore decided to determine the average complexity of our algorithm \emph{and} the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\approx 10^{-6}$), making using this algorithm feasible for even reasonably large graphs.
 
 
 
@@ -339,7 +339,7 @@ Both GM and its closely related counterpart, graph isomorphism (GI), are computa
 \subsection{Brain-Graph Matching} % (fold)
 \label{sub:connectome_classification}
 
-A ``connectome'' is a brain-graph in which vertices correspond to (collections of) neurons, and edges correspond to connections between them. The \emph{Caenorhabditis elegans} (\emph{C. elegans}) is a small worm (nematode) with $302$ labeled vertices.  We consider the subgraph with $279$ somatic neurons that form edges with other neurons \cite{WhiteBrenner86, Varshney2009}.  Two distinct kinds of edges exist between vertices: chemical and electrical ``synapses'' (edges). Any pair of vertices may have several edges of each type. Moreover, some of the synapses are polyadic, meaning between $>2$ vertices.    Thus, the connectome of a \emph{C. elegans} may be thought of as a weighted multi-hypergraph, where the weights are the number of edges of each type.  The \qapm algorithm natively operates on weighted or unweighted graphs.  We therefore conducted the following synthetic experiments.  Let $A_{uvz} \in \{0,1,2,\ldots\}$ be number of synapses from neuron $v$ to neuron $u$ of type $z$ (either chemical or electrical), and let $A_z=\{A_{uv}\}_{u,v \in [279]}$ for $z \in \{e,c\}$ corresponding to the electrical or chemical connectome.  Let $B_{iz}=Q_{iz} A_z Q_{iz}\T$, for some $Q_{iz}$ chosen uniformly at random from $\mc{Q}$ for $i=1,\ldots,s$.  For each $i$ and $z$, obtain $\mh{Q}_{iz}$ using \qapm as described above.  Define ``accuracy'' as $\frac{1}{279}\sum_{uv} Q_{iz} \mh{Q}_{iz}$.  Table \ref{tab:1} shows some summary results of applying \qapm to both $A_c$ and $A_e$ for $s=10$ times.  Note that average solution time is actually smaller than predicted via simulations.  Further note that while the electrical connectome was more difficult, that the median number of restarts was less than $30$.  Our stopping criteria on the number of restarts was either (i) perfect assignment or (ii) 30 restarts.  Therefore, this approach achieve perfect assignment sometimes even on this harder assignment problem.
+A ``connectome'' is a brain-graph in which vertices correspond to (collections of) neurons, and edges correspond to connections between them. The \emph{Caenorhabditis elegans} (\emph{C. elegans}) is a small worm (nematode) with $302$ labeled vertices.  We consider the subgraph with $279$ somatic neurons that form edges with other neurons \cite{WhiteBrenner86, Varshney2011}.  Two distinct kinds of edges exist between vertices: chemical and electrical ``synapses'' (edges). Any pair of vertices may have several edges of each type. Moreover, some of the synapses are polyadic, meaning between $>2$ vertices.    Thus, the connectome of a \emph{C. elegans} may be thought of as a weighted multi-hypergraph, where the weights are the number of edges of each type.  The \qapm algorithm natively operates on weighted or unweighted graphs.  We therefore conducted the following synthetic experiments.  Let $A_{uvz} \in \{0,1,2,\ldots\}$ be number of synapses from neuron $v$ to neuron $u$ of type $z$ (either chemical or electrical), and let $A_z=\{A_{uv}\}_{u,v \in [279]}$ for $z \in \{e,c\}$ corresponding to the electrical or chemical connectome.  Let $B_{iz}=Q_{iz} A_z Q_{iz}\T$, for some $Q_{iz}$ chosen uniformly at random from $\mc{Q}$ for $i=1,\ldots,s$.  For each $i$ and $z$, obtain $\mh{Q}_{iz}$ using \qapm as described above.  Define ``accuracy'' as $\frac{1}{279}\sum_{uv} Q_{iz} \mh{Q}_{iz}$.  Table \ref{tab:1} shows some summary results of applying \qapm to both $A_c$ and $A_e$ for $s=10$ times.  Note that average solution time is actually smaller than predicted via simulations.  Further note that while the electrical connectome was more difficult, that the median number of restarts was less than $30$.  Our stopping criteria on the number of restarts was either (i) perfect assignment or (ii) 30 restarts.  Therefore, this approach achieve perfect assignment sometimes even on this harder assignment problem.
 
 To be consistent with previous QAP library benchmarks, we repeated the above analysis using binarized symmeterized versions of the graphs ($A_{uvz}=1$ if and only if $A_{uvz}\geq 1$ or $A_{vuz} \geq 1$).  The resulting summary statistics are nearly identical to those presented in Table \ref{tab:1} (XXX conroy: but time was longer? XXX).
 
@@ -368,7 +368,7 @@ This work presents an inexact graph matching algorithm based on the Frank-Wolfe 
 Unfortunately, even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve in the top panel of Figure \ref{fig:scaling}, this algorithm would take about 2 years to finish (on a standard laptop from 2009) when $n=20,000$.  We hope to be able to perform GM on graphs much larger than that even, given that the number of neurons in even a fly brain is $\mc{O}(10^5)$.  Therefore, more efficient implementations are of interest.  
 
 A few generalizations of this approach spring to mind.  First, that QAP and LAP are so similar suggests that perhaps one could simply implement a single iteration of QAP starting from the identity.  While not changing the order of complexity, it could reduce computational time by at least an order of magnitude, without drastically changing performance properties.  The relative performance/computational cost trade-off merits further theoretical investigations.  Second, the most ``costly'' subroutine is LAP.  Fortunately, LAP is a quadratic optimization problem with linear constraints.  A number of parallelized optimization strategies could therefore potentially be brought to bear on this problem \cite{Boyd2011}.  Third, for brain-graphs, we have some prior information that could easily be incorporated in the form of vertex attributes.  For example, position in the brain, cell type, etc. could be used to measure ``dissimilarity'' between vertices.  The objective function could then be modified:
-\begin{align} \label{eq:tqap}
+\begin{align} \label{eq:Jqap}
 	\mt{Q}_{AB}= \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F + \lambda J(Q)
 \end{align}
 where $J(Q)$ is a dissimilarity based penalty and $\lambda$ is a hyper-parameter.  Finally, although this approach natively operates on both unweighted and weighted graphs, multi-graphs are a possible extension.
