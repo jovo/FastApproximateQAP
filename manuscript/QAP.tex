@@ -172,7 +172,7 @@ In other words, letting $B=I$, the projection of a matrix onto its nearest doubl
 \begin{align}\label{eq:relaxed}
 	\mt{L}_{AI} = \argmin_{Q\in\mc{D}} -\langle Q, A \rangle. 
 \end{align}
-Since the permutation matrices are the vertices of the set of doubly stochastic matrices, finding the minimum of Eq. \eqref{eq:relaxed} is guaranteed to yield a permutation matrix (as minima are necessarily at the vertices).  Thus, letting $A=\nabla_Q^{(j)}$, solving Eq. \eqref{eq:relaxed}---which is a linear problem with linear and non-negative constraints---is equivalent to solving Eq. \eqref{eq:dir}. 
+Since the permutation matrices are the extremal points of the set of doubly stochastic matrices, finding the minimum of Eq. \eqref{eq:relaxed} is guaranteed to yield a permutation matrix (as minima are necessarily at the vertices).  Thus, letting $A=\nabla_Q^{(j)}$, solving Eq. \eqref{eq:relaxed}---which is a linear problem with linear and non-negative constraints---is equivalent to solving Eq. \eqref{eq:dir}. 
 % In other words, Eq. \eqref{eq:dir} is solved by \texttt{Hungarian}$(I,\nabla_Q^{(j)})$. 
 Fortunately, the Hungarian algorithm solves any LAP in $\mc{O}(n^3)$ \cite{Burkard2009}, thus this projection is relatively computationally efficient.\footnote{More efficient algorithms are available for certain special cases, for example, whenever the matrix-vector multiplication operation is fast (for example, when both $A$ and $B$ are sparse).}
 % paragraph step_2_finding_the_closest_doubly_stochastic_matrix (end)
