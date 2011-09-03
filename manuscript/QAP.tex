@@ -26,7 +26,7 @@
 
 \title{A Quadratic Assignment Problem Approach to Graph Matching: Applications in Statistical Connectomics}
 
-\author{Joshua T.~Vogelstein, John M.~Conroy, Lou Podrazik, Steve Kratzer, 
+\author{Joshua T.~Vogelstein, John M.~Conroy, Louis J.~Podrazik, Steven G.~Kratzer, 
         R.~Jacob~Vogelstein,
         and~Carey~E.~Priebe% <-this % stops a space
 \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.T. Vogelstein and C.E. Priebe are with the Department
@@ -34,8 +34,8 @@ of Applied Mathematics and Statistics, Johns Hopkins University, Baltimore, MD 2
 %\protect\\
 % note need leading \protect in front of \\ to get a newline within \thanks as
 % \\ is fragile and will error, could use \hfil\break instead.
-E-mail: \{joshuav,cep\}@jhu.edu
-\IEEEcompsocthanksitem J.M. Conroy, L. Podrazik and S. Kratzer are with XXX conroy: need affiliations XXX
+E-mail: \{joshuav,cep\}@jhu.edu, \{conroyjohnm,ljpodra,sgkratz\}@gmail.com, jacob.vogelstein@jhuapl.edu
+\IEEEcompsocthanksitem J.M. Conroy, L.J. Podrazik and S.G. Kratzer are with Institute for Defense Analyses, Center for Computing Sciences, Bowie, MD 20708.
 \IEEEcompsocthanksitem R.J. Vogelstein is with the Johns Hopkins University Applied Physics Laboratory, Laurel, MD, 20723.}% <-this % stops a space
 \thanks{}}
  
@@ -45,7 +45,7 @@ E-mail: \{joshuav,cep\}@jhu.edu
 
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-It is becoming increasingly popular to represent myriad and diverse data sets as graphs.  When the labels of vertices of these graphs are unavailable, graph matching (GM)---the process of determining whether the graphs are isomorphic to one another---is a computationally daunting problem.  This work presents an inexact strategy for GM.  Specifically, we relax of the feasible region to its convex hull and then apply a well known and efficient nonlinear programming algorithm, Frank-Wolfe, to the relaxed objective function.  Though this relaxation is convex, the point around which the local approximation is made determines the apex.  We therefore consider a number of initializations based on the geometry of the convex hull.  Multiple restarts of this algorithm leads to performance that exceeds the previous state-of-the-art in \emph{all} of 16 benchmark tests.  Moreover, this approach is fast, scaling cubically with the number of vertices, requiring only a few minutes on standard modern laptops for graphs with up to a few hundred vertices.  We illustrate this approach via a brain-graph (``connectome'') application in which vertices represent neurons in a small nematode brain (the \emph{Caenorhabditis elegans} worm), and edges represent either chemical or electrical synapses.  For every chemical connectome and several electrical connectomes, this approach found the optimal solution.  Although this strategy already natively operates on  unweighted and weighted graphs, either directed or undirected, we propose a number of possible extensions, and make all code available.
+It is becoming increasingly popular to represent myriad and diverse data sets as graphs.  When the labels of vertices of these graphs are unavailable, graph matching (GM)---the process of determining whether the graphs are isomorphic to one another---is a computationally daunting problem.  This work presents an inexact strategy for GM.  Specifically, we relax the feasible region to its convex hull and then apply a well known and efficient nonlinear programming algorithm, Frank-Wolfe, to the objective function.  Though this relaxation is convex, the point around which the local approximation is made determines the optimum.  We therefore consider a number of initializations based on the geometry of the convex hull.  Multiple restarts of this algorithm lead to performance that exceeds the previous state-of-the-art in \emph{all} of 16 benchmark tests.  Moreover, this approach is fast, scaling cubically with the number of vertices, requiring only a few minutes on standard modern laptops for graphs with up to a few hundred vertices.  We illustrate this approach via a brain-graph (``connectome'') application in which vertices represent neurons in a small nematode brain (the \emph{Caenorhabditis elegans} worm), and edges represent either chemical or electrical synapses.  For every chemical connectome and several electrical connectomes, this approach found the optimal solution.  Although this strategy already natively operates on  unweighted and weighted graphs, either directed or undirected, we propose a number of possible extensions, and make all code available.
 \end{abstract}
 
 % Note that keywords are not normally used for peer review papers.
@@ -65,7 +65,7 @@ statistical inference, graph theory, network theory, structural pattern recognit
 
 % define a graph labeling function as any algorithm that assigns a label to each vertex of a graph: $Q_n: \mc{A}, \Xi^n \mapsto \mc{L}$, where $\Xi \subseteq \mc{G}$, for example, $\Xi=\mc{A}$ (note that we have actually defined a sequence of graph labeling functions).  Remember that we have defined $\mc{L}$ as a subset of $[n_v]$, so each vertex need not have a unique label.  
 
-\IEEEPARstart{A}{} graph matching (GM) algorithm is any algorithm who's goal is to ``align'' any set of $n\geq 2$ graphs such that each vertex $v$ in one graph can be ``assigned'' to its corresponding vertex in the other graphs.  Perhaps due to its complex computational properties (it is NP-hard \cite{Garey1979}), GM has received widespread attention in both the mathematical graph theory and computer science communities \cite{Conte2004}.  Moreover, the potential span of applications of graph matching algorithms is vast, ranging from neural coding \cite{Richiardi2010} to machine vision \cite{Wiskott1997}.  
+\IEEEPARstart{A}{} graph matching (GM) algorithm is any algorithm whose goal is to ``align'' any set of $n\geq 2$ graphs such that each vertex $v$ in one graph can be ``assigned'' to its corresponding vertex in the other graphs.  Perhaps due to its complex computational properties (it is NP-hard \cite{Garey1979}), GM has received widespread attention in both the mathematical graph theory and computer science communities \cite{Conte2004}.  Moreover, the potential span of applications of graph matching algorithms is vast, ranging from neural coding \cite{Richiardi2010} to machine vision \cite{Wiskott1997}.  
 
 Our motivation is the bourgeoning field called connectomics: the study of brain-graphs.  In brain-graphs,  vertices represent (collections of) neurons and edges represent either functional dependencies or structural connections \cite{Sporns2010}.  In some scenarios vertices are labeled.  For example, when vertices represent single neurons in invertebrates \cite{WhiteBrenner86}, or macro-anatomical gyral regions in vertebrates \cite{Biswal2010,Bullmore2010}.  However, in other scenarios, even whether vertices can be labeled is questionable.  For example, if one desired to compare brain-(sub)graphs from parts of brains across species or mammalian organisms, there is no known vertex assignment.  In these scenarios GM might be an important element of any statistical analysis of these brain-graphs \cite{VP11_sigsub, VP11_unlabeled}.
 
@@ -125,7 +125,8 @@ where $\sigma$ is a permutation function, $\sigma: [n] \mapsto [n]$.  Unfortunat
 \begin{align} \label{eq:tqap}
 	\mt{Q}_{AB}= \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F,
 \end{align}
-where $\mc{D}$ is the set of doubly stochastic matrices.  When the permutation matrix constraint is relaxed, the equivalence relation shown in Eq. \eqref{eq:qap} no longer holds.  Nonetheless, we proceed by attempting to solve
+where $\mc{D}$ is the set of doubly stochastic matrices.  When the permutation matrix constraint is relaxed, the equivalence relation shown in Eq. \eqref{eq:qap} no longer holds.  
+Thus, the solution to this relaxed problem is not necessarily a permutation matrix; even if it is, there is no guarantee that it is the same permutation matrix that satisfies the original permutation-constrained problem. Nonetheless, we proceed by attempting to solve
 \begin{align} \label{eq:nqap}
 	\mh{\mt{Q}}_{AB} \approx \argmin_{Q \in \mc{D}} - tr(B\T QAQ\T) - tr(QAQ\T B),
 \end{align}
@@ -204,13 +205,13 @@ This can be performed exactly, because $f$ is a quadratic function.
 
 \textbf{Projecting onto the set of permutation matrices}   Let $Q^{(J+1)}$ be the doubly stochastic matrix resulting from the final iteration.  We project $Q^{(J+1)}$ onto the set of permutation matrices, yielding
 \begin{align} \label{eq:proj}
-	\mh{Q} = \argmin_{Q \in \mc{Q}} \langle Q^{(J+1)}, Q \rangle,
+	\mh{Q} = \argmin_{Q \in \mc{Q}} -\langle Q^{(J+1)}, Q \rangle,
 \end{align}
 which is a LAP, and yields an approximate solution to the original QAP.  Let FW appended with a projection onto the permutation matrices be denoted by \texttt{QAP}.
 
 % paragraph the_final_iteration (end)
 
-\textbf{Multiple restarts} We refer to multiple re-starts of \qap with subscripts; that is, the performance of \qapm is the best result of $m$ pseudo-random re-starts of \texttt{QAP}.  We set $m$ based on computational budget, lacking criteria for assessing whether we have obtained the global solution. Note that \qap natively operates on matrices, which could correspond to either weighted or unweighted graphs, as well as either directed or undirected graphs.  
+\textbf{Multiple restarts} We refer to multiple re-starts of \qap with subscripts; that is, the performance of \qapm is the best result of $m$ pseudo-random re-starts of \texttt{QAP}.  We continue restarting until either we converge to a known global solution or we exceed our computational budget. Note that \qap natively operates on matrices, which could correspond to either weighted or unweighted graphs, as well as either directed or undirected graphs.  
 % Algorithm \ref{alg:1} shows pseudo-code for the complete algorithm.
 
 % 
@@ -322,7 +323,7 @@ Comparing this gradient to that of the QAP objective function---Eq. \eqref{eq:gr
 \subsection{Algorithm Complexity and leading constants} % (fold)
 \label{sub:algorithm_complexity_and_leading_constants}
 
-Both GM and its closely related counterpart, graph isomorphism (GI), are computationally difficult.  There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be NP-hard, it remains unclear whether GI is in P, NP, or its own intermediate complexity class, NP-isomorphism (or isomorphism-complete).  Yet, for large classes of GI and GM problems linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GM or GI algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all graphs have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  We therefore determined the average complexity of our algorithm \emph{and} the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\approx 10^{-6}$), making using this algorithm feasible for even reasonably large graphs.
+Both GM and its closely related counterpart, graph isomorphism (GI), are computationally difficult.  There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be NP-hard, it remains unclear whether GI is in P, NP, or its own intermediate complexity class, NP-isomorphism (or isomorphism-complete).  Yet, for large classes of GI and GM problems linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GM or GI algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all graphs have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  We therefore determined the average complexity of our algorithm \emph{and} the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\approx 10^{-6}$ seconds), making using this algorithm feasible for even reasonably large graphs.
 
 
 
@@ -342,11 +343,12 @@ Both GM and its closely related counterpart, graph isomorphism (GI), are computa
 
 A ``connectome'' is a brain-graph in which vertices correspond to (collections of) neurons, and edges correspond to connections between them. The \emph{Caenorhabditis elegans} (\emph{C. elegans}) is a small worm (nematode) with $302$ labeled vertices.  We consider the subgraph with $279$ somatic neurons that form edges with other neurons \cite{WhiteBrenner86, Varshney2011}.  Two distinct kinds of edges exist between vertices: chemical and electrical ``synapses'' (edges). Any pair of vertices may have several edges of each type. Moreover, some of the synapses are hyperedges amongst more than two vertices.    Thus, the connectome of a \emph{C. elegans} may be thought of as a weighted multi-hypergraph, where the weights are the number of edges of each type.  The \qapm algorithm natively operates on weighted or unweighted graphs.  We therefore conducted the following synthetic experiments.  Let $A_{uvz} \in \{0,1,2,\ldots\}$ be number of synapses from neuron $v$ to neuron $u$ of type $z$ (either chemical or electrical), and let $A_z=\{A_{uv}\}_{u,v \in [279]}$ for $z \in \{e,c\}$ corresponding to the electrical or chemical connectome.  Let $B_{iz}=Q_{iz} A_z Q_{iz}\T$, for some $Q_{iz}$ chosen uniformly at random from $\mc{Q}$ for $i=1,\ldots,s$.  For each $i$ and $z$, obtain $\mh{Q}_{iz}$ using \qapm as described above.  Define ``accuracy'' as $\frac{1}{279}\sum_{uv} Q_{iz} \mh{Q}_{iz}$.  Table \ref{tab:1} shows some summary results of applying \qapm to both $A_c$ and $A_e$ for $s=10$ times.  Note that average solution time is actually smaller than predicted via simulations.  Further note that while the electrical connectome was more difficult, that the median number of restarts was less than $30$.  Our stopping criteria on the number of restarts was either (i) perfect assignment or (ii) 30 restarts.  Therefore, this approach achieved perfect assignment sometimes even on this harder assignment problem.
 
-To be consistent with previous QAP library benchmarks, we repeated the above analysis using binarized symmeterized versions of the graphs ($A_{uvz}=1$ if and only if $A_{uvz}\geq 1$ or $A_{vuz} \geq 1$).  The resulting summary statistics are nearly identical to those presented in Table \ref{tab:1} (XXX conroy: but time was longer? XXX).
+To investigate the performance of \qap using an undirected graph model, we repeated the above analysis using binarized symmeterized versions of the graphs ($A_{uvz}=1$ if and only if $A_{uvz}\geq 1$ or $A_{vuz} \geq 1$).  The resulting summary statistics are nearly identical to those presented in Table \ref{tab:1}, although runtime was somewhat longer.
 
 \begin{table}
-	  \caption{Brain-graph matching summary statistics.  The maximum number of restarts for both was 30.  That the median number of restarts for the electrical connectome is less than 30 implies that our approach found the optimal solution many times, just not always.}
-	\label{tab:1}\centering
+\caption{Brain-graph matching summary statistics.  The maximum number of restarts for both was 30.  That the median number of restarts for the electrical connectome is less than 30 implies that our approach found the optimal solution many times, just not always.}
+	\label{tab:1}
+\begin{center}
 \begin{tabular}{|l|c|c|}
 \hline	 					& chemical 		& electrical  \\ \hline
 	Median Accuracy    &       100\%            &             59.5\% \\
@@ -354,6 +356,7 @@ To be consistent with previous QAP library benchmarks, we repeated the above ana
 	% Vertex Solution      &          10        &                      5 \\
 	Avg. Solution Time     &      182 sec.      &                226 sec. \\ \hline
 \end{tabular} 
+\end{center}
 \end{table}
 
  
@@ -364,7 +367,7 @@ To be consistent with previous QAP library benchmarks, we repeated the above ana
 
 \section{Discussion}
 
-This work presents an inexact graph matching algorithm based on the Frank-Wolfe algorithm.  While others have incorporated the FW algorithm as a subroutine of a graph matching strategy \cite{Zaslavskiy2009}, we modified the FW algorithm for GM in a few ways.  First, after FW is finished, we project the resulting doubly stochastic matrix onto the set of permutation matrices.  Second, we initialize the algorithm using either the identity matrix or the doubly flat matrix (the matrix where all elements are $1/n$).  These choices seem to us to be the most obvious places to start if one has to choose.  Third, if one of those choices does not work, we restart FW with other ``nearby'' initial points.  These modifications facilitate improved performance on \emph{all} the benchmarks we considered.  Moreover, although the algorithm scales cubically with the number of vertices, the leading constants are very small ($\mc{O}(10^{-6})$), so the algorithm runs quite fast on reasonably sized networks (e.g., $n \approx 100$).  Indeed, on a biologically inspired GM problem, \emph{C. elegans} connectome mapping, this approach was both fast and effective.  
+This work presents an inexact graph matching algorithm based on the Frank-Wolfe algorithm.  While others have incorporated the FW algorithm as a subroutine of a graph matching strategy \cite{Zaslavskiy2009}, we modified the FW algorithm for GM in a few ways.  First, after FW is finished, we project the resulting doubly stochastic matrix onto the set of permutation matrices.  Second, we initialize the algorithm using either the identity matrix or the doubly flat matrix (the matrix where all elements are $1/n$).  These choices seem to us to be the most obvious places to start if one has to choose.  Third, if one of those choices does not work, we restart FW with other ``nearby'' initial points.  These modifications facilitate improved performance on \emph{all} the benchmarks we considered.  Moreover, although the algorithm scales cubically with the number of vertices, the leading constants are very small ($\mc{O}(10^{-6})$ seconds), so the algorithm runs quite fast on reasonably sized networks (e.g., $n \approx 100$).  Indeed, on a biologically inspired GM problem, \emph{C. elegans} connectome mapping, this approach was both fast and effective.  
 
 Unfortunately, even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve in the top panel of Figure \ref{fig:scaling}, this algorithm would take about 2 years to finish (on a standard laptop from 2009) when $n=20,000$.  We hope to be able to perform GM on graphs much larger than that even, given that the number of neurons in even a fly brain is $\mc{O}(10^5)$.  Therefore, more efficient implementations are of interest.  
 
