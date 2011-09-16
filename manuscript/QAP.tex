@@ -21,6 +21,9 @@
 \input{/Users/jovo/Research/latex/latex_commands.tex}
 \hyphenation{op-tical net-works semi-conduc-tor}
 % \newcommand{\Qqap}{\Qqap}
+\usepackage{caption}
+\captionsetup{justification=raggedright}
+
 
 \begin{document}
 
@@ -37,7 +40,7 @@ of Applied Mathematics and Statistics, Johns Hopkins University, Baltimore, MD 2
 E-mail: \{joshuav,cep\}@jhu.edu, \{conroyjohnm,ljpodra,sgkratz\}@gmail.com, jacob.vogelstein@jhuapl.edu
 \IEEEcompsocthanksitem J.M. Conroy, L.J. Podrazik and S.G. Kratzer are with Institute for Defense Analyses, Center for Computing Sciences, Bowie, MD 20708.
 \IEEEcompsocthanksitem R.J. Vogelstein is with the Johns Hopkins University Applied Physics Laboratory, Laurel, MD, 20723.}% <-this % stops a space
-\thanks{}}
+\thanks{This work was partially supported by the Research Program in Applied Neuroscience.}}
  
 % The paper headers
 \markboth{IN PREP}%
@@ -330,8 +333,8 @@ Both GM and its closely related counterpart, graph isomorphism (GI), are computa
 
 \begin{figure}[htbp]
 	\centering			
-	\includegraphics[width=1.0\linewidth]{../figs/scaling_law.jpg}
-	\caption{Performance of \qap as function of number of vertices.  The top panel depicts run time, and the bottom panel depicts residual errors.  Each point represents a single simulation.  Data was sampled from the following model: XXX conroy: you know the answer to this? can you send me the data so i can make this fig ``publication ready'' XXX.}
+	\includegraphics[width=1.0\linewidth]{../figs/digraph_qap2}
+	\caption{Performance of \qap as function of number of vertices. Data was sampled from an Erd\"os-R\'enyi model with $\log(n)/n$.  Each dot represents a single simulation.  The solid line is the best fit cubic function.  Note the leading constant is $10^{-6}$ seconds. }
 	\label{fig:scaling}
 \end{figure}
 
@@ -343,10 +346,10 @@ Both GM and its closely related counterpart, graph isomorphism (GI), are computa
 
 A ``connectome'' is a brain-graph in which vertices correspond to (collections of) neurons, and edges correspond to connections between them. The \emph{Caenorhabditis elegans} (\emph{C. elegans}) is a small worm (nematode) with $302$ labeled vertices.  We consider the subgraph with $279$ somatic neurons that form edges with other neurons \cite{WhiteBrenner86, Varshney2011}.  Two distinct kinds of edges exist between vertices: chemical and electrical ``synapses'' (edges). Any pair of vertices may have several edges of each type. Moreover, some of the synapses are hyperedges amongst more than two vertices.    Thus, the connectome of a \emph{C. elegans} may be thought of as a weighted multi-hypergraph, where the weights are the number of edges of each type.  The \qapm algorithm natively operates on weighted or unweighted graphs.  We therefore conducted the following synthetic experiments.  Let $A_{uvz} \in \{0,1,2,\ldots\}$ be number of synapses from neuron $v$ to neuron $u$ of type $z$ (either chemical or electrical), and let $A_z=\{A_{uv}\}_{u,v \in [279]}$ for $z \in \{e,c\}$ corresponding to the electrical or chemical connectome.  Let $B_{iz}=Q_{iz} A_z Q_{iz}\T$, for some $Q_{iz}$ chosen uniformly at random from $\mc{Q}$ for $i=1,\ldots,s$.  For each $i$ and $z$, obtain $\mh{Q}_{iz}$ using \qapm as described above.  Define ``accuracy'' as $\frac{1}{279}\sum_{uv} Q_{iz} \mh{Q}_{iz}$.  Table \ref{tab:1} shows some summary results of applying \qapm to both $A_c$ and $A_e$ for $s=10$ times.  Note that average solution time is actually smaller than predicted via simulations.  Further note that while the electrical connectome was more difficult, that the median number of restarts was less than $30$.  Our stopping criteria on the number of restarts was either (i) perfect assignment or (ii) 30 restarts.  Therefore, this approach achieved perfect assignment sometimes even on this harder assignment problem.
 
-To investigate the performance of \qap using an undirected graph model, we repeated the above analysis using binarized symmeterized versions of the graphs ($A_{uvz}=1$ if and only if $A_{uvz}\geq 1$ or $A_{vuz} \geq 1$).  The resulting summary statistics are nearly identical to those presented in Table \ref{tab:1}, although runtime was somewhat longer.
+To investigate the performance of \qap using an undirected graph model, we repeated the above analysis using binarized symmeterized versions of the graphs ($A_{uvz}=1$ if and only if $A_{uvz}\geq 1$ or $A_{vuz} \geq 1$).  The resulting summary statistics are nearly identical to those presented in Table \ref{tab:1}, although runtime was less than half the time.
 
 \begin{table}
-\caption{Brain-graph matching summary statistics.  The maximum number of restarts for both was 30.  That the median number of restarts for the electrical connectome is less than 30 implies that our approach found the optimal solution many times, just not always.}
+\caption{Brain-graph matching summary statistics for both the chemical and electrical connectome.  The maximum number of restarts for both was 30.  The median number of restarts for the electrical connectome is less than 30, implying that our approach found the optimal solution many times, just not always.}
 	\label{tab:1}
 \begin{center}
 \begin{tabular}{|l|c|c|}
@@ -399,6 +402,7 @@ In conclusion, this manuscript has presented a GM algorithm that is fast, effect
   \section*{Acknowledgment}
 \fi
 
+This work was partially supported by the Research Program in Applied Neuroscience. 
 
 % Can use something like this to put references on a page
 % by themselves when using endfloat and the captionsoff option.
