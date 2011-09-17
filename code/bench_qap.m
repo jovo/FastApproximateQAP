@@ -56,9 +56,11 @@ else
     times=zeros(size(ns));
     errors=times;
     iters=errors;
-    for i=1:length(ns)
+    parfor i=1:length(ns)
+        
+        display(i) 
         % Generate a random digraph is Pr(i,j)=log(n)/n;
-        p=log(ns(i))/ns(i);
+        p=0.1; %log(ns(i))/ns(i);
         A=spones(sprand(ns(i),ns(i),p));
         q=randperm(s,ns(i));
         B=A;
