@@ -27,7 +27,7 @@
 
 \begin{document}
 
-\title{Brain-Graph Matching}
+\title{Inexact Graph Matching: \\ Applications in Statistical Connectomics}
 % \title{A Quadratic Assignment Problem Approach to Graph Matching: Applications in Statistical Connectomics}
 
 \author{Joshua T.~Vogelstein, John M.~Conroy, Louis J.~Podrazik, Steven G.~Kratzer, 
@@ -112,14 +112,14 @@ Graph matching can be cast as a quadratic assignment problem \cite{Burkard2009}
  \begin{align} \label{eq:QAP}
 	Q_{AB}= \argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F,
 \end{align}
-where the permutation matrix $Q_{AB}$ induces a labeling of the vertices of $A$ onto those of $B$. A bit of linear algebra simplifies Eq. \eqref{eq:QAP} to give: % \cite{Horn1990}, and demonstrates that the above objective function 
+where the permutation matrix $Q_{AB}$ induces a labeling of the vertices of $A$ onto those of $B$. A bit of linear algebra simplifies Eq. \eqref{eq:QAP} to give % \cite{Horn1990}, and demonstrates that the above objective function 
 %shows that Eq \eqref{eq:QAP} can be simplified:
 \begin{multline} \label{eq:qap}
-	\argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F \nonumber \\
+	\argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F  %\\
 	% &=\argmin_{Q \in \mc{Q}} \sqrt{tr(QAQ\T - B)\T (QAQ\T - B)} \nonumber \\
 	% &=\argmin_{Q \in \mc{Q}}  tr(Q\T A\T Q\T Q A Q\T) + B\T B  \nonumber \\
 	% &\qquad \qquad - tr(QAQ\T B) - tr(B\T QAQ\T) \nonumber \\
-	= \argmin_{Q \in \mc{Q}} - tr(B\T QAQ\T) - tr(QAQ\T B),			
+	= \argmin_{Q \in \mc{Q}} - tr(B\T QAQ\T), % - tr(QAQ\T B),			
 \end{multline}
 which follows from the definition of the Frobenius norm and canceling appropriately.  Note that the objective function on the right-hand-side is equivalent to the standard representation of the quadratic assignment problem (QAP) \cite{Conte2004}:
 \begin{align}
@@ -132,7 +132,7 @@ where $\sigma$ is a permutation function, $\sigma: [n] \mapsto [n]$.  Unfortunat
 where $\mc{D}$ is the set of doubly stochastic matrices.  When the permutation matrix constraint is relaxed, the equivalence relation shown in Eq. \eqref{eq:qap} no longer holds.  
 Thus, the solution to this relaxed problem is not necessarily a permutation matrix; even if it is, there is no guarantee that it is the same permutation matrix that satisfies the original permutation-constrained problem. Nonetheless, we proceed by attempting to solve
 \begin{align} \label{eq:nqap}
-	\mh{\mt{Q}}_{AB} \approx \argmin_{Q \in \mc{D}} - tr(B\T QAQ\T) - tr(QAQ\T B),
+	\mh{\mt{Q}}_{AB} \approx \argmin_{Q \in \mc{D}} - tr(B\T QAQ\T), % - tr(QAQ\T B),
 \end{align}
 considering it an auxiliary function for which we can compute gradients and ascend a likelihood, unlike the permutation-constrained case.  
 
@@ -147,7 +147,7 @@ Let $f(Q)=- tr(B\T QAQ\T) - tr(QAQ\T B)$ be our objective function. Unfortunatel
 \end{align}
 where $\otimes$ indicates the Kronecker product. This means that it will potentially be multi-modal, making initialization potentially important.  We therefore develop a nonlinear programing algorithm for approximately solving Eq. \eqref{eq:QAP} using multiple restarts.  Below we provide details and explanation of each step.
 
-\textbf{Step 0: Choose an initial estimate} While any doubly stochastic matrix would be a feasible initial point, two choices seem natural: (i) the ``flat doubly  stochastic matrix,'' $J=\ve{1}\T \ve{1}/n$, which is the middle of the feasible region, and (ii) the identity matrix, which is a permutation matrix.  Therefore, if we run \qap  once, we always start with one of those two.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $J'$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let $Q^{(0)}=(J+J')/2$. Given this initial estimate, we iterate the following five steps until convergence.
+\textbf{Step 0: Choose an initial estimate} While any doubly stochastic matrix would be a feasible initial point, two choices seem natural: (i) the ``flat doubly  stochastic matrix,'' $J=\ve{1}\T \ve{1}/n$, which is the center of the feasible region, and (ii) the identity matrix, which is a permutation matrix.  Therefore, if we run \qap  once, we always start with one of those two.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $J'$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let $Q^{(0)}=(J+J')/2$. Given this initial estimate, we iterate the following five steps until convergence.
 
 \textbf{Step 1: Compute the gradient} The gradient of $f$ with respect to $Q$ is given by
 \begin{align} \label{eq:grad}
@@ -162,16 +162,16 @@ where $\otimes$ indicates the Kronecker product. This means that it will potenti
 \end{align}
 Eq. \eqref{eq:dir} can be solved as a Linear Assignment Problem (LAP).  More specifically, a LAP can be written as
 \begin{align} \label{eq:LAP}
-	L_{AB} = \argmin_{Q \in \mc{Q}} \norm{QA - B }^2_F,
+	L_{AB} = \argmin_{Q \in \mc{Q}} \norm{QA - B }^2_F.
 \end{align}
-which, when $B$ is the identity matrix $I$, the above can be simplified as
+When $B$ is the identity matrix $I$, the above can be simplified as
 \begin{align} \label{eq:proja}
 	L_{AI} &=\argmin_{Q \in \mc{Q}} \norm{QA - I}_F^2 
 	% \nonumber \\ &
 	= \argmin_{Q \in \mc{Q}} (QA-I)\T (QA-I) 
 	\nonumber\\ &=\argmin_{Q \in \mc{Q}} tr (A\T Q\T QA) - tr(2QA) - tr(II) 
 	\nonumber\\ &
-	= \argmin_{Q \in \mc{Q}}  -\langle Q, A \rangle,
+	= \argmin_{Q \in \mc{Q}}  -\langle Q, A \rangle.
 \end{align}
 In other words, letting $B=I$, the projection of a matrix onto its nearest doubly stochastic matrix is a LAP problem.  While Eq. \eqref{eq:proja} cannot be solved directly, as above, we can relax the permutation matrix constraint to the doubly stochastic matrix constraint
 \begin{align}\label{eq:relaxed}
@@ -204,7 +204,7 @@ This can be performed exactly, because $f$ is a quadratic function.
 
 % paragraph step_5_update_q_ (end)
 
-\textbf{Stopping criteria} Steps 1--5 are iterated until convergence, computational budget limits, or some other stopping criterion is met.  These 5 steps collectivelu comprise the FW algorithm for solving Eq. \eqref{eq:nqap}.  Note that while $Q^{(j)}$ will generally not be a permutation matrix, we do not project $Q^{(j)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time.
+\textbf{Stopping criteria} Steps 1--5 are iterated until convergence, computational budget limits, or some other stopping criterion is met.  These 5 steps collectively comprise the FW algorithm for solving Eq. \eqref{eq:nqap}.  Note that while $Q^{(j)}$ will generally not be a permutation matrix, we do not project $Q^{(j)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time.
 
 
 \textbf{Projecting onto the set of permutation matrices}   Let $Q^{(J+1)}$ be the doubly stochastic matrix resulting from the final iteration.  We project $Q^{(J+1)}$ onto the set of permutation matrices, yielding
@@ -215,7 +215,7 @@ which is a LAP, and yields an approximate solution to the original QAP.  Let FW 
 
 % paragraph the_final_iteration (end)
 
-\textbf{Multiple restarts} We refer to multiple re-starts of \qap with subscripts; that is, the performance of \qapm is the best result of $m$ pseudo-random re-starts of \texttt{QAP}.  We continue restarting until either we converge to a known global solution or we exceed our computational budget. Note that \qap natively operates on matrices, which could correspond to either weighted or unweighted graphs, as well as either directed or undirected graphs.  
+\textbf{Multiple restarts} We refer to multiple re-starts of \qap with subscripts; that is, the performance of \qapm is the best result of $m$ pseudo-random re-starts of \texttt{QAP}.  We continue restarting until either we converge to a known global solution or we exceed our computational budget. Note that \qap natively operates on matrices, which could correspond to either weighted or unweighted, directed or undirected graphs.  
 % Algorithm \ref{alg:1} shows pseudo-code for the complete algorithm.
 
 % 
@@ -251,7 +251,7 @@ which is a LAP, and yields an approximate solution to the original QAP.  Let FW 
 
 \subsection{QAP benchmarks}
 
-We first compare the performance of \qapm with recent state-of-the-art approaches on the QAP benchmark library \cite{Burkard1997}.  Specifically, \cite{Zaslavskiy2009} reported improved performance in all but two cases, in which the QPB method of Cremers et al. \cite{Schellewald2001} achieved a lower minimum.  We compare \qapm with the previous state-of-the-art algorithm.  In \emph{all} cases, \texttt{QAP}$_3$ outperforms the previous best result, often by orders of magnitude in terms of relative error. In three cases, \qapb achieves the absolute minimum.  In 12 out of 16 cases, $75\%$, the simple \qapa algorithm outperforms the others (starting with the flat doubly stochastic matrix).  See Figure \ref{fig:fwpath} for quantitative comparisons.
+We first compare the performance of \qapm with recent state-of-the-art approaches on the QAP benchmark library \cite{Burkard1997}.  Specifically, \cite{Zaslavskiy2009} reported improved performance in all but two cases, in which the QPB method of Cremers et al. \cite{Schellewald2001} achieved a lower minimum.  We compare \qapm with the previous state-of-the-art algorithm.  In \emph{all} cases, \texttt{QAP}$_3$ outperforms the previous best result, often by orders of magnitude in terms of relative error. In three cases, \qapb achieves the absolute minimum.  In 12 out of 16 cases, the simple \qapa algorithm outperforms the others (starting with the flat doubly stochastic matrix).  See Figure \ref{fig:fwpath} for quantitative comparisons.
 
 
 % \begin{table}[h!]
@@ -345,7 +345,7 @@ Both GM and its closely related counterpart, graph isomorphism (GI), are computa
 \subsection{Brain-Graph Matching} % (fold)
 \label{sub:connectome_classification}
 
-A ``connectome'' is a brain-graph in which vertices correspond to (collections of) neurons, and edges correspond to connections between them. The \emph{Caenorhabditis elegans} (\emph{C. elegans}) is a small worm (nematode) with $302$ labeled vertices.  We consider the subgraph with $279$ somatic neurons that form edges with other neurons \cite{WhiteBrenner86, Varshney2011}.  Two distinct kinds of edges exist between vertices: chemical and electrical ``synapses'' (edges). Any pair of vertices may have several edges of each type. Moreover, some of the synapses are hyperedges amongst more than two vertices.    Thus, the connectome of a \emph{C. elegans} may be thought of as a weighted multi-hypergraph, where the weights are the number of edges of each type.  The \qapm algorithm natively operates on weighted or unweighted graphs.  We therefore conducted the following synthetic experiments.  Let $A_{uvz} \in \{0,1,2,\ldots\}$ be number of synapses from neuron $v$ to neuron $u$ of type $z$ (either chemical or electrical), and let $A_z=\{A_{uv}\}_{u,v \in [279]}$ for $z \in \{e,c\}$ corresponding to the electrical or chemical connectome.  Let $B_{iz}=Q_{iz} A_z Q_{iz}\T$, for some $Q_{iz}$ chosen uniformly at random from $\mc{Q}$ for $i=1,\ldots,s$.  For each $i$ and $z$, obtain $\mh{Q}_{iz}$ using \qapm as described above.  Define ``accuracy'' as $\frac{1}{279}\sum_{uv} Q_{iz} \mh{Q}_{iz}$.  Table \ref{tab:1} shows some summary results of applying \qapm to both $A_c$ and $A_e$ for $s=10$ times.  Note that average solution time is actually smaller than predicted via simulations.  Further note that while the electrical connectome was more difficult, that the median number of restarts was less than $30$.  Our stopping criteria on the number of restarts was either (i) perfect assignment or (ii) 30 restarts.  Therefore, this approach achieved perfect assignment sometimes even on this harder assignment problem.
+A ``connectome'' is a brain-graph in which vertices correspond to (collections of) neurons, and edges correspond to connections between them. The \emph{Caenorhabditis elegans} (\emph{C. elegans}) is a small worm (nematode) with $302$ labeled vertices.  We consider the subgraph with $279$ somatic neurons that form edges with other neurons \cite{WhiteBrenner86, Varshney2011}.  Two distinct kinds of edges exist between vertices: chemical and electrical ``synapses'' (edges). Any pair of vertices may have several edges of each type. Moreover, some of the synapses are hyperedges amongst more than two vertices.    Thus, the connectome of a \emph{C. elegans} may be thought of as a weighted multi-hypergraph, where the weights are the number of edges of each type.  The \qapm algorithm natively operates on weighted or unweighted graphs.  We therefore conducted the following synthetic experiments.  Let $A_{uvz} \in \{0,1,2,\ldots\}$ be the number of synapses from neuron $v$ to neuron $u$ of type $z$ (either chemical or electrical), and let $A_z=\{A_{uv}\}_{u,v \in [279]}$ for $z \in \{e,c\}$ corresponding to the electrical or chemical connectome.  Let $B_{iz}=Q_{iz} A_z Q_{iz}\T$, for some $Q_{iz}$ chosen uniformly at random from $\mc{Q}$ for $i=1,\ldots,s$.  For each $i$ and $z$, obtain $\mh{Q}_{iz}$ using \qapm as described above.  Define ``accuracy'' as $\frac{1}{279}\sum_{uv} Q_{iz} \mh{Q}_{iz}$.  Table \ref{tab:1} shows some summary results of applying \qapm to both $A_c$ and $A_e$ for $s=10$ times.  Note that average solution time is actually smaller than predicted via simulations.  Further note that while the electrical connectome was more difficult, the median number of restarts was less than $30$.  Our stopping criteria on the number of restarts was either (i) perfect assignment or (ii) 30 restarts.  Therefore, this approach achieved perfect assignment sometimes even on this harder assignment problem.
 
 To investigate the performance of \qap using an undirected graph model, we repeated the above analysis using binarized symmeterized versions of the graphs ($A_{uvz}=1$ if and only if $A_{uvz}\geq 1$ or $A_{vuz} \geq 1$).  The resulting summary statistics are nearly identical to those presented in Table \ref{tab:1}, although runtime was less than half the time.
 
@@ -368,9 +368,9 @@ To investigate the performance of \qap using an undirected graph model, we repea
 
 \section{Discussion}
 
-This work presents an inexact graph matching algorithm based on the Frank-Wolfe algorithm.  While others have incorporated the FW algorithm as a subroutine of a graph matching strategy \cite{Zaslavskiy2009}, we modified the FW algorithm for GM in a few ways.  First, after FW is finished, we project the resulting doubly stochastic matrix onto the set of permutation matrices.  Second, we initialize the algorithm using either the identity matrix or the doubly flat matrix (the matrix where all elements are $1/n$).  These choices seem to us to be the most obvious places to start if one has to choose.  Third, if one of those choices does not work, we restart FW with other ``nearby'' initial points.  These modifications facilitate improved performance on \emph{all} the benchmarks we considered.  Moreover, although the algorithm scales cubically with the number of vertices, the leading constants are very small ($\mc{O}(10^{-6})$ seconds), so the algorithm runs quite fast on reasonably sized networks (e.g., $n \approx 100$).  Indeed, on a biologically inspired GM problem, \emph{C. elegans} connectome mapping, this approach was both fast and effective.  
+This work presents an inexact graph matching algorithm based on the Frank-Wolfe algorithm.  While others have incorporated the FW algorithm as a subroutine of a graph matching strategy \cite{Zaslavskiy2009}, we modified the FW algorithm for GM in a few ways.  First, after FW is finished, we project the resulting doubly stochastic matrix onto the set of permutation matrices.  Second, we initialize the algorithm using either the identity matrix or the doubly flat matrix (the matrix where all elements are $1/n$).  These choices seem to us to be the most obvious places to start if one must choose.  Third, if one of those choices does not work, we restart FW with other ``nearby'' initial points.  These modifications facilitate improved performance on \emph{all} the benchmarks we considered.  Moreover, although the algorithm scales cubically with the number of vertices, the leading constants are very small ($\mc{O}(10^{-6})$ seconds), so the algorithm runs quite fast on reasonably sized networks (e.g., $n \approx 100$).  Indeed, on a biologically inspired GM problem, \emph{C. elegans} connectome mapping, this approach was both fast and effective.  
 
-Unfortunately, even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve in the top panel of Figure \ref{fig:scaling}, this algorithm would take about 2 years to finish (on a standard laptop from 2009) when $n=20,000$.  We hope to be able to perform GM on graphs much larger than that even, given that the number of neurons in even a fly brain, for example, is $\mc{O}(10^5)$.  Therefore, more efficient implementations are of interest.  
+Unfortunately, even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve of Figure \ref{fig:scaling}, this algorithm would take about 2 years to finish (on a standard laptop from 2009) when $n=20,000$.  We hope to be able to perform GM on graphs much larger than that, given that the number of neurons in even a fly brain, for example, is $\mc{O}(10^5)$.  Therefore, more efficient implementations are of interest.  
 
 Although \qapn consistently found the optimal solution for the \emph{C. elegans} chemical connectome, connectomes for different organisms even within a species are unlikely to be identical. Even if all connectomes of a particular species were identical, measurement error will likely persist \cite{Helmstaedter2011}. Therefore, \texttt{QAP}$_n$'s scientific utility will largely rest on its performance under noisy conditions, which we aim to explore in future work.  
 
@@ -402,7 +402,7 @@ In conclusion, this manuscript has presented a GM algorithm that is fast, effect
   \section*{Acknowledgment}
 \fi
 
-This work was partially supported by the Research Program in Applied Neuroscience. 
+% This work was partially supported by the Research Program in Applied Neuroscience. 
 
 % Can use something like this to put references on a page
 % by themselves when using endfloat and the captionsoff option.
