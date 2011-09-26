@@ -23,11 +23,12 @@
 % \newcommand{\Qqap}{\Qqap}
 \usepackage{caption}
 \captionsetup{justification=raggedright}
+\newcommand{\PmcP}{P \in \mc{P}}
 
 
 \begin{document}
 
-\title{Inexact Graph Matching: \\ Applications in Statistical Connectomics}
+\title{Inexact Graph Matching via Assignment: \\ Applications in Statistical Connectomics}
 % \title{A Quadratic Assignment Problem Approach to Graph Matching: Applications in Statistical Connectomics}
 
 \author{Joshua T.~Vogelstein, John M.~Conroy, Louis J.~Podrazik, Steven G.~Kratzer, 
@@ -49,7 +50,7 @@ E-mail: \{joshuav,cep\}@jhu.edu, \{conroyjohnm,ljpodra,sgkratz\}@gmail.com, jaco
 
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-It is becoming increasingly popular to represent myriad and diverse data sets as graphs.  When the labels of vertices of these graphs are unavailable, graph matching (GM)---the process of determining whether the graphs are isomorphic to one another---is a computationally daunting problem.  This work presents an inexact strategy for GM.  Specifically, we relax the feasible region to its convex hull and then apply a well known and efficient nonlinear programming algorithm, Frank-Wolfe, to the objective function.  Though this relaxation is convex, the point around which the local approximation is made determines the optimum.  We therefore consider a number of initializations based on the geometry of the convex hull.  Multiple restarts of this algorithm lead to performance that exceeds the previous state-of-the-art in \emph{all} of 16 benchmark tests.  Moreover, this approach is fast, scaling cubically with the number of vertices, requiring only a few minutes on standard modern laptops for graphs with up to a few hundred vertices.  We illustrate this approach via a brain-graph (``connectome'') application in which vertices represent neurons in a small nematode brain (the \emph{Caenorhabditis elegans} worm), and edges represent either chemical or electrical synapses.  For every chemical connectome and several electrical connectomes, this approach found the optimal solution.  Although this strategy already natively operates on  unweighted and weighted graphs, either directed or undirected, we propose a number of possible extensions, and make all code available.
+It is becoming increasingly popular to represent myriad and diverse data sets as graphs.  When the labels of vertices of these graphs are unavailable, graph matching (GM)---the process of determining how to assign vertices of one graph to align it with another---is a computationally daunting problem.  This work presents an inexact strategy for GM.  Specifically, we relax the feasible region to its convex hull and then apply a well known and efficient nonlinear programming algorithm, Frank-Wolfe, to the objective function.  Though this relaxation is convex, the point around which the local approximation is made determines the optimum.  We therefore consider a number of initializations based on the geometry of the convex hull.  Multiple restarts of this algorithm lead to performance that exceeds the previous state-of-the-art in \emph{all} of 16 benchmark tests.  Moreover, this approach is fast, scaling cubically with the number of vertices, requiring only a few minutes on standard modern laptops for graphs with up to a few hundred vertices.  We illustrate this approach via a brain-graph (``connectome'') application in which vertices represent neurons in a small nematode brain (the \emph{Caenorhabditis elegans} worm), and edges represent either chemical or electrical synapses.  For every chemical connectome and several electrical connectomes, this approach found the optimal solution.  Although this strategy already natively operates on  unweighted and weighted graphs, either directed or undirected, we propose a number of possible extensions, and make all code available.
 \end{abstract}
 
 % Note that keywords are not normally used for peer review papers.
@@ -71,10 +72,10 @@ statistical inference, graph theory, network theory, structural pattern recognit
 
 \IEEEPARstart{A}{} graph matching (GM) algorithm is any algorithm whose goal is to ``align'' any set of $n\geq 2$ graphs such that each vertex in one graph can be ``assigned'' to its corresponding vertex in the other graphs.  Perhaps due to its complex computational properties (it is $\mc{NP}$-hard \cite{Garey1979}), GM has received widespread attention in both the mathematical graph theory and computer science communities \cite{Conte2004}.  Moreover, the potential span of applications of graph matching algorithms is vast, ranging from neural coding \cite{Richiardi2010} to machine vision \cite{Wiskott1997}.  
 
-Our motivation for this work includes the bourgeoning field called ``connectomics'': the study of brain-graphs.  In brain-graphs,  vertices represent (collections of) neurons and edges represent either functional dependencies or structural connections \cite{Sporns2010}.  In some scenarios vertices, are labeled.  For example, when vertices represent single neurons in invertebrates \cite{WhiteBrenner86}, or macro-anatomical gyral regions in vertebrates \cite{Biswal2010,Bullmore2010}.  However, in other scenarios, even whether vertices can be labeled is questionable.  For example, if one desired to compare brain-(sub)graphs from parts of brains across species or within vertebrate organisms, there is no known vertex assignment.  In these scenarios GM might be an important element of any statistical analysis of these brain-graphs \cite{VP11_sigsub, VP11_unlabeled}.
+Our motivation for this work includes the bourgeoning field called ``connectomics'': the study of brain-graphs.  In brain-graphs,  vertices represent (collections of) neurons and edges represent either functional dependencies or structural connections \cite{Sporns2010}.  In some scenarios, vertices are labeled.  For example, when vertices represent single neurons in invertebrates \cite{WhiteBrenner86} or macro-anatomical gyral regions in vertebrates \cite{Biswal2010,Bullmore2010}.  However, in other scenarios, even whether vertices can be labeled is questionable.  For example, if one desired to compare brain-(sub)graphs from parts of brains across species or within vertebrate organisms, there is no known vertex assignment.  In these scenarios GM might be an important element of any statistical analysis of these brain-graphs \cite{VP11_sigsub, VP11_unlabeled}.
 
 
-We therefore propose a novel inexact graph matching algorithm.  The intuition is relatively simple: GM is computationally difficult because the set of feasible solutions is  (i) non-differentiable  and (ii) multimodal  (and large).   A common approach to approximating difficult nonlinear programming problems is to relax the constraints on the feasible region.  By relaxing the non-differentiable constraint, any gradient based algorithm may be applied to the problem \cite{Mangasarian1987}. Unfortunately, the multimodality of the solution space implies that the initialization will, in general, be important.  Multiple ``principled'' restarts can potentially facilitate an efficient stochastic search strategy.  
+We therefore propose a novel inexact graph matching algorithm.  The intuition is relatively simple: GM is computationally difficult because the underlying feasible region is non-differentiable and the implied objective function is multimodal.  A common approach to approximating difficult nonlinear programming problems is to relax the constraints on the feasible region.  By relaxing the non-differentiable constraint, any gradient based algorithm may be applied to the problem \cite{Mangasarian1987}. Unfortunately, the multimodality of the solution space implies that the initialization will, in general, be important.  Multiple ``principled'' restarts can potentially facilitate an efficient stochastic search strategy.  
 
 This manuscript describes an algorithm that approximately solves graph matching in cubic time (with very small leading constants).  Via numerical experiments, we demonstrate that this approach outperforms several state-of-the-art algorithms on all tests in a standard benchmark library \cite{Burkard1997}, indicating both its efficiency and its effectivity. We then test this approach on a brain-graph matching problem: matching the brain-graphs of a small nematode with $302$ vertices.  We are able to find the optimal solution after $3$ restarts for each randomly permuted example.  We are therefore optimistic that this algorithm will be useful for the massive graphs ($\mc{O}(10^5)$ vertices)  promised to arise due to various ongoing connectome projects \cite{HCP,OCP}.
 
@@ -96,131 +97,221 @@ This manuscript describes an algorithm that approximately solves graph matching 
 
 % subsection preliminaries (end)
 
-A labeled graph $G=(\mc{V},\mc{E})$ consists of a vertex set, $\mc{V}=[n]=\{1,\ldots, n\}$, where $n$ is number of vertices and an edge set $\mc{E} \subseteq n^2$.  Let $A$ be the adjacency matrix representations of graph such that $A_{uv}=1$ if there is an edge from $u$ to $v$, and $A_{uv}=0$ otherwise. Note that the below follows for directed/undirected and loopy/non-loopy graphs.
+A labeled graph $G=(\mc{V},\mc{E})$ consists of a vertex set s $\mc{V}$, where $|\mc{V}|=n$ is number of vertices and an edge set $\mc{E}$, where $|\mc{E}| \leq n^2$.  Let $A$ be the adjacency matrix representation of graph such that $A_{uv}=1$ if there is an edge from $u$ to $v$, and $A_{uv}=0$ otherwise. 
+% Note that the below follows for directed/undirected and loopy/non-loopy graphs.
 % $u \sim v \in \mc{E}$ and $A_{uv}=0$ otherwise.  
-Let $\mc{Q}$ be the set of permutation matrices, that is, matrices with a single one in each row and column, and zeros otherwise.  Given a pair of adjacency matrices, $A$ and $B$, to graph match $A$ with $B$ is to find a permutation matrix $Q$ such that $QAQ\T=B$. In this work, we propose a novel inexact graph matching algorithm, essentially a Frank-Wolfe algorithm with multiple restarts.  We demonstrate the efficacy of this algorithm over the previous state-of-the-art on a reference library of benchmarks.  
+Let  $\Pi$ be the set of permutation functions, where a permutation function $\pi: \mc{V} \to \mc{V}$ (re-)orders the elements of the set $\mc{V}$.  $P_{\pi}$ is the $n \times n$ permutation matrix with elements $(v,\pi(v))=1$ for all $v \in \mc{V}$ and zeros elsewhere. For brevity, let $P_{\pi}=P=(p_{uv})_{uv}$. Given a pair of $n \times n$ adjacency matrices, $A=(a_{uv})_{uv}$ and $B=(b_{uv})_{uv}$, consider the following four related problems:
+\begin{itemize}
+	\item \textbf{Graph Isomorphism (GI):}  Does there exist a $\pi$ such that $a_{\pi(u)\pi(v)}=a_{uv}$ for all $u,v \in \mc{V}$?
+	\item \textbf{Graph Matching (GM):} Which $\pi$ (if any) satisfies $a_{\pi(u)\pi(v)}=b_{uv}$ for all $u,v \in \mc{V}$?
+	% $\PmcP$ (if any) satisfies $QAQ\T=B$?
+	\item \textbf{Linear Assignment Problem (LAP):} 
+	\begin{align}
+		\text{minimize}_{\pi \in \Pi} \sum_{u \in \mc{V}} a_{u \pi(v)}
+	\end{align}
+	\item \textbf{Quadratic Assignment Problem (QAP):} 
+	\begin{align}
+		\text{minimize}_{\pi \in \Pi} \sum_{u,v \in \mc{V}} a_{\pi(u) \pi(v)}b_{uv}
+	\end{align}
+\end{itemize}
+
+Clearly, these four problems are closely related. In particular, \emph{inexact graph matching} can be cast as a QAP \cite{Burkard2009}.  In this work we focus on an efficient approximate approach to solving QAP.  
+
+
+% Given a pair of adjacency matrices, $A$ and $B$, to graph match $A$ with $B$ is to find a permutation matrix $Q$ such that $QAQ\T=B$. In this work, we propose a novel inexact graph matching algorithm, essentially a Frank-Wolfe algorithm with multiple restarts.  We demonstrate the efficacy of this algorithm over the previous state-of-the-art on a reference library of benchmarks.  
 
 \subsection{Assignment Problems} % (fold)
 \label{sub:assignment_problems}
 
+\subsubsection{Linear Assignment Problems} % (fold)
+\label{ssub:linear_assignment_problems}
+
+% subsubsection linear_assignment_problems (end)
+
+LAP may be written in a number of equivalent ways:
+\begin{align}
+	 &\argmin_{\pi \in \Pi} \sum_{u \in \mc{V}} a_{u \pi(v)} b_{uv} =\nonumber\\
+	&\argmin_{\PmcP} \norm{PA - B} =\nonumber\\
+	&\argmin_{\PmcP} (PA-B)\T (PA-B) \nonumber\\ 
+	&\argmin_{\PmcP} tr (A\T P\T PA) - tr(2PAB\T) + tr(B\T B)=\nonumber\\ 
+	&\argmin_{\PmcP}  -tr (P AB\T) =\nonumber\\
+	&\argmin_{\PmcP}  -\langle P, AB\T \rangle =\nonumber\\
+	&\argmin_{\PmcP}  -\sum_{u \in \mc{V}} p_{uv} a_{uv} b_{uv}. \label{eq:LAP}
+\end{align}
+
+Originally formulated in the BLAH-BLAH form, LAP has received much attention in the last several decades \cite{???}. While the original solutions required $\mc{O}(n^6)$ time, recent implementations of the ``Hungarian algorithm'' require only $\mc{O}(n^3)$ or less \cite{???}.\footnote{More efficient algorithms are available for certain special cases, for example, whenever the matrix-vector multiplication operation is fast (for example, when both $A$ and $B$ are sparse).} As will be evident in a subsequent section, solving a LAP will be the primary computational bottleneck in our approach.   
+
+\subsubsection{Quadratic Assignment Problems} % (fold)
+\label{ssub:linear_assignment_problems}
+
+% subsubsection linear_assignment_problems (end)
+
+QAP may be written in a number of equivalent ways:
+\begin{align}
+	 &\argmin_{\pi \in \Pi} \sum_{u \in \mc{V}} A_{\pi(u) \pi(v)} B_{uv} =\nonumber\\
+	&\argmin_{\PmcP} \norm{PAP\T - B} =
+	% \nonumber\\&
+	\argmin_{\PmcP} \norm{PA - BP\T} =\nonumber\\
+	&\argmin_{\PmcP} (PAP\T-B)\T (PAP\T-B) \nonumber\\ 
+	&\argmin_{\PmcP} tr(PAP\T - B)\T (PAP\T - B) \nonumber \\
+	&\argmin_{\PmcP}  tr(P\T A\T P\T P A P\T) - 2tr(PAP\T B) + tr(B\T B)  =\nonumber \\ %- tr(B\T PAP\T)
+	&\argmin_{\PmcP} - tr(B\T PAP\T)=\nonumber\\ % - tr(PAP\T B),			
+	% &\argmin_{\PmcP} tr (A\T P\T PA) - tr(2PA) + tr(B\T B)=\nonumber\\ 
+	% &\argmin_{\PmcP}  - tr(B\T PAP\T)=\nonumber\\
+	&\argmin_{\PmcP}  -\langle PAP\T, B \rangle =
+	% \nonumber\\&
+	\argmin_{\PmcP}  -\langle PA, BP\T \rangle =\nonumber\\
+	&\argmin_{\PmcP}  -\sum_{u \in \mc{V}} P_{uv} A_{uv} P_{uv} B_{uv}. \label{eq:qap}
+\end{align}
+Unfortunately, QAP is an $\mc{NP}$-complete problem \cite{Garey1979}.   Many exact and inexact algorithms are available \cite{Burkard2009}.  We present a novel inexact solution based utilizing matrix analysis.
 
 
+\subsection{Relaxing the Objective Function} % (fold)
+\label{sub:relaxing_the_objective_function}
+
+% subsection relaxing_the_objective_function (end)
+
+
+A primary hurdle is the discrete non-convex constraint set.  The objective function and constraints in Eq. \eqref{eq:qap} may explicitly be written:
+\begin{align} 
+	&\text{minimize}_{P} - tr(B\T PAP\T) \text{ subject to } \nonumber \\
+	& P\T\mb{1}=\mb{1}, \nonumber \\
+	&\mb{1}\T P=\mb{1}, \nonumber \\
+	&p_{uv} \in \{0,1\} \forall u,v, \label{eq:obj}
+\end{align}
+where $\mb{1} \in \Real^n$ is a column vector of ones.  While the first two constraints are linear, the third is highly nonlinear.  We therefore relax the third constraint to a non-negativity constraint, as opposed to a discrete set constraint.  Thus, instead of $P$ necessarily being a permutation matrix, it is now required only be a doubly stochastic matrix:
+\begin{align} 
+	&\text{minimize}_{P} - tr(B\T PAP\T) \text{ subject to } \nonumber \\
+	& P\T\mb{1}=\mb{1}, \nonumber \\
+	&\mb{1}\T P=\mb{1}, \nonumber \\
+	&p_{uv} \geq 0 \forall u,v. \label{eq:aobj}
+\end{align}
+Now, all three constraint sets are tractable.  Importantly, the convex hull of permutation matrices is the set of doubly stochastic matrices, implying that this is a ``natural'' relaxation in a very meaningful sense.
+
+% Thus, it is natural to consider an approximation with the third constraint set relaxed.  Since the convex hull of permutation matrices is the set of doubly stochastic matrices (matrices whose rows and columns all sum to one), we define the approximate quadratic assignment problem to be
+% \begin{align} \label{eq:tqap}
+% 	\mt{Q}_{AB}= \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F,
+% \end{align}
+% where $\mc{D}$ is the set of doubly stochastic matrices.
 
 
 % subsection assignment_problems (end)
 
-\subsection{A QAP Approach to GM} % (fold)
+\subsection{Solving the Relaxed Objective Function} % (fold)
 \label{ssub:graph_matching}
 
-% A common approach to (approximately) solving the graph labeling problem follows from an adjacency matrix representation of the graph.  A labeled graph can be represented by its adjacency matrix, $A$, whenever its edge attributes are univariate.  Unlabeled graphs, on the other hand, can be represented by a set of adjacency matrices, $\{QAQ\T : Q \in \mc{Q}\}$, where $Q$ is any permutation matrix. Thus, one can define a graph labeling function that finds a permutation matrix that permutes the rows and columns of one graph to match another: % $\sigma_1: \mc{A} \times \mc{A} \mapsto \mc{L}$.    
+% (fold)
+% A common approach to (approximately) solving the graph labeling problem follows from an adjacency matrix representation of the graph.  A labeled graph can be represented by its adjacency matrix, $A$, whenever its edge attributes are univariate.  Unlabeled graphs, on the other hand, can be represented by a set of adjacency matrices, $\{QAQ\T : \PmcP\}$, where $Q$ is any permutation matrix. Thus, one can define a graph labeling function that finds a permutation matrix that permutes the rows and columns of one graph to match another: % $\pi_1: \mc{A} \times \mc{A} \mapsto \mc{L}$.    
 
 % More specifically, we consider the % Given a pair of unlabeled graphs, determining whether they are isomorphic with respect to one another is equivalent to determining whether one can find an adjacency matrix of one graph that is identical to the other's.  This problem can be cast as a 
 % \emph{quadratic assignment problem} (QAP):
 
-Graph matching can be cast as a quadratic assignment problem \cite{Burkard2009}
+% Graph matching can be cast as a quadratic assignment problem 
+% 
+% 
+%  \begin{align} \label{eq:QAP}
+% 	Q_{AB}= \argmin_{\PmcP} \norm{Q A Q\T - B}^2_F,
+% \end{align}
+% where the permutation matrix $Q_{AB}$ induces a labeling of the vertices of $A$ onto those of $B$. A bit of linear algebra simplifies Eq. \eqref{eq:QAP} to give % \cite{Horn1990}, and demonstrates that the above objective function 
+% %shows that Eq \eqref{eq:QAP} can be simplified:
+% \begin{multline} \label{eq:qap}
+% 	\argmin_{\PmcP} \norm{Q A Q\T - B}^2_F  %\\
+% 	% &=\argmin_{\PmcP} \sqrt{tr(QAQ\T - B)\T (QAQ\T - B)} \nonumber \\
+% 	% &=\argmin_{\PmcP}  tr(Q\T A\T Q\T Q A Q\T) + B\T B  \nonumber \\
+% 	% &\qquad \qquad - tr(QAQ\T B) - tr(B\T QAQ\T) \nonumber \\
+% 	= \argmin_{\PmcP} - tr(B\T QAQ\T), % - tr(QAQ\T B),			
+% \end{multline}
+% which follows from the definition of the Frobenius norm and canceling appropriately.  Note that the objective function on the right-hand-side is equivalent to the standard representation of the quadratic assignment problem (QAP) \cite{Conte2004}:
+% \begin{align}
+% 	\mh{\pi}= \argmin_{\pi} \sum_{u,v \in \mc{V}} a_{\pi(u), \pi(v)} b_{uv} = \argmin_{q \in \mc{Q}} \sum_{u,v \in \mc{V}} q_{uv} a_{uv} q_{vu} b_{uv}
+% \end{align}
+% where $\pi$ is a permutation function, $\pi: \mc{V} \mapsto \mc{V}$.  
 
+% The primary difficulty in solving Eq. \eqref{eq:QAP} is the discrete non-convex constraint set.  Thus, it is natural to consider an approximation with the constraints relaxed.  Since the convex hull of permutation matrices is the set of doubly stochastic matrices (matrices whose rows and columns all sum to one), we define the approximate quadratic assignment problem to be
+% \begin{align} \label{eq:tqap}
+% 	\mt{Q}_{AB}= \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F,
+% \end{align}
+% where $\mc{D}$ is the set of doubly stochastic matrices.  When the permutation matrix constraint is relaxed, the equivalence  shown in Eq. \eqref{eq:qap} no longer holds.  
+% Thus, the solution to this relaxed problem is not necessarily a permutation matrix; even if it is, there is no guarantee that it is the same permutation matrix that satisfies the original permutation-constrained problem. Nonetheless, we proceed by attempting to solve
+% \begin{align} \label{eq:nqap}
+% 	\mh{\mt{Q}}_{AB} \approx \argmin_{Q \in \mc{D}} - tr(B\T QAQ\T), % - tr(QAQ\T B),
+% \end{align}
+% considering it an auxiliary function for which we can compute gradients and ascend a likelihood, unlike the permutation-constrained case.  
+% (end)
 
- \begin{align} \label{eq:QAP}
-	Q_{AB}= \argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F,
-\end{align}
-where the permutation matrix $Q_{AB}$ induces a labeling of the vertices of $A$ onto those of $B$. A bit of linear algebra simplifies Eq. \eqref{eq:QAP} to give % \cite{Horn1990}, and demonstrates that the above objective function 
-%shows that Eq \eqref{eq:QAP} can be simplified:
-\begin{multline} \label{eq:qap}
-	\argmin_{Q \in \mc{Q}} \norm{Q A Q\T - B}^2_F  %\\
-	% &=\argmin_{Q \in \mc{Q}} \sqrt{tr(QAQ\T - B)\T (QAQ\T - B)} \nonumber \\
-	% &=\argmin_{Q \in \mc{Q}}  tr(Q\T A\T Q\T Q A Q\T) + B\T B  \nonumber \\
-	% &\qquad \qquad - tr(QAQ\T B) - tr(B\T QAQ\T) \nonumber \\
-	= \argmin_{Q \in \mc{Q}} - tr(B\T QAQ\T), % - tr(QAQ\T B),			
-\end{multline}
-which follows from the definition of the Frobenius norm and canceling appropriately.  Note that the objective function on the right-hand-side is equivalent to the standard representation of the quadratic assignment problem (QAP) \cite{Conte2004}:
-\begin{align}
-	\mh{\sigma}= \argmin_{\sigma} \sum_{u,v \in \mc{V}} a_{\sigma(u), \sigma(v)} b_{uv} = \argmin_{q \in \mc{Q}} \sum_{u,v \in \mc{V}} q_{uv} a_{uv} q_{vu} b_{uv}
-\end{align}
-where $\sigma$ is a permutation function, $\sigma: [n] \mapsto [n]$.  Unfortunately, QAP is an $\mc{NP}$-complete problem \cite{Garey1979}. The primary difficulty in solving Eq. \eqref{eq:QAP} is the discrete non-convex constraint set.  Thus, it is natural to consider an approximation with the constraints relaxed.  Since the convex hull of permutation matrices is the set of doubly stochastic matrices (matrices whose rows and columns all sum to one), we define the approximate quadratic assignment problem to be
-\begin{align} \label{eq:tqap}
-	\mt{Q}_{AB}= \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F,
-\end{align}
-where $\mc{D}$ is the set of doubly stochastic matrices.  When the permutation matrix constraint is relaxed, the equivalence  shown in Eq. \eqref{eq:qap} no longer holds.  
-Thus, the solution to this relaxed problem is not necessarily a permutation matrix; even if it is, there is no guarantee that it is the same permutation matrix that satisfies the original permutation-constrained problem. Nonetheless, we proceed by attempting to solve
-\begin{align} \label{eq:nqap}
-	\mh{\mt{Q}}_{AB} \approx \argmin_{Q \in \mc{D}} - tr(B\T QAQ\T), % - tr(QAQ\T B),
-\end{align}
-considering it an auxiliary function for which we can compute gradients and ascend a likelihood, unlike the permutation-constrained case.  
-
-
-The Frank-Wolfe (FW) algorithm 
-is a successive linear programming algorithm 
- originally designed for solving quadratic problems with linear (equality and/or inequality) constraints \cite{Frank1956}. It later became used more generally 
-for nonlinear programming problems \cite{Bradley1977}.  
-Let $f(Q)=- tr(B\T QAQ\T)$ be our objective function. Unfortunately, this objective function is not necessarily convexx.  This follows from computing the Hessian of $f$  with respect to $Q$
+The relaxed constraint set facilitates using standard constrained gradient descent routines for finding local minima.  Unfortunately, this objective function is not necessarily convex.  This follows from computing the Hessian of $f$  with respect to $Q$
 \begin{align}
 	\nabla_Q^2  =  B \otimes A + B\T \otimes A\T,
 \end{align}
-which is not necessarily positive definite ($\otimes$ indicates the Kronecker product). This means that it will potentially be multi-modal, making initialization important.  We therefore develop a nonlinear programing algorithm for approximately solving Eq. \eqref{eq:QAP} using multiple restarts.  Below we provide details and explanation of each step.
+which is not necessarily positive definite ($\otimes$ indicates the Kronecker product). This means that it will potentially be multi-modal, making initialization important.   We therefore develop a nonlinear programing algorithm for approximately solving Eq. \eqref{eq:aobj} using multiple restarts.   Our approach can be thought of as a Frank-Wolfe (FW) algorithm, or a successive linear programming algorithm.  The FW algorithm was originally designed for solving quadratic problems with linear (equality and/or inequality) constraints \cite{Frank1956}. It later became used more generally for nonlinear programming problems \cite{Bradley1977}.  
+% Let $f(P)=- tr(B\T PAP\T)$ be our objective function. 
+Below we provide details and explanation of each step.
 
-\textbf{Step 0: Choose an initial estimate} While any doubly stochastic matrix would be a feasible initial point, two choices seem natural: (i) the ``flat doubly  stochastic matrix,'' $J=\ve{1} \ve{1}\T/n$, which is the center of the feasible region, and (ii) the identity matrix, which is a permutation matrix.  Therefore, if we run \qap  once, we always start with one of those two.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $K$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let $Q^{(0)}=(J+K)/2$. Given this initial estimate, we iterate the following five steps until convergence.
+\textbf{Step 0: Choose an initial estimate} While any doubly stochastic matrix would be a feasible initial point, two choices seem natural: (i) the ``flat doubly  stochastic matrix,'' $J=\ve{1} \ve{1}\T/n$, which is the center of the feasible region, and (ii) the identity matrix, which is a permutation matrix.  Therefore, if we run \qap  once, we always start with one of those two.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $K$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let $P^{(0)}=(J+K)/2$. Given this initial estimate, we iterate the following five steps until convergence.
 
-\textbf{Step 1: Compute the gradient} The gradient of $f$ with respect to $Q$ is given by
+\textbf{Step 1: Compute the gradient} The gradient of $f$ with respect to $P$ is given by
 \begin{align} \label{eq:grad}
-	\nabla_Q^{(j)} = \partial f / \partial Q^{(j)} =  - A Q^{(j)} B\T - A\T Q^{(j)} B.
+	\nabla_P^{(j)} = \partial f / \partial P^{(j)} =  - A P^{(j)} B\T - A\T P^{(j)} B.
 \end{align}
 
 % paragraph step_1_computing_the_gradient (end)
 
 \textbf{Step 2: Find the closest doubly stochastic matrix} Instead of directly descending this gradient, we search for the direction of the doubly stochastic matrix closest to this gradient. Noting that that direction may be computed by the dot-product operator, we have
 \begin{align}\label{eq:dir}
-	L^{(j)} = \argmin_{L \in \mc{D}} \langle L, \nabla_Q^{(j)} \rangle. %  \sum_{i,j=1}^m 	\left( 	\nabla_Q^{(j)}\circ L^{(j)} \right)_{ij}.
+	L^{(j)} = \argmin_{L \in \mc{D}} \langle L, \nabla_P^{(j)} \rangle, %  \sum_{i,j=1}^m 	\left( 	\nabla_P^{(j)}\circ L^{(j)} \right)_{ij}.
 \end{align}
-Eq. \eqref{eq:dir} can be solved as a Linear Assignment Problem (LAP).  More specifically, a LAP can be written as
-\begin{align} \label{eq:LAP}
-	L_{AB} = \argmin_{Q \in \mc{Q}} \norm{QA - B }^2_F.
-\end{align}
-When $B$ is the identity matrix $I$, the above can be simplified as
-\begin{align} \label{eq:proja}
-	L_{AI} &=\argmin_{Q \in \mc{Q}} \norm{QA - I}_F^2 
-	% \nonumber \\ &
-	= \argmin_{Q \in \mc{Q}} (QA-I)\T (QA-I) 
-	\nonumber\\ &=\argmin_{Q \in \mc{Q}} tr (A\T Q\T QA) - tr(2QA) - tr(II) 
-	\nonumber\\ &
-	= \argmin_{Q \in \mc{Q}}  -\langle Q, A \rangle.
-\end{align}
-In other words, letting $B=I$, the projection of a matrix onto its nearest doubly stochastic matrix is a LAP problem.  While Eq. \eqref{eq:proja} cannot be solved directly, as above, we can relax the permutation matrix constraint to the doubly stochastic matrix constraint
-\begin{align}\label{eq:relaxed}
-	\mt{L}_{AI} = \argmin_{Q\in\mc{D}} -\langle Q, A \rangle. 
-\end{align}
-Since the permutation matrices are the extremal points of the set of doubly stochastic matrices, finding the minimum of Eq. \eqref{eq:relaxed} is guaranteed to yield a permutation matrix (as minima are necessarily at the vertices).  Thus, letting $A=\nabla_Q^{(j)}$, solving Eq. \eqref{eq:relaxed}---which is a linear problem with linear and non-negative constraints---is equivalent to solving Eq. \eqref{eq:dir}. 
-% In other words, Eq. \eqref{eq:dir} is solved by \texttt{Hungarian}$(I,\nabla_Q^{(j)})$. 
-Fortunately, the Hungarian algorithm solves any LAP in $\mc{O}(n^3)$ \cite{Burkard2009}, thus this projection is relatively computationally efficient.\footnote{More efficient algorithms are available for certain special cases, for example, whenever the matrix-vector multiplication operation is fast (for example, when both $A$ and $B$ are sparse).}
+where $\mc{D}$ is the set of doubly stochastic matrices.  Eq. \eqref{eq:dir} can be solved as a LAP.  More specifically, let $A=\nabla_P^{(j)}$ and $B=I$ (the $n\times n$ identity matrix), and we recover Eq. \eqref{eq:LAP}.
+
+% % a LAP can be written as
+% % \begin{align} \label{eq:LAP}
+% % 	L_{AB} = \argmin_{\PmcP} \norm{PA - B }^2_F.
+% % \end{align}
+% % When $B$ is the identity matrix $I$, the above can be simplified as
+% \begin{align} \label{eq:proja}
+% 	L_{AI} &=\argmin_{\PmcP} \norm{PA - I}_F^2 
+% 	% \nonumber \\ &
+% 	= \argmin_{\PmcP} (PA-I)\T (PA-I) 
+% 	\nonumber\\ &=\argmin_{\PmcP} tr (A\T P\T PA) - tr(2PA) - tr(II) 
+% 	\nonumber\\ &
+% 	= \argmin_{\PmcP}  -\langle P, A \rangle.
+% \end{align}
+% In other words, letting $B=I$, the projection of a matrix onto its nearest doubly stochastic matrix is a LAP problem.  While Eq. \eqref{eq:proja} cannot be solved directly, as above, we can relax the permutation matrix constraint to the doubly stochastic matrix constraint
+% \begin{align}\label{eq:relaxed}
+% 	\mt{L}_{AI} = \argmin_{P\in\mc{D}} -\langle P, A \rangle. 
+% \end{align}
+% Since the permutation matrices are the extremal points of the set of doubly stochastic matrices, finding the minimum of Eq. \eqref{eq:relaxed} is guaranteed to yield a permutation matrix (as minima are necessarily at the vertices).  Thus, letting $A=\nabla_P^{(j)}$, solving Eq. \eqref{eq:relaxed}---which is a linear problem with linear and non-negative constraints---is equivalent to solving Eq. \eqref{eq:dir}. 
+% % In other words, Eq. \eqref{eq:dir} is solved by \texttt{Hungarian}$(I,\nabla_P^{(j)})$. 
+% Fortunately, the Hungarian algorithm solves any LAP in $\mc{O}(n^3)$ \cite{Burkard2009}, thus this projection is relatively computationally efficient.
 % paragraph step_2_finding_the_closest_doubly_stochastic_matrix (end)
 
 \textbf{Step 3: Update the direction} Given $L^{(j)}$, the new direction is given by
 \begin{align}
-	d^{(j)}=L^{(j)}-Q^{(j)}.
+	d^{(j)}=L^{(j)}-P^{(j)}.
 \end{align}
 
 % paragraph step_3_updating_the_direction (end)
 
 \textbf{Step 4: Line search} Given this direction, one can then perform a line search to find the doubly stochastic matrix that minimizes the objective function along that direction:
 \begin{align}\label{eq:step}
-	\alpha^{(j)} = \argmin_{\alpha \in [0,1]} f(Q^{(j)} + \alpha^{(j)} d^{(j)}).
+	\alpha^{(j)} = \argmin_{\alpha \in [0,1]} f(P^{(j)} + \alpha^{(j)} d^{(j)}).
 \end{align}
 This can be performed exactly, because $f$ is a quadratic function.  
 
 % paragraph step_4_line_search (end)
 
-\textbf{Step 5: Update $Q$} Finally, the new estimated doubly stochastic matrix is given by
+\textbf{Step 5: Update $P$} Finally, the new estimated doubly stochastic matrix is given by
 \begin{align}\label{eq:update}
-	Q^{(j+1)} = Q^{(j)} + \alpha^{(j)} d^{(j)}.
+	P^{(j+1)} = P^{(j)} + \alpha^{(j)} d^{(j)}.
 \end{align}
 
 % paragraph step_5_update_q_ (end)
 
-\textbf{Stopping criteria} Steps 1--5 are iterated until convergence, computational budget limits, or some other stopping criterion is met.  These 5 steps collectively comprise the FW algorithm for solving Eq. \eqref{eq:nqap}.  Note that while $Q^{(j)}$ will generally not be a permutation matrix, we do not project $Q^{(j)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time.
+\textbf{Stopping criteria} Steps 1--5 are iterated until convergence, computational budget limits, or some other stopping criterion is met.  These 5 steps collectively comprise the FW algorithm for solving Eq. \eqref{eq:aqap}.  Note that while $P^{(j)}$ will generally not be a permutation matrix, we do not project $P^{(j)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time.
 
 
-\textbf{Projecting onto the set of permutation matrices}   Let $Q^{(J+1)}$ be the doubly stochastic matrix resulting from the final iteration.  We project $Q^{(J+1)}$ onto the set of permutation matrices, yielding
+\textbf{Projecting onto the set of permutation matrices}   Let $P^{(J+1)}$ be the doubly stochastic matrix resulting from the final iteration.  We project $P^{(J+1)}$ onto the set of permutation matrices, yielding
 \begin{align} \label{eq:proj}
-	\mh{Q} = \argmin_{Q \in \mc{Q}} -\langle Q^{(J+1)}, Q \rangle,
+	\mh{P} = \argmin_{\PmcP} -\langle P^{(J+1)}, P \rangle,
 \end{align}
 which is a LAP, and yields an approximate solution to the original QAP.  Let FW appended with a projection onto the permutation matrices be denoted by \texttt{QAP}.
 
@@ -310,7 +401,7 @@ We first compare the performance of \qapm with recent state-of-the-art approache
 
 Much like the QAP objective function from Eq. \eqref{eq:QAP} can be simplified to Eq. \eqref{eq:qap}, the LAP objective function can be similarly simplified, to give
 \begin{align}
-	Q_{LAP}= \argmin_{Q \in \mc{Q}} \norm{QA-B}_F^2 = \argmin_{Q \in \mc{Q}} tr(QA B\T).
+	Q_{LAP}= \argmin_{\PmcP} \norm{QA-B}_F^2 = \argmin_{\PmcP} tr(QA B\T).
 \end{align}
 The gradient of the argument on the right-hand-side of the above equation is $2AB\T$.
 % Letting $f_{LAP}(Q)=tr(QA B\T)$, the gradient is:
@@ -325,8 +416,8 @@ The gradient of the argument on the right-hand-side of the above equation is $2A
 % % \end{align}
 Comparing this gradient to that of the QAP objective function---Eq. \eqref{eq:grad}---one can see that when (i) $Q^{(j)}$ is the identity matrix and (ii) both $A$ and $B$ are symmetric (for example, for undirected graphs), the two gradients are identical.  Thus, if QAP is initialized at the identity matrix and the graphs are undirected, the first permutation matrix---the output of Step 2---is identical to $\mh{Q}_{LAP}$; although the line search will make $Q^{(1)} \neq Q_{LAP}$, in general.  %Moreoever, projecting a matrix onto the closest permutation matrix can be written as a LAP because of the following relationship:
 % \begin{align}
-% 	\argmin_{Q \in \mc{Q}} \norm{QA\T - I}_F^2 &= \argmin_{Q \in \mc{Q}} (QA\T-I)\T (QA\T-I) 
-% \nonumber\\ &=\argmin_{Q \in \mc{Q}} AQ\T QA\T -2QA\T - II = \argmin_{Q \in \mc{Q}}  -\langle Q, A\T \rangle  
+% 	\argmin_{\PmcP} \norm{QA\T - I}_F^2 &= \argmin_{\PmcP} (QA\T-I)\T (QA\T-I) 
+% \nonumber\\ &=\argmin_{\PmcP} AQ\T QA\T -2QA\T - II = \argmin_{\PmcP}  -\langle Q, A\T \rangle  
 % \end{align}
 
 % In the above simulation, the first iteration of \qap is essentially the only useful one.  Thus, we compare the performance of \texttt{BPI}$\circ$\texttt{LAP} (dark gray).  The performance of LAP and QAP are not statistically different for this simulation.  This suggests that for certain problems, LAP (which is $\mc{O}(n^3)$) is both an efficient and useful approximation to solving $\mc{NP}$-hard graph matching problems. We were unable to find a model for simple graphs in which multiple iterations of \qap improved performance over LAP. %We confirm this intuition by substituting QAP with LAP in the above simulations (black line).  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic time complexity, will often suffice.
@@ -338,7 +429,7 @@ Comparing this gradient to that of the QAP objective function---Eq. \eqref{eq:gr
 \subsection{Algorithm Complexity and leading constants} % (fold)
 \label{sub:algorithm_complexity_and_leading_constants}
 
-Both GM and its closely related counterpart, graph isomorphism (GI), are computationally difficult.  There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be $\mc{NP}$-hard, it remains unclear whether GI is in $\mc{P}$, $\mc{NP}$, or its own intermediate complexity class, $\mc{NP}$-isomorphism (or isomorphism-complete).  Yet, for large classes of GI and GM problems, linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(\exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GM or GI algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all graphs have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  We therefore determined the average complexity of our algorithm \emph{and} the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\approx 10^{-6}$ seconds), making using this algorithm feasible for even reasonably large graphs.
+Both GM and its closely related counterpart, graph isomorphism (GI), are computationally difficult.  There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be $\mc{NP}$-hard, it remains unclear whether GI is in $\mc{P}$, $\mc{NP}$, or its own intermediate complexity class, $\mc{NP}$-isomorphism (or isomorphism-complete).  Yet, for large classes of GI and GM problems, linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(\exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GM or GI algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all graphs have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  We therefore determined the average complexity of our algorithm \emph{and} the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\approx 10^{-12}$ seconds), making using this algorithm feasible for even reasonably large graphs.
 
 
 
@@ -346,7 +437,7 @@ Both GM and its closely related counterpart, graph isomorphism (GI), are computa
 \begin{figure}[htbp]
 	\centering			
 	\includegraphics[width=1.0\linewidth]{../figs/digraph_qap2}
-	\caption{Performance of \qap as function of number of vertices. Data was sampled from an Erd\"os-R\'enyi model with $p=log(n)/n$.  Each dot represents a single simulation.  The solid line is the best fit cubic function.  Note the leading constant is $10^{-6}$ seconds. }
+	\caption{Performance of \qap as function of number of vertices. Data was sampled from an Erd\"os-R\'enyi model with $p=log(n)/n$.  Each dot represents a single simulation.  The solid line is the best fit cubic function.  Note the leading constant is $10^{-12}$ seconds. }
 	\label{fig:scaling}
 \end{figure}
 
@@ -379,7 +470,7 @@ To investigate the performance of \qap using an undirected graph model, we repea
 
 \section{Discussion}
 
-This work presents an inexact graph matching algorithm based on the Frank-Wolfe algorithm.  While others have incorporated the FW algorithm as a subroutine of a graph matching strategy \cite{Zaslavskiy2009}, we modified the FW algorithm for GM in a few ways.  First, after FW is finished, we project the resulting doubly stochastic matrix onto the set of permutation matrices.  Second, we initialize the algorithm using either the identity matrix or the doubly flat matrix (the matrix where all elements are $1/n$).  These choices seem to us to be the most obvious places to start if one must choose.  Third, if one of those choices does not work, we restart FW with other ``nearby'' initial points.  These modifications facilitate improved performance on \emph{all} the benchmarks we considered.  Moreover, although the algorithm scales cubically with the number of vertices, the leading constants are very small ($\mc{O}(10^{-6})$ seconds), so the algorithm runs quite fast on reasonably sized networks (e.g., $n \approx 100$).  Indeed, on a biologically inspired GM problem, \emph{C. elegans} connectome mapping, this approach was both fast and effective.  
+This work presents an inexact graph matching algorithm based on the Frank-Wolfe algorithm.  While others have incorporated the FW algorithm as a subroutine of a graph matching strategy \cite{Zaslavskiy2009}, we modified the FW algorithm for GM in a few ways.  First, after FW is finished, we project the resulting doubly stochastic matrix onto the set of permutation matrices.  Second, we initialize the algorithm using either the identity matrix or the doubly flat matrix (the matrix where all elements are $1/n$).  These choices seem to us to be the most obvious places to start if one must choose.  Third, if one of those choices does not work, we restart FW with other ``nearby'' initial points.  These modifications facilitate improved performance on \emph{all} the benchmarks we considered.  Moreover, although the algorithm scales cubically with the number of vertices, the leading constants are very small ($\mc{O}(10^{-12})$ seconds), so the algorithm runs quite fast on reasonably sized networks (e.g., $n \approx 100$).  Indeed, on a biologically inspired GM problem, \emph{C. elegans} connectome mapping, this approach was both fast and effective.  
 
 Unfortunately, even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve of Figure \ref{fig:scaling}, this algorithm would take about 2 years to finish (on a standard laptop from 2009) when $n=20,000$.  We hope to be able to perform GM on graphs much larger than that, given that the number of neurons in even a fly brain, for example, is $\mc{O}(10^5)$.  Therefore, more efficient implementations are of interest.  
 

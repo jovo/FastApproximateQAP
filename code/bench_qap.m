@@ -38,6 +38,7 @@ if (n>1)&&(m==n)
     errors=times; iters=errors;
     for i=1:k
         q=randperm(s,n);
+        disp(i)
         for j=1:2
             if j==1,
                 A=ns;
