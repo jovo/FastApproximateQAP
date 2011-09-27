@@ -499,15 +499,15 @@ A ``connectome'' is a brain-graph in which vertices correspond to (collections o
 To investigate the performance of \qap using an undirected graph model, we repeated the above analysis using binarized symmeterized versions of the graphs ($A_{uvz}=1$ if and only if $A_{uvz}\geq 1$ or $A_{vuz} \geq 1$).  The resulting summary statistics are nearly identical to those presented in Table \ref{tab:1}, although runtime was less than half the time.
 
 \begin{table}
-\caption{Brain-graph matching summary statistics for both the chemical and electrical connectome.  The maximum number of restarts for both was 30.  The median number of restarts for the electrical connectome is less than 30, implying that our approach found the optimal solution many times, just not always.  The median (median absolute deviation) times were only a few seconds each.}
+\caption{Brain-graph matching summary statistics for both the chemical and electrical connectome.  The table shows the median and median absolute deviation (MAD) of accuracy, number of restarts, and solution time for both connectomes.  The maximum number of restarts for both was 30.  The median number of restarts for the both connectomes is less than 30, implying that our approach found the optimal solution many times, just not always for the electrical connectome.  Both ran very quickly, only requiring tens of seconds.}
 	\label{tab:1}
 \begin{center}
 \begin{tabular}{|l|c|c|}
-\hline	 					& chemical 		& electrical  \\ \hline
-	Median Accuracy    &       100\%            &             59.5\% \\
-	Median \# Restarts  &         3            &                   26 \\
+	\hline Median (MAD) 					& chemical 		& electrical  \\ \hline
+	Accuracy  (\%)  &       100  (0)           &             59.5 \\
+	Restarts (\#) &         3    (0)    &                   26 \\
 	% Vertex Solution      &          10        &                      5 \\
-	Median (MAD) Solution Time     &  4.3 (0.04) sec.      &    226 sec. \\ \hline
+	Solution Time (sec)    &  42 (0.42)       &    226  \\ \hline
 \end{tabular} 
 \end{center}
 \end{table}

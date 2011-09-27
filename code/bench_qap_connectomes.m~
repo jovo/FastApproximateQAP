@@ -1,0 +1,9 @@
+%% connectome times
+
+load('~/Research/data/EM/c_elegans/c_elegans_chemical_connectome.mat')
+
+[times,errors,iters]=bench_qap(A);
+
+[median(times); mad(times)]
+[median(errors); mad(errors)]
+[median(iters); mad(iters)]
