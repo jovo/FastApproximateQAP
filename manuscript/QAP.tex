@@ -16,6 +16,7 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{url}
+\usepackage{enumerate}
 % \usepackage{hyperref}
 % 
 \input{/Users/jovo/Research/latex/latex_commands.tex}
@@ -136,34 +137,52 @@ LAP may be written in a number of equivalent ways:
 	&\argmin_{\PmcP} tr (A\T P\T PA) - tr(2PAB\T) + tr(B\T B)=\nonumber\\ 
 	&\argmin_{\PmcP}  -tr (P AB\T) =\nonumber\\
 	&\argmin_{\PmcP}  -\langle P, AB\T \rangle =\nonumber\\
-	&\argmin_{\PmcP}  -\sum_{u \in \mc{V}} p_{uv} a_{uv} b_{uv}. \label{eq:LAP}
+	&\argmin_{\PmcP}  -\sum_{u \in \mc{V}} p_{uv} a_{uv} b_{vu}. \label{eq:LAP}
 \end{align}
+The last form indicates that LAP is a linear programming problem (hence the name).  Yet, the constraints, $\mc{P}$, make it a bit trickier.  The feasible region $\mc{P}$ can be written as a set of three constraints: two linear equality constraint sets and a binary constraint.  The LAP objection function with constraints can explicitly be written:
+\begin{align}
+		&\text{minimize}_P  &&\sum_{u \in \mc{V}} -p_{uv} a_{uv} b_{vu} \nonumber \\
+		&\text{subject to } && \sum_{u \in \mc{V}} p_{uv} = 1 \, \forall u \in \mc{V} \nonumber \\
+		& && \sum_{v \in \mc{V}} p_{uv} = 1 \, \forall v \in \mc{V}, \nonumber \\
+		& &&p_{uv} \in \{0,1\} \, \forall u,v, \label{eq:LAP2}	
+\end{align}
+where $\mb{1} \in \Real^n$ is a column vector of ones.  
+Perhaps because LAP comes up in a wide variety of contexts, a large number of algorithms have been developed to solve LAP \cite{Burkard2009}.  These algorithms have become increasing efficient.  One of the most popular algorithms, the so-called ``Hungarian algorithm'' has time complexity $\mc{O}(n^3)$ \cite{Jonker1987}.  Under certain conditions (for example, when $AB\T$ is sparse), faster implementations are also available.  As will be seen below, LAP is a key subroutine to our inexact QAP solution.  Importantly, LAP is equivalent to its continuous relaxation given by:
+\begin{align}
+		&\text{minimize}_P  &&\sum_{u \in \mc{V}} -p_{uv} a_{uv} b_{vu} \nonumber \\
+		&\text{subject to } && \sum_{u \in \mc{V}} p_{uv} = 1 \, \forall u \in \mc{V} \nonumber \\
+		& && \sum_{v \in \mc{V}} p_{uv} = 1 \, \forall v \in \mc{V}, \nonumber \\
+		& &&p_{uv} \geq 0 \, \forall u,v, \label{eq:ALAP}	
+\end{align}
+Thus, solving Eq. \eqref{eq:ALAP} is equivalent to solving Eq. \eqref{eq:LAP2}.
 
-Originally formulated in the BLAH-BLAH form, LAP has received much attention in the last several decades \cite{???}. While the original solutions required $\mc{O}(n^6)$ time, recent implementations of the ``Hungarian algorithm'' require only $\mc{O}(n^3)$ or less \cite{???}.\footnote{More efficient algorithms are available for certain special cases, for example, whenever the matrix-vector multiplication operation is fast (for example, when both $A$ and $B$ are sparse).} As will be evident in a subsequent section, solving a LAP will be the primary computational bottleneck in our approach.   
+	
+ 
+% Originally formulated in the BLAH-BLAH form, LAP has received much attention in the last several decades \cite{???}. While the original solutions required $\mc{O}(n^6)$ time, recent implementations of the ``Hungarian algorithm'' require only $\mc{O}(n^3)$ or less \cite{???}.\footnote{More efficient algorithms are available for certain special cases, for example, whenever the matrix-vector multiplication operation is fast (for example, when both $A$ and $B$ are sparse).} As will be evident in a subsequent section, solving a LAP will be the primary computational bottleneck in our approach.   
 
 \subsubsection{Quadratic Assignment Problems} % (fold)
 \label{ssub:linear_assignment_problems}
 
 % subsubsection linear_assignment_problems (end)
 
-QAP may be written in a number of equivalent ways:
+Koopmans and Beckman \cite{Koopmans} introduced QAP in its original form.  Since then, a number of equivalent formulations have been developed:
 \begin{align}
 	 &\argmin_{\pi \in \Pi} \sum_{u \in \mc{V}} A_{\pi(u) \pi(v)} B_{uv} =\nonumber\\
 	&\argmin_{\PmcP} \norm{PAP\T - B} =
 	% \nonumber\\&
 	\argmin_{\PmcP} \norm{PA - BP\T} =\nonumber\\
-	&\argmin_{\PmcP} (PAP\T-B)\T (PAP\T-B) \nonumber\\ 
+	% &\argmin_{\PmcP} (PAP\T-B)\T (PAP\T-B) \nonumber\\ 
 	&\argmin_{\PmcP} tr(PAP\T - B)\T (PAP\T - B) \nonumber \\
-	&\argmin_{\PmcP}  tr(P\T A\T P\T P A P\T) - 2tr(PAP\T B) + tr(B\T B)  =\nonumber \\ %- tr(B\T PAP\T)
+	% &\argmin_{\PmcP}  tr(P\T A\T P\T P A P\T) - 2tr(PAP\T B) + tr(B\T B)  =\nonumber \\ %- tr(B\T PAP\T)
 	&\argmin_{\PmcP} - tr(B\T PAP\T)=\nonumber\\ % - tr(PAP\T B),			
 	% &\argmin_{\PmcP} tr (A\T P\T PA) - tr(2PA) + tr(B\T B)=\nonumber\\ 
 	% &\argmin_{\PmcP}  - tr(B\T PAP\T)=\nonumber\\
 	&\argmin_{\PmcP}  -\langle PAP\T, B \rangle =
 	% \nonumber\\&
 	\argmin_{\PmcP}  -\langle PA, BP\T \rangle =\nonumber\\
-	&\argmin_{\PmcP}  -\sum_{u \in \mc{V}} P_{uv} A_{uv} P_{uv} B_{uv}. \label{eq:qap}
+	&\argmin_{\PmcP}  -\sum_{u \in \mc{V}} p_{uv} a_{uv} b_{uv} p_{vu}. \label{eq:qap}
 \end{align}
-Unfortunately, QAP is an $\mc{NP}$-complete problem \cite{Garey1979}.   Many exact and inexact algorithms are available \cite{Burkard2009}.  We present a novel inexact solution based utilizing matrix analysis.
+The last form indicates that QAP is indeed a constrained quadratic problem.  Unfortunately, QAP is an $\mc{NP}$-complete problem \cite{Garey1979}.   Many exact and inexact algorithms are available \cite{Burkard2009}.  We present a novel inexact solution based utilizing matrix analysis.
 
 
 \subsection{Relaxing the Objective Function} % (fold)
@@ -172,21 +191,33 @@ Unfortunately, QAP is an $\mc{NP}$-complete problem \cite{Garey1979}.   Many exa
 % subsection relaxing_the_objective_function (end)
 
 
-A primary hurdle is the discrete non-convex constraint set.  The objective function and constraints in Eq. \eqref{eq:qap} may explicitly be written:
-\begin{align} 
-	&\text{minimize}_{P} - tr(B\T PAP\T) \text{ subject to } \nonumber \\
-	& P\T\mb{1}=\mb{1}, \nonumber \\
-	&\mb{1}\T P=\mb{1}, \nonumber \\
-	&p_{uv} \in \{0,1\} \forall u,v, \label{eq:obj}
+A primary hurdle to solving QAP is the discrete non-convex constraint set.  The objective function and constraints in Eq. \eqref{eq:qap} may explicitly be written compactly in its ``trace'' form:
+\begin{align}
+		&\text{minimize}_P  &&\sum_{u \in \mc{V}} - tr(B\T PAP\T) \nonumber \\
+		&\text{subject to } &&P\T\mb{1}=\mb{1} \nonumber \\
+		& && \mb{1}\T P=\mb{1}, \nonumber \\
+		& &&p_{uv} \in \{0,1\} \, \forall u,v, \label{eq:QAP}	
 \end{align}
-where $\mb{1} \in \Real^n$ is a column vector of ones.  While the first two constraints are linear, the third is highly nonlinear.  We therefore relax the third constraint to a non-negativity constraint, as opposed to a discrete set constraint.  Thus, instead of $P$ necessarily being a permutation matrix, it is now required only be a doubly stochastic matrix:
-\begin{align} 
-	&\text{minimize}_{P} - tr(B\T PAP\T) \text{ subject to } \nonumber \\
-	& P\T\mb{1}=\mb{1}, \nonumber \\
-	&\mb{1}\T P=\mb{1}, \nonumber \\
-	&p_{uv} \geq 0 \forall u,v. \label{eq:aobj}
+% \begin{align} 
+% 	&\text{minimize}_{P} - tr(B\T PAP\T) \text{ subject to } \nonumber \\
+% 	& P\T\mb{1}=\mb{1}, \nonumber \\
+% 	&\mb{1}\T P=\mb{1}, \nonumber \\
+% 	&p_{uv} \in \{0,1\} \forall u,v, \label{eq:obj}
+% \end{align}
+Like in LAP, it is the binary constraint that is the sticky-wicket. We therefore relax the third constraint to a non-negativity constraint, as opposed to a discrete set constraint.  Thus, instead of $P$ necessarily being a permutation matrix, it is now required only be a doubly stochastic matrix:
+\begin{align}
+		&\text{minimize}_P  &&\sum_{u \in \mc{V}} - tr(B\T PAP\T) \nonumber \\
+		&\text{subject to } &&P\T\mb{1}=\mb{1}, %\nonumber \\& && 
+		\mb{1}\T P=\mb{1}, %\nonumber \\& &&
+		p_{uv} \geq 0 \, \forall u,v, \label{eq:AQAP}	
 \end{align}
-Now, all three constraint sets are tractable.  Importantly, the convex hull of permutation matrices is the set of doubly stochastic matrices, implying that this is a ``natural'' relaxation in a very meaningful sense.
+% \begin{align} 
+% 	&\text{minimize}_{P} - tr(B\T PAP\T) \text{ subject to } \nonumber \\
+% 	& P\T\mb{1}=\mb{1}, \nonumber \\
+% 	&\mb{1}\T P=\mb{1}, \nonumber \\
+% 	&p_{uv} \geq 0 \forall u,v. \label{eq:AQAP}
+% \end{align}
+Now, all three constraint sets are tractable.  Importantly, the convex hull of permutation matrices is the set of doubly stochastic matrices, implying that this is a ``natural'' relaxation in a very meaningful sense.    
 
 % Thus, it is natural to consider an approximation with the third constraint set relaxed.  Since the convex hull of permutation matrices is the set of doubly stochastic matrices (matrices whose rows and columns all sum to one), we define the approximate quadratic assignment problem to be
 % \begin{align} \label{eq:tqap}
@@ -197,7 +228,7 @@ Now, all three constraint sets are tractable.  Importantly, the convex hull of p
 
 % subsection assignment_problems (end)
 
-\subsection{Solving the Relaxed Objective Function} % (fold)
+\section{Algorithm} % (fold)
 \label{ssub:graph_matching}
 
 % (fold)
@@ -239,28 +270,40 @@ Now, all three constraint sets are tractable.  Importantly, the convex hull of p
 % considering it an auxiliary function for which we can compute gradients and ascend a likelihood, unlike the permutation-constrained case.  
 % (end)
 
-The relaxed constraint set facilitates using standard constrained gradient descent routines for finding local minima.  Unfortunately, this objective function is not necessarily convex.  This follows from computing the Hessian of $f$  with respect to $Q$
+Given the above relaxation, our approach is to solve Eq. \eqref{eq:AQAP}, and then project the solution that we obtain onto the set of permutation matrices.  Unfortunately, although the objective function $f(P)=- tr(B\T PAP\T)$ is quadratic, it is not necessarily convex.  This follows from computing the Hessian of $f$  with respect to $P$
 \begin{align}
-	\nabla_Q^2  =  B \otimes A + B\T \otimes A\T,
+	\nabla_P^2  =  B \otimes A + B\T \otimes A\T,
 \end{align}
-which is not necessarily positive definite ($\otimes$ indicates the Kronecker product). This means that it will potentially be multi-modal, making initialization important.   We therefore develop a nonlinear programing algorithm for approximately solving Eq. \eqref{eq:aobj} using multiple restarts.   Our approach can be thought of as a Frank-Wolfe (FW) algorithm, or a successive linear programming algorithm.  The FW algorithm was originally designed for solving quadratic problems with linear (equality and/or inequality) constraints \cite{Frank1956}. It later became used more generally for nonlinear programming problems \cite{Bradley1977}.  
-% Let $f(P)=- tr(B\T PAP\T)$ be our objective function. 
-Below we provide details and explanation of each step.
+which is not necessarily positive definite ($\otimes$ indicates the Kronecker product). This means that the solution space will potentially be multi-modal, making initialization important.  Our strategy therefore has three components:
+\begin{enumerate}[I.]
+	\item Choose an initial estimate.
+	\item Find a local solution to Eq. \eqref{eq:AQAP}.
+	\item Project that solution onto the set of permutation matrices.
+\end{enumerate}
+We refer to one run of the above three steps as \texttt{QAP}.  Upon using $m$ restarts, we report only the best solution, and we refer to the whole procedure as \texttt{QAP}$_m$.  Below, we provide details for each component.
 
-\textbf{Step 0: Choose an initial estimate} While any doubly stochastic matrix would be a feasible initial point, two choices seem natural: (i) the ``flat doubly  stochastic matrix,'' $J=\ve{1} \ve{1}\T/n$, which is the center of the feasible region, and (ii) the identity matrix, which is a permutation matrix.  Therefore, if we run \qap  once, we always start with one of those two.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $K$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let $P^{(0)}=(J+K)/2$. Given this initial estimate, we iterate the following five steps until convergence.
 
-\textbf{Step 1: Compute the gradient} The gradient of $f$ with respect to $P$ is given by
+\textbf{I: Choose an initial estimate} While any doubly stochastic matrix would be a feasible initial point, two choices seem natural: (i) the ``flat doubly  stochastic matrix,'' $J=\ve{1} \ve{1}\T/n$, which is the center of the feasible region, and (ii) the identity matrix, which is a permutation matrix.  Therefore, if we run \qap  once, we always start with one of those two.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $K$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let $P^{(0)}=(J+K)/2$. %Given this initial estimate, we iterate the following five steps until convergence.
+
+
+\textbf{II: Find a local solution to Eq. \eqref{eq:AQAP}} As mentioned above, Eq. \eqref{eq:AQAP} is a quadratic problem with linear equality and boundary constraints.  A number of off-the-shelf algorithms are readily available for finding local optima in such problems.  We utilize a kind of projection steepest descent algorithm, called the 
+% We therefore develop a nonlinear programing algorithm for approximately solving Eq. \eqref{eq:AQAP} using multiple restarts.
+   % Our approach can be thought of as a 
+Frank-Wolfe (FW) algorithm, or a successive linear programming algorithm.  The FW algorithm was originally designed for solving quadratic problems with linear (equality and/or inequality) constraints \cite{Frank1956}. It later became used more generally for nonlinear programming problems \cite{Bradley1977}.  The FW algorithm iteratively finds the direction of steepest descent, projects the direction into the feasible region, and takes a step of optimal size.  FW is often described as a five-step process:
+% Let  be our objective function. 
+
+\emph{Step 1: Compute the gradient} The gradient of $f$ with respect to $P$ is given by
 \begin{align} \label{eq:grad}
 	\nabla_P^{(j)} = \partial f / \partial P^{(j)} =  - A P^{(j)} B\T - A\T P^{(j)} B.
 \end{align}
 
 % paragraph step_1_computing_the_gradient (end)
 
-\textbf{Step 2: Find the closest doubly stochastic matrix} Instead of directly descending this gradient, we search for the direction of the doubly stochastic matrix closest to this gradient. Noting that that direction may be computed by the dot-product operator, we have
+\emph{Step 2: Find the steepest doubly stochastic matrix} Instead of doing steepest descent, we project the gradient onto the feasible region, and descend along the steepest doubly stochastic matrix. Noting that that direction may be computed by the dot-product operator, we have
 \begin{align}\label{eq:dir}
 	L^{(j)} = \argmin_{L \in \mc{D}} \langle L, \nabla_P^{(j)} \rangle, %  \sum_{i,j=1}^m 	\left( 	\nabla_P^{(j)}\circ L^{(j)} \right)_{ij}.
 \end{align}
-where $\mc{D}$ is the set of doubly stochastic matrices.  Eq. \eqref{eq:dir} can be solved as a LAP.  More specifically, let $A=\nabla_P^{(j)}$ and $B=I$ (the $n\times n$ identity matrix), and we recover Eq. \eqref{eq:LAP}.
+where $\mc{D}$ is the set of doubly stochastic matrices.  Eq. \eqref{eq:dir} can be solved as a LAP.  More specifically, let $A=\nabla_P^{(j)}$ and $B=I$ (the $n\times n$ identity matrix), and we recover Eq. \eqref{eq:ALAP}, whose solution is identical to LAP.
 
 % % a LAP can be written as
 % % \begin{align} \label{eq:LAP}
@@ -284,14 +327,14 @@ where $\mc{D}$ is the set of doubly stochastic matrices.  Eq. \eqref{eq:dir} can
 % Fortunately, the Hungarian algorithm solves any LAP in $\mc{O}(n^3)$ \cite{Burkard2009}, thus this projection is relatively computationally efficient.
 % paragraph step_2_finding_the_closest_doubly_stochastic_matrix (end)
 
-\textbf{Step 3: Update the direction} Given $L^{(j)}$, the new direction is given by
+\emph{Step 3: Update the direction} Given $L^{(j)}$, the new direction is given by
 \begin{align}
 	d^{(j)}=L^{(j)}-P^{(j)}.
 \end{align}
 
 % paragraph step_3_updating_the_direction (end)
 
-\textbf{Step 4: Line search} Given this direction, one can then perform a line search to find the doubly stochastic matrix that minimizes the objective function along that direction:
+\emph{Step 4: Line search} Given this direction, one can then perform a line search to find the doubly stochastic matrix that minimizes the objective function along that direction:
 \begin{align}\label{eq:step}
 	\alpha^{(j)} = \argmin_{\alpha \in [0,1]} f(P^{(j)} + \alpha^{(j)} d^{(j)}).
 \end{align}
@@ -299,25 +342,26 @@ This can be performed exactly, because $f$ is a quadratic function.
 
 % paragraph step_4_line_search (end)
 
-\textbf{Step 5: Update $P$} Finally, the new estimated doubly stochastic matrix is given by
+\emph{Step 5: Update $P$} Finally, the new estimated doubly stochastic matrix is given by
 \begin{align}\label{eq:update}
 	P^{(j+1)} = P^{(j)} + \alpha^{(j)} d^{(j)}.
 \end{align}
 
 % paragraph step_5_update_q_ (end)
 
-\textbf{Stopping criteria} Steps 1--5 are iterated until convergence, computational budget limits, or some other stopping criterion is met.  These 5 steps collectively comprise the FW algorithm for solving Eq. \eqref{eq:aqap}.  Note that while $P^{(j)}$ will generally not be a permutation matrix, we do not project $P^{(j)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time.
+\emph{Stopping criteria} Steps 1--5 are iterated until convergence, computational budget limits, or some other stopping criterion is met.  These 5 steps collectively comprise the FW algorithm for solving Eq. \eqref{eq:AQAP}.  %Note that while $P^{(j)}$ will generally not be a permutation matrix, we do not project $P^{(j)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time.
 
 
-\textbf{Projecting onto the set of permutation matrices}   Let $P^{(J+1)}$ be the doubly stochastic matrix resulting from the final iteration.  We project $P^{(J+1)}$ onto the set of permutation matrices, yielding
+\textbf{III: Projecting onto the set of permutation matrices}   Let $P^{(J+1)}$ be the doubly stochastic matrix resulting from the final iteration.  We project $P^{(J+1)}$ onto the set of permutation matrices, yielding
 \begin{align} \label{eq:proj}
 	\mh{P} = \argmin_{\PmcP} -\langle P^{(J+1)}, P \rangle,
 \end{align}
-which is a LAP, and yields an approximate solution to the original QAP.  Let FW appended with a projection onto the permutation matrices be denoted by \texttt{QAP}.
+which is a LAP.  Thus, this completes one restart of \texttt{QAP}.
 
 % paragraph the_final_iteration (end)
 
-\textbf{Multiple restarts} We refer to multiple re-starts of \qap with subscripts; that is, the performance of \qapm is the best result of $m$ pseudo-random re-starts of \texttt{QAP}.  We continue restarting until either we converge to a known global solution or we exceed our computational budget. Note that \qap natively operates on matrices, which could correspond to either weighted or unweighted, directed or undirected graphs.  
+% \textbf{Multiple restarts} We refer to multiple re-starts of \qap with subscripts; that is, the performance of \qapm is the best result of $m$ pseudo-random re-starts of \texttt{QAP}.  We continue restarting until either we converge to a known global solution or we exceed our computational budget. Note that \qap natively operates on matrices, which could correspond to either weighted or unweighted, directed or undirected graphs.  
+
 % Algorithm \ref{alg:1} shows pseudo-code for the complete algorithm.
 
 % 
@@ -399,11 +443,13 @@ We first compare the performance of \qapm with recent state-of-the-art approache
 \subsection{LAP vs. QAP} % (fold)
 \label{sub:lap_vs_qap}
 
-Much like the QAP objective function from Eq. \eqref{eq:QAP} can be simplified to Eq. \eqref{eq:qap}, the LAP objective function can be similarly simplified, to give
-\begin{align}
-	Q_{LAP}= \argmin_{\PmcP} \norm{QA-B}_F^2 = \argmin_{\PmcP} tr(QA B\T).
-\end{align}
-The gradient of the argument on the right-hand-side of the above equation is $2AB\T$.
+At surface, LAP and QAP are quite similar.  In fact, the gradient of the LAP objective function is $2AB\T$.
+
+% Much like the QAP objective function from Eq. \eqref{eq:QAP} can be simplified to Eq. \eqref{eq:qap}, the LAP objective function can be similarly simplified, to give
+% \begin{align}
+% 	Q_{LAP}= \argmin_{\PmcP} \norm{QA-B}_F^2 = \argmin_{\PmcP} tr(QA B\T).
+% \end{align}
+% The gradient of the argument on the right-hand-side of the above equation is $2AB\T$.
 % Letting $f_{LAP}(Q)=tr(QA B\T)$, the gradient is:
 % \begin{align}
 % 	% f_{QAP}(Q)	&= -tr(B\T QAQ\T) -tr(QAQ\T B)  &f_{LAP}(Q)&=-tr(AQ\T B\T) \\
@@ -414,7 +460,7 @@ The gradient of the argument on the right-hand-side of the above equation is $2A
 % % \begin{align} \label{eq:grad2}
 % 	$\partial f'/\partial Q = 2A B\T$. 
 % % \end{align}
-Comparing this gradient to that of the QAP objective function---Eq. \eqref{eq:grad}---one can see that when (i) $Q^{(j)}$ is the identity matrix and (ii) both $A$ and $B$ are symmetric (for example, for undirected graphs), the two gradients are identical.  Thus, if QAP is initialized at the identity matrix and the graphs are undirected, the first permutation matrix---the output of Step 2---is identical to $\mh{Q}_{LAP}$; although the line search will make $Q^{(1)} \neq Q_{LAP}$, in general.  %Moreoever, projecting a matrix onto the closest permutation matrix can be written as a LAP because of the following relationship:
+Comparing this gradient to the gradient of the QAP objective function---Eq. \eqref{eq:grad}---one can see that when (i) $P^{(j)}$ is the identity matrix and (ii) both $A$ and $B$ are symmetric (for example, for undirected graphs), the two gradients are identical.  Thus, if QAP is initialized at the identity matrix and the graphs are undirected, the first permutation matrix---the output of \emph{Step 2} in our \qap algorithm---is identical to the LAP solution; although the line search will make $P^{(1)}$ not equal the LAP solution in general. %$ \neq Q_{LAP}$, in general.  %Moreoever, projecting a matrix onto the closest permutation matrix can be written as a LAP because of the following relationship:
 % \begin{align}
 % 	\argmin_{\PmcP} \norm{QA\T - I}_F^2 &= \argmin_{\PmcP} (QA\T-I)\T (QA\T-I) 
 % \nonumber\\ &=\argmin_{\PmcP} AQ\T QA\T -2QA\T - II = \argmin_{\PmcP}  -\langle Q, A\T \rangle  
@@ -452,7 +498,7 @@ A ``connectome'' is a brain-graph in which vertices correspond to (collections o
 To investigate the performance of \qap using an undirected graph model, we repeated the above analysis using binarized symmeterized versions of the graphs ($A_{uvz}=1$ if and only if $A_{uvz}\geq 1$ or $A_{vuz} \geq 1$).  The resulting summary statistics are nearly identical to those presented in Table \ref{tab:1}, although runtime was less than half the time.
 
 \begin{table}
-\caption{Brain-graph matching summary statistics for both the chemical and electrical connectome.  The maximum number of restarts for both was 30.  The median number of restarts for the electrical connectome is less than 30, implying that our approach found the optimal solution many times, just not always.}
+\caption{Brain-graph matching summary statistics for both the chemical and electrical connectome.  The maximum number of restarts for both was 30.  The median number of restarts for the electrical connectome is less than 30, implying that our approach found the optimal solution many times, just not always.  The median (median absolute deviation) times were only a few seconds each.}
 	\label{tab:1}
 \begin{center}
 \begin{tabular}{|l|c|c|}
@@ -460,7 +506,7 @@ To investigate the performance of \qap using an undirected graph model, we repea
 	Median Accuracy    &       100\%            &             59.5\% \\
 	Median \# Restarts  &         3            &                   26 \\
 	% Vertex Solution      &          10        &                      5 \\
-	Avg. Solution Time     &      182 sec.      &                226 sec. \\ \hline
+	Median (MAD) Solution Time     &  4.3 (0.04) sec.      &    226 sec. \\ \hline
 \end{tabular} 
 \end{center}
 \end{table}
@@ -472,7 +518,7 @@ To investigate the performance of \qap using an undirected graph model, we repea
 
 This work presents an inexact graph matching algorithm based on the Frank-Wolfe algorithm.  While others have incorporated the FW algorithm as a subroutine of a graph matching strategy \cite{Zaslavskiy2009}, we modified the FW algorithm for GM in a few ways.  First, after FW is finished, we project the resulting doubly stochastic matrix onto the set of permutation matrices.  Second, we initialize the algorithm using either the identity matrix or the doubly flat matrix (the matrix where all elements are $1/n$).  These choices seem to us to be the most obvious places to start if one must choose.  Third, if one of those choices does not work, we restart FW with other ``nearby'' initial points.  These modifications facilitate improved performance on \emph{all} the benchmarks we considered.  Moreover, although the algorithm scales cubically with the number of vertices, the leading constants are very small ($\mc{O}(10^{-12})$ seconds), so the algorithm runs quite fast on reasonably sized networks (e.g., $n \approx 100$).  Indeed, on a biologically inspired GM problem, \emph{C. elegans} connectome mapping, this approach was both fast and effective.  
 
-Unfortunately, even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve of Figure \ref{fig:scaling}, this algorithm would take about 2 years to finish (on a standard laptop from 2009) when $n=20,000$.  We hope to be able to perform GM on graphs much larger than that, given that the number of neurons in even a fly brain, for example, is $\mc{O}(10^5)$.  Therefore, more efficient implementations are of interest.  
+Unfortunately, even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve of Figure \ref{fig:scaling}, this algorithm would take about 2 years to finish (on a standard laptop from 2011) when $n=20,000$.  We hope to be able to perform GM on graphs much larger than that, given that the number of neurons in even a fly brain, for example, is $\mc{O}(10^5)$.  Therefore, more efficient implementations are of interest.  
 
 Although \qapn consistently found the optimal solution for the \emph{C. elegans} chemical connectome, connectomes for different organisms even within a species are unlikely to be identical. Even if all connectomes of a particular species were identical, measurement error will likely persist \cite{Helmstaedter2011}. Therefore, \texttt{QAP}$_n$'s scientific utility will largely rest on its performance under noisy conditions, which we aim to explore in future work.  
 

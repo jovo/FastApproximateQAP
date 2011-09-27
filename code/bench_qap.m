@@ -61,7 +61,7 @@ else
         
         display(i) 
         % Generate a random digraph is Pr(i,j)=log(n)/n;
-        p=0.1; %log(ns(i))/ns(i);
+        p=log(ns(i))/ns(i);
         A=spones(sprand(ns(i),ns(i),p));
         q=randperm(s,ns(i));
         B=A;
