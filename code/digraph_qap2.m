@@ -35,9 +35,9 @@ xs=100:100:1000;
 yhat=p(1)*xs.^3+p(2)*xs.^2+p(3)*xs+p(4);
 plot(xs,yhat,'k','linewidth',2)
 
-str=['$\hat{y}=4.7\!e\!^-\!^{12}x^3 + 8.4\!e\!^-\!^5x^2 - 0.03x + 2.8$'];
-text(60,50,str,'fontsize',12,'Interpreter','latex')
-
+str=['$\hat{y}=6.1\!e\!^-\!^{7}x^3 - 4.5\!e\!^-\!^4x^2 + 0.18x - 16.7$'];
+text(120,350,str,'fontsize',12,'Interpreter','latex')
+axis([min(x) max(x) min(y) max(y)])
 
 %
 figname='../figs/digraph_qap2';
