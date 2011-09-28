@@ -29,7 +29,7 @@
 
 \begin{document}
 
-\title{Inexact Graph Matching via Assignment: \\ Applications in Statistical Connectomics}
+\title{Fast Inexact Graph Matching \\ with Applications in Statistical Connectomics}
 % \title{A Quadratic Assignment Problem Approach to Graph Matching: Applications in Statistical Connectomics}
 
 \author{Joshua T.~Vogelstein, John M.~Conroy, Louis J.~Podrazik, Steven G.~Kratzer, 
@@ -41,7 +41,7 @@ of Applied Mathematics and Statistics, Johns Hopkins University, Baltimore, MD 2
 %\protect\\
 % note need leading \protect in front of \\ to get a newline within \thanks as
 % \\ is fragile and will error, could use \hfil\break instead.
-E-mail: \{joshuav,cep\}@jhu.edu, \{conroyjohnm,ljpodra,sgkratz\}@gmail.com, jacob.vogelstein@jhuapl.edu
+E-mail: \{joshuav,def,cep\}@jhu.edu, \{conroyjohnm,ljpodra,sgkratz\}@gmail.com, jacob.vogelstein@jhuapl.edu
 \IEEEcompsocthanksitem J.M. Conroy, L.J. Podrazik and S.G. Kratzer are with Institute for Defense Analyses, Center for Computing Sciences, Bowie, MD 20708.
 \IEEEcompsocthanksitem R.J. Vogelstein is with the Johns Hopkins University Applied Physics Laboratory, Laurel, MD, 20723.}% <-this % stops a space
 \thanks{This work was partially supported by the Research Program in Applied Neuroscience.}}
@@ -102,9 +102,9 @@ This manuscript describes an algorithm that approximately solves graph matching 
 A labeled graph $G=(\mc{V},\mc{E})$ consists of a vertex set s $\mc{V}$, where $|\mc{V}|=n$ is number of vertices and an edge set $\mc{E}$, where $|\mc{E}| \leq n^2$.  Let $A$ be the adjacency matrix representation of graph such that $A_{uv}=1$ if there is an edge from $u$ to $v$, and $A_{uv}=0$ otherwise. 
 % Note that the below follows for directed/undirected and loopy/non-loopy graphs.
 % $u \sim v \in \mc{E}$ and $A_{uv}=0$ otherwise.  
-Let  $\Pi$ be the set of permutation functions, where a permutation function $\pi: \mc{V} \to \mc{V}$ (re-)orders the elements of the set $\mc{V}$.  $P_{\pi}$ is the $n \times n$ permutation matrix with elements $(v,\pi(v))=1$ for all $v \in \mc{V}$ and zeros elsewhere. For brevity, let $P_{\pi}=P=(p_{uv})_{uv}$. Given a pair of $n \times n$ adjacency matrices, $A=(a_{uv})_{uv}$ and $B=(b_{uv})_{uv}$, consider the following four related problems:
+Let  $\Pi$ be the set of permutation functions, where a permutation function $\pi: \mc{V} \to \mc{V}$ (re-)orders the elements of the set $\mc{V}$.  $P_{\pi}$ is the $n \times n$ permutation matrix with elements $(v,\pi(v))=1$ for all $v \in \mc{V}$ and zeros elsewhere. For brevity, let $P_{\pi}=P=(p_{uv})$. Given a pair of $n \times n$ adjacency matrices, $A=(a_{uv})$ and $B=(b_{uv})$, consider the following four related problems:
 \begin{itemize}
-	\item \textbf{Graph Isomorphism (GI):}  Does there exist a $\pi$ such that $a_{\pi(u)\pi(v)}=a_{uv}$ for all $u,v \in \mc{V}$?
+	\item \textbf{Graph Isomorphism (GI):}  Does there exist a $\pi$ such that $a_{\pi(u)\pi(v)}=b_{uv}$ for all $u,v \in \mc{V}$?
 	\item \textbf{Graph Matching (GM):} Which $\pi$ (if any) satisfies $a_{\pi(u)\pi(v)}=b_{uv}$ for all $u,v \in \mc{V}$?
 	% $\PmcP$ (if any) satisfies $QAQ\T=B$?
 	\item \textbf{Linear Assignment Problem (LAP):} 
@@ -133,8 +133,8 @@ Clearly, these four problems are closely related. In particular, \emph{inexact g
 LAP may be written in a number of equivalent ways:
 \begin{align}
 	 &\argmin_{\pi \in \Pi} \sum_{u \in \mc{V}} a_{u \pi(v)} b_{uv} =\nonumber\\
-	&\argmin_{\PmcP} \norm{PA - B} =\nonumber\\
-	&\argmin_{\PmcP} (PA-B)\T (PA-B) \nonumber\\ 
+	&\argmin_{\PmcP} \norm{PA - B}_F =\nonumber\\
+	&\argmin_{\PmcP} tr(PA-B)\T (PA-B) \nonumber\\ 
 	&\argmin_{\PmcP} tr (A\T P\T PA) - tr(2PAB\T) + tr(B\T B)=\nonumber\\ 
 	&\argmin_{\PmcP}  -tr (P AB\T) =\nonumber\\
 	&\argmin_{\PmcP}  -\langle P, AB\T \rangle =\nonumber\\
@@ -145,9 +145,8 @@ The last form indicates that LAP is a linear programming problem (hence the name
 		&\text{minimize}_P  &&\sum_{u \in \mc{V}} -p_{uv} a_{uv} b_{vu} \nonumber \\
 		&\text{subject to } && \sum_{u \in \mc{V}} p_{uv} = 1 \, \forall u \in \mc{V} \nonumber \\
 		& && \sum_{v \in \mc{V}} p_{uv} = 1 \, \forall v \in \mc{V}, \nonumber \\
-		& &&p_{uv} \in \{0,1\} \, \forall u,v, \label{eq:LAP2}	
+		& &&p_{uv} \in \{0,1\} \, \forall u,v. \label{eq:LAP2}	
 \end{align}
-where $\mb{1} \in \Real^n$ is a column vector of ones.  
 Perhaps because LAP comes up in a wide variety of contexts, a large number of algorithms have been developed to solve LAP \cite{Burkard2009}.  These algorithms have become increasing efficient.  One of the most popular algorithms, the so-called ``Hungarian algorithm'' has time complexity $\mc{O}(n^3)$ \cite{Jonker1987}.  Under certain conditions (for example, when $AB\T$ is sparse), faster implementations are also available.  As will be seen below, LAP is a key subroutine to our inexact QAP solution.  Importantly, LAP is equivalent to its continuous relaxation given by:
 \begin{align}
 		&\text{minimize}_P  &&\sum_{u \in \mc{V}} -p_{uv} a_{uv} b_{vu} \nonumber \\
@@ -169,9 +168,10 @@ Thus, solving Eq. \eqref{eq:ALAP} is equivalent to solving Eq. \eqref{eq:LAP2}.
 Koopmans and Beckman \cite{Koopmans} introduced QAP in its original form.  Since then, a number of equivalent formulations have been developed:
 \begin{align}
 	 &\argmin_{\pi \in \Pi} \sum_{u \in \mc{V}} A_{\pi(u) \pi(v)} B_{uv} =\nonumber\\
-	&\argmin_{\PmcP} \norm{PAP\T - B} =
+	&\argmin_{\PmcP} \norm{PAP\T - B}_F =
 	% \nonumber\\&
-	\argmin_{\PmcP} \norm{PA - BP\T} =\nonumber\\
+	% \argmin_{\PmcP} \norm{PA - BP\T} =
+	\nonumber\\
 	% &\argmin_{\PmcP} (PAP\T-B)\T (PAP\T-B) \nonumber\\ 
 	&\argmin_{\PmcP} tr(PAP\T - B)\T (PAP\T - B) \nonumber \\
 	% &\argmin_{\PmcP}  tr(P\T A\T P\T P A P\T) - 2tr(PAP\T B) + tr(B\T B)  =\nonumber \\ %- tr(B\T PAP\T)
@@ -180,7 +180,8 @@ Koopmans and Beckman \cite{Koopmans} introduced QAP in its original form.  Since
 	% &\argmin_{\PmcP}  - tr(B\T PAP\T)=\nonumber\\
 	&\argmin_{\PmcP}  -\langle PAP\T, B \rangle =
 	% \nonumber\\&
-	\argmin_{\PmcP}  -\langle PA, BP\T \rangle =\nonumber\\
+	% \argmin_{\PmcP}  -\langle PA, BP\T \rangle =
+	\nonumber\\
 	&\argmin_{\PmcP}  -\sum_{u \in \mc{V}} p_{uv} a_{uv} b_{uv} p_{vu}. \label{eq:qap}
 \end{align}
 The last form indicates that QAP is indeed a constrained quadratic problem.  Unfortunately, QAP is an $\mc{NP}$-complete problem \cite{Garey1979}.   Many exact and inexact algorithms are available \cite{Burkard2009}.  We present a novel inexact solution based utilizing matrix analysis.
@@ -195,10 +196,11 @@ The last form indicates that QAP is indeed a constrained quadratic problem.  Unf
 A primary hurdle to solving QAP is the discrete non-convex constraint set.  The objective function and constraints in Eq. \eqref{eq:qap} may explicitly be written compactly in its ``trace'' form:
 \begin{align}
 		&\text{minimize}_P  &&\sum_{u \in \mc{V}} - tr(B\T PAP\T) \nonumber \\
-		&\text{subject to } &&P\T\mb{1}=\mb{1} \nonumber \\
-		& && \mb{1}\T P=\mb{1}, \nonumber \\
+		&\text{subject to } &&P\T\mb{1}=\mb{1}, \nonumber \\
+		& && \mb{1}\T P=\mb{1}\T, \nonumber \\
 		& &&p_{uv} \in \{0,1\} \, \forall u,v, \label{eq:QAP}	
 \end{align}
+where $\mb{1} \in \Real^n$ is a column vector of ones.  
 % \begin{align} 
 % 	&\text{minimize}_{P} - tr(B\T PAP\T) \text{ subject to } \nonumber \\
 % 	& P\T\mb{1}=\mb{1}, \nonumber \\
@@ -209,7 +211,7 @@ Like in LAP, it is the binary constraint that is the sticky-wicket. We therefore
 \begin{align}
 		&\text{minimize}_P  &&\sum_{u \in \mc{V}} - tr(B\T PAP\T) \nonumber \\
 		&\text{subject to } &&P\T\mb{1}=\mb{1}, %\nonumber \\& && 
-		\mb{1}\T P=\mb{1}, %\nonumber \\& &&
+		\mb{1}\T P=\mb{1}\T, %\nonumber \\& &&
 		p_{uv} \geq 0 \, \forall u,v, \label{eq:AQAP}	
 \end{align}
 % \begin{align} 
@@ -284,7 +286,7 @@ which is not necessarily positive definite ($\otimes$ indicates the Kronecker pr
 We refer to one run of the above three steps as \texttt{QAP}.  Upon using $m$ restarts, we report only the best solution, and we refer to the whole procedure as \texttt{QAP}$_m$.  Below, we provide details for each component.
 
 
-\textbf{I: Choose an initial estimate} While any doubly stochastic matrix would be a feasible initial point, two choices seem natural: (i) the ``flat doubly  stochastic matrix,'' $J=\ve{1} \ve{1}\T/n$, which is the center of the feasible region, and (ii) the identity matrix, which is a permutation matrix.  Therefore, if we run \qap  once, we always start with one of those two.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $K$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let $P^{(0)}=(J+K)/2$. %Given this initial estimate, we iterate the following five steps until convergence.
+\textbf{I: Choose an initial estimate} While any doubly stochastic matrix would be a feasible initial point, two choices seem natural: (i) the ``flat doubly  stochastic matrix,'' $J=\ve{1} \cdot \ve{1}\T/n$, which is the center of the feasible region, and (ii) the identity matrix, which is a permutation matrix.  Therefore, if we run \qap  once, we always start with one of those two.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $K$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let $P^{(0)}=(J+K)/2$. %Given this initial estimate, we iterate the following five steps until convergence.
 
 
 \textbf{II: Find a local solution to Eq. \eqref{eq:AQAP}} As mentioned above, Eq. \eqref{eq:AQAP} is a quadratic problem with linear equality and boundary constraints.  A number of off-the-shelf algorithms are readily available for finding local optima in such problems.  We utilize a kind of projection steepest descent algorithm, called the 
@@ -499,15 +501,16 @@ A ``connectome'' is a brain-graph in which vertices correspond to (collections o
 To investigate the performance of \qap using an undirected graph model, we repeated the above analysis using binarized symmeterized versions of the graphs ($A_{uvz}=1$ if and only if $A_{uvz}\geq 1$ or $A_{vuz} \geq 1$).  The resulting summary statistics are nearly identical to those presented in Table \ref{tab:1}, although runtime was less than half the time.
 
 \begin{table}
-\caption{Brain-graph matching summary statistics for both the chemical and electrical connectome.  The table shows the median and median absolute deviation (MAD) of accuracy, number of restarts, and solution time for both connectomes.  The maximum number of restarts for both was 30.  The median number of restarts for the both connectomes is less than 30, implying that our approach found the optimal solution many times, just not always for the electrical connectome.  Both ran very quickly, only requiring tens of seconds.}
+\caption{Brain-graph matching summary statistics for both the chemical and electrical connectome.  
+The table shows the mean (standard deviation) of accuracy, number of restarts, and solution time for both connectomes.  
+The maximum number of restarts for both was 30.  The mean number of restarts for the both connectomes is less than 30, implying that our approach found the optimal solution many times, just not always for the electrical connectome.  Both ran very quickly, only requiring tens of seconds.}
 	\label{tab:1}
 \begin{center}
-\begin{tabular}{|l|c|c|}
-	\hline Median (MAD) 					& chemical 		& electrical  \\ \hline
-	Accuracy  (\%)  &       100  (0)           &             59.5 \\
-	Restarts (\#) &         3    (0)    &                   26 \\
-	% Vertex Solution      &          10        &                      5 \\
-	Solution Time (sec)    &  42 (0.42)       &    226  \\ \hline
+\begin{tabular}{|l|c|c|c|}
+	\hline  	& chemical 	& electrical 	& unit \\ \hline
+	Accuracy  		  	& 100  (0)  & 59 (0.30) 	& \% \\
+	Restarts 	  		& 3    (0)  & 25 (6.7)  	& \# \\
+	Solution Time  		& 42 (0.42)	& 79 (20)  		& sec. \\ \hline
 \end{tabular} 
 \end{center}
 \end{table}

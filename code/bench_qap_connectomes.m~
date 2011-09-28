@@ -1,9 +1,17 @@
 %% connectome times
+clear, clc
 
-load('~/Research/data/EM/c_elegans/c_elegans_chemical_connectome.mat')
+load('~/Research/data/EM/c_elegans/ConnOrdered_040903.mat')
 
-[times,errors,iters]=bench_qap(A);
+[times,errors,iters]=bench_qap(A_init_t_ordered);
 
-[median(times); mad(times)]
-[median(errors); mad(errors)]
-[median(iters); mad(iters)]
+[mean(times); std(times)]
+[mean(errors); std(errors)]
+[mean(iters); std(iters)]
+
+
+[times,errors,iters]=bench_qap(Ag_t_ordered);
+
+[mean(times); std(times)]
+[mean(errors); std(errors)]
+[mean(iters); std(iters)]
