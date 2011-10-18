@@ -135,7 +135,7 @@ Because we are interested in solving GM for graphs with $\mc{O}(10^6)$ or more v
 \section{Assignment Problems} % (fold)
 \label{sub:assignment_problems}
 
-Both GI and GM can be cast as assignment problems.  Let $A=(a_{uv})$ and $B=(b_{uv})$ correspond to the adjacency matrix representations of graphs $G_1$ and $G_2$, respectively.  That is, $a_{uv}=1$ if and only if $(u,v) \in \mc{E}_1$, and zero otherwise (and similarly for $B$ and $G_2$). Now, GI may be stated thusly:  does there exist a $\pi \in \Pi$ such that $a_{uv}=b_{\pi(u)\pi(v)}$ for all $u,v \in [n]=\{1,\ldots, n\}$.  Although assignment problems do not restrict $A$ and $B$ to correspond to adjacency matrices, when $A$ and $B$ are adjacency matrices, GM and QAP are equivalent.  Our approach is based on a continuous relaxation and quadratic optimization approach, as will be described below.  Because a linear assignment problem (LAP) will be a subroutine of our approach, we introduce LAP first, followed by QAP.  In both cases, we will consider a matrix, $P=(p_{uv}) \in \mc{P}$, which is a permutation matrix if and only if it satisfies the following three constraints:
+Both GI and GM can be cast as assignment problems.  Let $A=(a_{uv})$ and $B=(b_{uv})$ correspond to the adjacency matrix representations of graphs $G_1$ and $G_2$, respectively.  That is, $a_{uv}=1$ if and only if $(u,v) \in \mc{E}_1$, and zero otherwise (and similarly for $B$ and $G_2$). Now, GI may be stated thusly:  does there exist a $\pi \in \Pi$ such that $a_{uv}=b_{\pi(u)\pi(v)}$ for all $u,v \in [n]=\{1,\ldots, n\}$.  Although assignment problems do not restrict $A$ and $B$ to correspond to adjacency matrices, when $A$ and $B$ are adjacency matrices, GM and the quadratic assignment problem (QAP) are equivalent.  Our approach is based on a continuous relaxation and quadratic optimization approach, as will be described below.  Because a linear assignment problem (LAP) will be a subroutine of our approach, we introduce LAP first, followed by QAP.  In both cases, we will consider a matrix, $P=(p_{uv}) \in \mc{P}$, which is a permutation matrix if and only if it satisfies the following three constraints:
 \begin{enumerate}
 \item	$P\mb{1} = \mb{1}$,
 \item	$P\T \mb{1}=\mb{1}$, %\\
@@ -226,7 +226,7 @@ This relaxation motivates our approach to approximating QAP.
 
 % subsubsection linear_assignment_problems (end)
 
-Koopmans and Beckman \cite{Koopmans} introduced QAP in its original form:
+Koopmans and Beckman \cite{Koopmans1957} introduced QAP in its original form:
 \begin{subequations}
 \begin{align}
 	\text{(QAP) } \quad &\underset{P}{\text{minimize}}  &&\sum_{u,v \in [n]} a_{\pi(u)\pi(v)} b_{uv}  \\
