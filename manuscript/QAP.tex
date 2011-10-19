@@ -432,10 +432,10 @@ Comparing this gradient to the gradient of the QAP objective function---Eq. \eqr
 
 Although, rLAP and LAP are always equivalent, in general, it is not the case that rQAP and QAP are equivalent.  However, in a certain important special case, rQAP and QAP are equivalent.
 \begin{thm}
-	If $A$ and $B$ are the adjacency matrices of simple graphs (symmetric, hollow, and binary) that are isomorphic to one another, then the optimal solution to rQAP is equal to the optimal solution to QAP.
+	If $A$ and $B$ are the adjacency matrices of simple graphs (symmetric, hollow, and binary) that are isomorphic to one another, then the minimum of rQAP is equal to the minimum QAP.
 \end{thm}
 \begin{proof}
-
+Because any solution to QAP is also a solution to rQAP, we must only show that the solution to rQAP can be no better than the solution to QAP.  Let $A=PBP\T$, so that $\langle A, PBP\T\rangle=2m$, where $m$ is the number of edges in $A$.  If rQAP could achieve a lower objective value, then it must be that there exists a $D \in \mc{D}$ such that $\langle A, DBD\T\rangle > \langle A, PBP\T\rangle = 2m$. For that to be the case, it must be that $(DBD\T)_{uv} \geq 1$ for some $(u,v)$.  That this is not so may be seen by the following.  Consider $d_i=\langle D, \text{col}_i(BD\T) \rangle$, where $\text{col}_i(\cdot)$ indicates the $i^{th}$ column of the matrix.  $d_i \leq 1$ for all $i \in [n]$, therefore, our result holds.
 \end{proof}
 % subsection rqap_solves_qap_ (end)
 
