@@ -52,7 +52,7 @@ E-mail: \{joshuav,def,cep\}@jhu.edu, \{conroyjohnm,ljpodra,sgkratz\}@gmail.com, 
 
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-It is becoming increasingly popular to represent myriad and diverse data sets as graphs.  When the labels of vertices of these graphs are unavailable, graph matching (GM)---the process of determining which permutation assigns vertices of one graph to those of another, maintaining the adjacency structure---is a computationally daunting problem.  This work presents an inexact strategy for GM.  Specifically, we frame QM as a quadratic assignment problem (QAP), and then relax the feasible region to its convex hull.  Our relaxed optimization function (rQAP) has the same solution as the original problem, but has the advantage of being continuously differentiable.  We apply a well known and efficient nonlinear programming algorithm, Frank-Wolfe, to solve rQAP.  Though this relaxation is quadratic, the optimization function is not necessarily convex.  We therefore consider a number of initializations based on the geometry of the convex hull.  Multiple restarts of this algorithm lead to performance that exceeds the previous state-of-the-art in \emph{all} of 16 benchmark tests.  Moreover, this approach is fast, scaling cubically with the number of vertices, requiring only about a minute on standard modern laptops for graphs with up to a few hundred vertices.  We illustrate this approach via a brain-graph (``connectome'') application in which vertices represent neurons in a small nematode brain (the \emph{Caenorhabditis elegans} worm), and edges represent either chemical or electrical synapses.  For every permutation of the chemical connectome and several permutations of the electrical connectome, this approach found the optimal solution.  Although this strategy already natively operates on unweighted and weighted graphs, either directed or undirected, we propose a number of possible extensions, and make all code available.
+	It is becoming increasingly popular to represent myriad and diverse data sets as graphs.  When the labels of vertices of these graphs are unavailable, graph matching (GM)---the process of determining which permutation assigns vertices of one graph to those of another---is a computationally daunting problem.  This work presents an inexact strategy for GM.  Specifically, we frame GM as a quadratic assignment problem, and then relax the feasible region to its convex hull.  We prove that our relaxed optimization function has the same solution as the original problem, yet it is continuously differentiable. Because the objective function is not necessarily convex, we consider multiple principled initializations.  Performance exceeds the previous state-of-the-art in \emph{all} of 16 benchmark tests.  Moreover, this approach is fast, scaling cubically with the number of vertices, requiring only about a minute on a laptop for graphs with a few hundred vertices.  We illustrate this approach via a brain-graph application (the Caenorhabditis elegans ``connectome'').  We find that we can find the optimal solution for nearly every random permutation of the connectome that we sample.  Although this strategy already natively operates on weighted graphs, either directed or undirected, we propose a number of possible extensions, and make all code available.
 \end{abstract}
 
 % Note that keywords are not normally used for peer review papers.
@@ -123,7 +123,7 @@ let $\pi: \mc{V}_1 \to \mc{V}_2$ be a permutation function (bijection), and cons
 % 	\end{align}
 % \end{itemize}
 
-Both GI and GM are computationally difficult. GM is clearly harder than GI, since solving GM also solves GI, but not vice versa. It is not known whether GI is in complexity class $\mc{P}$ \cite{Fortin1996}.  In fact, GI is one of the few problems for which, if $\mc{P} \neq \mc{NP}$, then GI might reside in an intermediate complexity class called $\mc{GI}$-complete.  GM, however, is known to be in $\mc{NP}$-complete.    
+Both GI and GM are computationally difficult. GM is clearly harder than GI, since solving GM also solves GI, but not vice versa. It is not known whether GI is in complexity class $\mc{P}$ \cite{Fortin1996}.  In fact, GI is one of the few problems for which, if $\mc{P} \neq \mc{NP}$, then GI might reside in an intermediate complexity class called $\mc{GI}$-complete.  GM, however, is known to be $\mc{NP}$-hard.    
  % There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be $\mc{NP}$-hard, it remains unclear whether GI is in $\mc{P}$, $\mc{NP}$, or its own intermediate complexity class, $\mc{NP}$-isomorphism (or isomorphism-complete).  
 Yet, for large classes of GI and GM problems, linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(\exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GI or GM algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all graphs have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  
 
@@ -169,13 +169,13 @@ which can be written equivalently in a number of ways using the notion of permut
 	&\argmin_{\PmcP} \norm{PA - B}_F =\\
 	&\argmin_{\PmcP} \, tr(PA-B)\T (PA-B)=\\ 
 	% &\argmin_{\PmcP} tr (A\T P\T PA) - tr(2PAB\T) + tr(B\T B)=\\ 
-	&\argmin_{\PmcP}  -tr (P AB\T) =\\
-	&\argmin_{\PmcP}  -\sum_{u,v \in [n]} p_{uv} a_{uv} b_{vu}
-	% =\\% &\argmin_{\PmcP}  - \text{vec}(P)\T \text{vec}(AB\T).  
-	=\\&\argmin_{\PmcP}  -\langle P, AB\T \rangle. \label{eq:dotLAP}
+	&\argmin_{\PmcP}  -tr (P AB\T) = \argmin_{\PmcP}  -\langle (PA)\T, B \rangle = \label{eq:2c} \\
+	% &\argmin_{\PmcP}  -\sum_{u,v \in [n]} p_{uv} a_{uv} b_{vu}
+	% =\\% &\argmin_{\PmcP}  - \text{vec}(P)\T \text{vec}(AB\T).=\\
+	&\argmin_{\PmcP}  -\langle P, AB\T \rangle, \label{eq:dotLAP}
 \end{align}
 \end{subequations}
-% where the last form makes use of the dot product operator, $\langle X,Y\rangle = \sum_{i} x_i y_i$.  
+where the equality in on the second to last line defines the Euclidean inner product, $\langle X,Y\rangle = \sum_{i} x_i y_i$, and the last line follows because $P$ is a permutation matrix.  
 While the objective function and the first two constraints of LAP are linear, the binary constraints make solving this problem computationally tricky.  Nonetheless, in the last several decades, there has been much progress in accelerating algorithms for solving LAPs, starting with exponential time, all the way down to $\mc{O}(n^3)$ for general LAPs, and even faster for certain special cases (e.g., sparse matrices) \cite{Burkard2009}.
 % The last form indicates that LAP is a linear programming problem (hence the name).  Yet, the constraints, $\mc{P}$, make it a bit trickier.  The feasible region $\mc{P}$ can be written as a set of three constraints: two linear equality constraint sets and a binary constraint.  The LAP objection function with constraints can explicitly be written:
 % \begin{align}
@@ -196,7 +196,7 @@ Consider a continuous relaxation of LAP.  Specifically, let $\mc{D}$ be the set 
 where the third constraint relaxes the binary constraints of the permutation matrices with a non-negativity constraint.  Given this relaxation, we can state a relaxed LAP problem:
 \begin{subequations} \label{eq:rLAP}
 \begin{align}
-		\text{(rLAP) } \quad &\underset{P}{\text{minimize}}  &&\sum_{u \in \mc{V}} -p_{uv} a_{uv} b_{vu}  \\
+		\text{(rLAP) } \quad &\underset{P}{\text{minimize}}  &&-\langle P, AB\T \rangle \\
 		&\text{subject to } && P \in \mc{D}.
 		% && \sum_{u \in \mc{V}} p_{uv} = 1 \, \forall u \in \mc{V} \nonumber \\
 		% 		& && \sum_{v \in \mc{V}} p_{uv} = 1 \, \forall v \in \mc{V}, \nonumber \\
@@ -205,10 +205,10 @@ where the third constraint relaxes the binary constraints of the permutation mat
 \end{subequations}
 As it turns out, solving rLAP is equivalent to solving LAP.
 \begin{prop}
-	LAP and rLAP are equivalent, meaning that the argument that minimizes one also minimizes the other.
+	LAP and rLAP are equivalent, meaning that they have the same minimum.
 \end{prop}
 \begin{proof}
-	Let $P'$ be a solution to LAP and let $P = \sum_{i\in[k]} \alpha_i P^{(i)}$ be a solution to rLAP for some positive integer $k$, permutation matrices $\{P^{(i)}\}_{i \in [k]}$, and positive real numbers $\{\alpha_i\}_{i \in[k]}$ such that $\sum_{i \in [k]} \alpha_i=1$.  If 
+	Although this proposition is typically proven by invoking total unimodularity, we present a simpler proof here.	Let $P'$ be a solution to LAP and let $P = \sum_{i\in[k]} \alpha_i P^{(i)}$ be a solution to rLAP for some positive integer $k$, permutation matrices $\{P^{(i)}\}_{i \in [k]}$, and positive real numbers $\{\alpha_i\}_{i \in[k]}$ such that $\sum_{i \in [k]} \alpha_i=1$.  If 
 	\begin{align*}
 	\langle AB\T,P\rangle &= \langle AB\T,  \sum_{i\in[k]} \alpha_i P^{(i)}\rangle=  \sum_{i\in[k]} \alpha_i \langle AB\T,  P^{(i)}\rangle	 \\
 	&< \langle AB\T,P'\rangle,
@@ -247,10 +247,10 @@ More recently, a number of equivalent formulations have been developed:
 	&\argmin_{\PmcP} - tr(B\T PAP\T)= \label{eq:trQAP}\\ % - tr(PAP\T B),			
 	% &\argmin_{\PmcP} tr (A\T P\T PA) - tr(2PA) + tr(B\T B)=\\ 
 	% &\argmin_{\PmcP}  - tr(B\T PAP\T)=\\
-	&\argmin_{\PmcP}  -\sum_{u \in \mc{V}} p_{uv} a_{uv} b_{uv} p_{vu} 
+	% &\argmin_{\PmcP}  -\sum_{u \in \mc{V}} p_{uv} a_{uv} b_{uv} p_{vu} 
 	% = \\ &\argmin_{\PmcP}  -\langle PAP\T, B \rangle.
 	% 
-	\\&\argmin_{\PmcP}  -\langle A, PBP\T \rangle.
+	&\argmin_{\PmcP}  -\langle A, PBP\T \rangle.
 	 % =\\
 \end{align}
 \end{subequations}
@@ -294,13 +294,15 @@ We refer to one run of the above three steps as \texttt{rQAP}.  Upon using $m$ r
 and (ii) a successive linear programming algorithm.  The FW algorithm was originally designed for solving quadratic problems with linear (equality and/or inequality) constraints \cite{Frank1956}. It later became used more generally for nonlinear programming problems  \cite{Bradley1977}.  Specifically, it can be used to solve optimization problems of the following form:
 \begin{subequations} \label{eq:FW}
 \begin{align}
-		\text{(FW) } \quad &\underset{x}{\text{minimize}}  && f(x)  \\
+		\text{(FWP) } \quad &\underset{x}{\text{minimize}}  && f(x)  \\
 		&\text{subject to } && x \in \mc{S},
 \end{align}
 \end{subequations}
-where $\mc{S} \subset \Real^d$ is a polyhedral set (a set described by linear constraints) and the function $f: \mc{S} \to \Real$ is continuously differentiable.   
+where $\mc{S} \subset \Real^d$ is a polyhedral set (a set described by linear constraints) and the function $f: \mc{S} \to \Real$ is continuously differentiable.  Generally, the Frank-Wolfe algorithm consists of the following steps.  Given an initial position, $x^{(0)}$, recurse the following steps until some convergence criterium (e.g., computational budget) is met.  Let $\mt{x}^{(i)}$ be the direction that minimizes the first order Taylor series approximation of $f$ around $x^{(i)}$ such that  $\mt{x}^{(i)} \in \mc{S}$.  Next, let $x^{(i+1)}$ minimize $f(x)$ such that $x^{(i+1)}$ is on the line segment from $x^{(i)}$ to $\mt{x}^{(i)}$ in $\mc{S}$.  
+% The function $\mt{f}^{(i)}: \mc{S} \to \Real$ is defined to be the first-order (i.e., linear) approximation to $f$ at $x^{(i)}$---that is $f^{(i)} := f(x^{(i)}) + \nabla f(x^{(i)})\T (x-x^{(i)})$.  Next, solve the following linear program: minimize $\mt{f}^{(i)}(x)$ such that $x \in \mc{S}$ (this can be done efficiently since it is a linear objective function with linear constraints).  Note that by ignoring additive constants the objective function of this subproblem can be abbreviated: minimize $\nabla f(x^{(i)})\T x$ such that $x \in \mc{S}$.  Let $\mt{x}^{(i)}$ be the solution to this problem.  Now, the point $x^{(i)} \in \mc{S}$ is defined as the solution to: minimize $f(x)$ such that $x$ is on the line segment from $x^{(i)}$ to $\mt{x}^{(i)}$ in $\mc{S}$.  Because this is a one-dimensional quadratic optimization problem, it can be analytically solved exactly.   Go to the next $i$ and terminate this iterative procedure when $x^{(i)}$ stops changing much or develops a gradient sufficiently close to zero.
 % The FW algorithm iteratively finds the direction of steepest descent, projects the direction into the feasible region, and takes a step of optimal size.  
-Here we provide a detailed view of applying FW to rQAP.  Given an initial position, $P^{(i)}$, iterate the following four steps.
+
+Below we provide a detailed view of applying FW to rQAP.  Given an initial position, $P^{(i)}$, iterate the following four steps.
 
 \emph{Step 1: Compute the gradient $\nabla f(P^{(i)})$:}  The gradient $f$ with respect to $P$ is given by
 % \emph{Step 1: Compute the gradient} The gradient of $f$ with respect to $P$ is given by
@@ -355,7 +357,7 @@ This can be performed exactly, because $f$ is a quadratic function.
 
 % paragraph step_5_update_q_ (end)
 
-\emph{Stopping criteria} Steps 1--4 are iterated until convergence, computational budget limits, or some other stopping criterion is met.  These four steps collectively comprise the FW algorithm for solving Eq. \eqref{eq:rQAP}.  %Note that while $P^{(i)}$ will generally not be a permutation matrix, we do not project $P^{(i)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time.
+\emph{Stopping criteria} Steps 1--4 are iterated until some stopping criterion is met (computational budget limits, $P^{(i)}$ stops changing much, or $\nabla f(P^{(i)})$ is close to zero).  These four steps collectively comprise the FW algorithm for solving Eq. \eqref{eq:rQAP}.  %Note that while $P^{(i)}$ will generally not be a permutation matrix, we do not project $P^{(i)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time.
 
 
 \textbf{III: Projecting onto the set of permutation matrices}   Let $P^{(I)}$ be the doubly stochastic matrix resulting from the final iteration.  We project $P^{(I)}$ onto the set of permutation matrices, yielding
@@ -435,7 +437,9 @@ Although, rLAP and LAP are always equivalent, in general, it is not the case tha
 	If $A$ and $B$ are the adjacency matrices of simple graphs (symmetric, hollow, and binary) that are isomorphic to one another, then the minimum of rQAP is equal to the minimum QAP.
 \end{thm}
 \begin{proof}
-Because any solution to QAP is also a solution to rQAP, we must only show that the solution to rQAP can be no better than the solution to QAP.  Let $A=PBP\T$, so that $\langle A, PBP\T\rangle=2m$, where $m$ is the number of edges in $A$.  If rQAP could achieve a lower objective value, then it must be that there exists a $D \in \mc{D}$ such that $\langle A, DBD\T\rangle > \langle A, PBP\T\rangle = 2m$. For that to be the case, it must be that $(DBD\T)_{uv} \geq 1$ for some $(u,v)$.  That this is not so may be seen by the following.  Consider $d_i=\langle D, \text{col}_i(BD\T) \rangle$, where $\text{col}_i(\cdot)$ indicates the $i^{th}$ column of the matrix.  $d_i \leq 1$ for all $i \in [n]$, therefore, our result holds.
+Because any solution to QAP is also a solution to rQAP, we must only show that the solution to rQAP can be no better than the solution to QAP.  Let $A=PBP\T$, so that $\langle A, PBP\T\rangle=2m$, where $m$ is the number of edges in $A$.  If rQAP could achieve a lower objective value, then it must be that there exists a $D \in \mc{D}$ such that $\langle A, DBD\T\rangle > \langle A, PBP\T\rangle = 2m$ (remember that we are minimizing the negative Euclidean inner product). For that to be the case, it must be that $(DBD\T)_{uv} \geq 1$ for some $(u,v)$.  That this is not so may be seen by the submultiplicativity of the $\ell_{\infty}$ norm:
+$\norm{Px}_\infty \leq \norm{P}_\infty \norm{x}_\infty$.  Applying this twice (once for each permutation matrix multiplication) yields our result.
+% Consider $d_i=\langle D, \text{col}_i(BD\T) \rangle$, where $\text{col}_i(\cdot)$ indicates the $i^{th}$ column of the matrix.  $d_i \leq 1$ for all $i \in [n]$, therefore, our result holds.
 \end{proof}
 % subsection rqap_solves_qap_ (end)
 
