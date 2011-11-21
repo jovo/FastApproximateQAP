@@ -100,7 +100,8 @@ This manuscript describes an algorithm that approximately solves a relaxed versi
 % subsection preliminaries (end)
 
 A labeled graph $G=(\mc{V},\mc{E})$ consists of a vertex set $\mc{V}$, where $|\mc{V}|=n$ is number of vertices and an edge set $\mc{E}$, where $|\mc{E}| \leq n^2$. Note that we are not restricting our formulation to be directed or exclude self-loops. Given a pair of graphs, $G_1=(\mc{V}_1,\mc{E}_1)$ and $G_2=(\mc{V}_1,\mc{E}_1)$, where $|\mc{V}_1|=|\mc{V}_2|=n$, 
-let $\pi: \mc{V}_1 \to \mc{V}_2$ be a permutation function (bijection), and consider the following two closely related problems:
+let $\pi: \mc{V}_1 \to \mc{V}_2$ be a permutation function (bijection),
+and let $\Pi$ be the set of all such permutation functions.  Now consider the following two closely related problems:
 % A pair of graphs, $G_1$ and $G_2$, are isomorphic if and only if the following \emph{isomorphism criterion} holds: there exists a $\pi \in \Pi$ such that . 
 % Let $A$ be the adjacency matrix representation of graph such that $A_{uv}=1$ if there is an edge from $u$ to $v$, and $A_{uv}=0$ otherwise. 
 % Note that the below follows for directed/undirected and loopy/non-loopy graphs.
@@ -135,7 +136,7 @@ Because we are interested in solving GM for graphs with $\mc{O}(10^6)$ or more v
 \section{Assignment Problems} % (fold)
 \label{sub:assignment_problems}
 
-Both GI and GM can be cast as assignment problems.  Let $A=(a_{uv})$ and $B=(b_{uv})$ correspond to the adjacency matrix representations of graphs $G_1$ and $G_2$, respectively.  That is, $a_{uv}=1$ if and only if $(u,v) \in \mc{E}_1$, and zero otherwise (and similarly for $B$ and $G_2$). Now, GI may be stated thusly:  does there exist a $\pi \in \Pi$ such that $a_{uv}=b_{\pi(u)\pi(v)}$ for all $u,v \in [n]=\{1,\ldots, n\}$, where $\Pi$ is the set of permutations from $[n]$ to $[n]$.  Although assignment problems do not restrict $A$ and $B$ to correspond to adjacency matrices, when $A$ and $B$ are adjacency matrices, GM and the quadratic assignment problem (QAP) are equivalent.  Our approach is based on a continuous relaxation and quadratic optimization approach, as will be described below.  Because a linear assignment problem (LAP) will be a subroutine of our approach, we introduce LAP first, followed by QAP.   A permutation matrix is a matrix $P=(p_{uv})$ that satisfies the following three conditions:
+Both GI and GM can be cast as assignment problems.  Let $A=(a_{uv})$ and $B=(b_{uv})$ correspond to the adjacency matrix representations of graphs $G_1$ and $G_2$, respectively.  That is, $a_{uv}=1$ if and only if $(u,v) \in \mc{E}_1$, and zero otherwise (and similarly for $B$ and $G_2$). Now, GI may be stated thusly:  does there exist a $\pi \in \Pi$ such that $a_{uv}=b_{\pi(u)\pi(v)}$ for all $u,v \in [n]=\{1,\ldots, n\}$.  Although assignment problems do not restrict $A$ and $B$ to correspond to adjacency matrices, when $A$ and $B$ are adjacency matrices, GM and the quadratic assignment problem (QAP) are equivalent.  Our approach is based on a continuous relaxation and quadratic optimization approach, as will be described below.  Because a linear assignment problem (LAP) will be a subroutine of our approach, we introduce LAP first, followed by QAP.   A permutation matrix is a matrix $P=(p_{uv})$ that satisfies the following three conditions:
 \begin{enumerate}
 \item	$P\mb{1} = \mb{1}$,
 \item	$P\T \mb{1}=\mb{1}$, %\\
@@ -177,7 +178,7 @@ which can be written equivalently in a number of ways using the notion of permut
 \end{subequations}
 where $\langle \cdot,\cdot \rangle$ %the equality on the second to last line defines 
 is the usual Euclidean inner product, i.e., $\langle X,Y\rangle := tr(X\T,Y)= \sum_{ij} x_{ij} y_{ij}$.  
-While the objective function and the first two constraints of LAP are linear, the binary constraints make solving this problem computationally tricky.  Nonetheless, in the last several decades, there has been much progress in accelerating algorithms for solving LAPs, starting with exponential time, all the way down to $\mc{O}(n^3)$ for general LAPs, and even faster for certain special cases (e.g., sparse matrices) \cite{Burkard2009}.
+While the objective function and the first two constraints of LAP are linear, the binary constraints make solving this problem computationally tricky.  Nonetheless, in the last several decades, there has been much progress in accelerating algorithms for solving LAPs, starting with exponential time, all the way down to $\mc{O}(n^3)$ for general LAPs, and even faster for certain special cases (e.g., sparse matrices) \cite{Jonker1987, Burkard2009}.
 % The last form indicates that LAP is a linear programming problem (hence the name).  Yet, the constraints, $\mc{P}$, make it a bit trickier.  The feasible region $\mc{P}$ can be written as a set of three constraints: two linear equality constraint sets and a binary constraint.  The LAP objection function with constraints can explicitly be written:
 % \begin{align}
 % 		&\text{minimize}_P  &&\sum_{u \in \mc{V}} -p_{uv} a_{uv} b_{vu} \nonumber \\
@@ -234,7 +235,7 @@ This relaxation motivates our approach to approximating QAP.
 Koopmans and Beckman \cite{Koopmans1957} introduced QAP in its original form:
 \begin{subequations}
 \begin{align}
-	\text{(QAP) } \quad &\underset{P}{\text{minimize}}  &&\sum_{u,v \in [n]} a_{\pi(u)\pi(v)} b_{uv}  \\
+	\text{(QAP) } \quad &\underset{\pi}{\text{minimize}}  &&\sum_{u,v \in [n]} a_{\pi(u)\pi(v)} b_{uv}  \\
 	&\text{subject to } && \pi \in \Pi.
 \end{align}
 \end{subequations}
