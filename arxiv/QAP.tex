@@ -19,7 +19,285 @@
 \usepackage{enumerate}
 % \usepackage{hyperref}
 % 
-\input{/Users/jovo/Research/latex/latex_commands.tex}
+
+
+\newcommand{\jv}{Joshua Vogelstein}
+\newcommand{\jhu}{Johns Hopkins University}
+%\newcommand{\hp}{https://jshare.johnshopkins.edu/jvogels3/public_html/}
+\newcommand{\ema}{joshuav@jhu.edu}
+
+\newcommand{\Vr}{V_{reset}}
+\newcommand{\Vl}{V_{leat}}
+\newcommand{\eqdef}{\overset{\triangle}{=}}
+% \newcommand{\D}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\DD}[2]{\frac{\partial ^2 #1}{\partial #2 ^2}}
+\newcommand{\DDD}[3]{\frac{\partial ^2 #1}{\partial #2 \partial #3}}
+\newcommand{\Di}[2]{\frac{\partial ^i #1}{\partial #2 ^i}}
+\newcommand{\grad}{\nabla}
+\newcommand{\Hess}{\nabla\nabla}
+
+\providecommand{\tg}[1]{\textcolor{green}{#1}}
+\providecommand{\tb}[1]{\textcolor{blue}{#1}}
+\providecommand{\tr}[1]{\textcolor{red}{#1}}
+\providecommand{\tk}[1]{\textcolor{black}{#1}}
+\providecommand{\twhite}[1]{\textcolor{white}{#1}}
+\providecommand{\ve}[1]{\boldsymbol{#1}}
+\providecommand{\ma}[1]{\boldsymbol{#1}}
+%\providecommand{\ve}[1]{\boldsymbol{#1}}
+%\newcommand{\norm}[1]{\left|\left|#1\right|\right|}
+\providecommand{\norm}[1]{\left \lVert#1 \right  \rVert}
+\providecommand{\deter}[1]{\lvert #1 \rvert}
+\providecommand{\abs}[1]{\left \lvert #1 \right \rvert}
+\providecommand{\mat}[1]{\left[ #1 \right]}
+\newcommand{\trans}[1]{{#1}^{\ensuremath{\mathsf{T}}}}           % transpose
+\newcommand{\transpose}[1]{{#1}^{\ensuremath{\mathsf{T}}}}           % transpose
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\T}{^{\ensuremath{\mathsf{T}}}}           % transpose
+
+\newcommand{\XX}{\mathbb{X}}         
+\newcommand{\CC}{\mathbb{C}}         
+\newcommand{\FF}{\mathbb{F}}         
+\newcommand{\PP}{\mathbb{P}}         
+\newcommand{\GG}{\mathbb{G}}         
+\newcommand{\EE}{\mathbb{E}}           % expected value
+\newcommand{\II}{\mathbb{I}}           % indicator function
+\newcommand{\QQ}{\mathbb{Q}}           
+\newcommand{\SSS}{\mathbb{S}}           
+\newcommand{\YY}{\mathbb{Y}}
+\newcommand{\Aa}{\mathbb{A}}
+\newcommand{\VV}{\mathbb{V}}
+\newcommand{\LL}{\mathbb{L}}
+\newcommand{\ZZ}{\mathbb{Z}}         
+
+\newcommand{\iid}{\overset{iid}{\sim}}
+
+% \DeclareMathOperator*{\argmax}{argmax}
+% \DeclareMathOperator*{\argmin}{argmin}
+% \DeclareMathOperator{\find}{find}
+
+% \newtheorem{thm}{Theorem}
+\newcommand{\thma}{\begin{thm}}
+\newcommand{\thmb}{\end{thm}}
+
+\newcommand{\mata}{\begin{bmatrix}}
+\newcommand{\matb}{\end{bmatrix}}
+
+
+
+\newtheorem{lemma}{Lemma}
+\newtheorem{Rem}{Remark}%[section]
+\newtheorem{Alg}{Algorithm}%[section]
+\newtheorem{thm}{Theorem}
+\newtheorem{Thm}{Theorem}[section]
+\newtheorem{Lem}{Lemma}[section]
+\newtheorem{defi}{Definition}
+\newtheorem{Def}{Definition}[section]
+\newtheorem{prop}{Proposition}
+\newtheorem{coro}[thm]{Corollary}
+\newtheorem{claim}{Claim}
+\newtheorem{conj}{Conjecture}
+% \newtheorem{corollary}{Corollary}
+% \newtheorem{theorem}{Theorem}
+%\theoremstyle{marginbreak}
+%\newtheorem{Lem}[Cor]{Lemma}
+%\theoremstyle{change}
+%\theorembodyfont{\itshape}
+
+
+% \newtheorem{defi}{Definition}
+% \newcommand{\defa}{\begin{defi}}
+% \newcommand{\defb}{\end{defi}}
+
+% \newcommand{\eq}{\begin{equation}}
+% \newcommand{\en}{\end{equation}}
+% \newcommand{\eqa}{\begin{equation}}
+% \newcommand{\eqb}{\end{equation}}
+
+\newcommand{\enuma}{\begin{enumerate}}
+\newcommand{\enumb}{\end{enumerate}}
+\newcommand{\ena}{\begin{enumerate}}
+\newcommand{\enb}{\end{enumerate}}
+
+\newcommand{\itema}{\begin{itemize}}
+\newcommand{\itemb}{\end{itemize}}
+\newcommand{\ita}{\begin{itemize}}
+\newcommand{\itb}{\end{itemize}}
+
+\newcommand{\proofa}{\begin{proof}}
+\newcommand{\proofb}{\end{proof}}
+
+\newcommand{\bla}{\begin{block}}
+\newcommand{\blb}{\end{block}}
+
+% \newcommand{\seqa}{\begin{equation*}}
+\newcommand{\seqb}{\end{equation*}}
+
+\newcommand{\bth}{\ve{\theta}}
+\newcommand{\hth}{\mh{\theta}}
+\newcommand{\htth}{\mh{\theta}}
+\newcommand{\bhth}{\mh{\ve{\theta}}}
+\newcommand{\thetn}{\ve{\theta}}
+\newcommand{\thet}{\thetn}
+\newcommand{\theth}{\widehat{\ve{\theta}}}
+\newcommand{\theto}{\ve{\theta}'}
+\newcommand{\wht}{\widehat{\thet}}
+\newcommand{\wtt}{\widetilde{\thet}}
+\newcommand{\vth}{\ve{\thet}}
+\newcommand{\vTh}{\ve{\Theta}}
+\newcommand{\hvth}{\widehat{\ve{\thet}}}
+\newcommand{\bTh}{\ve{\Theta}}
+\newcommand{\hbth}{\widehat{\thet}}
+
+% \newcommand{\p}{P_{\bth}}
+\newcommand{\pold}{P_{\bth'}}
+\newcommand{\pk}{P_{\widehat{\ve{\theta}}^{(k)}}}
+\newcommand{\pT}{P_{\thetn_{Tr}}} %\thetn_T
+\newcommand{\pO}{P_{\thetn_o}} %\thetn_o
+% \newcommand{\Q}{Q(\thetn,\theto)}
+% \newcommand{\m}{m^{\ast}}
+% \newcommand{\q}{q(\ve{H}_t)}
+\newcommand{\Ca}{[\text{Ca}^{2+}]}
+
+\newcommand{\Lik}{\mathcal{L}}
+\newcommand{\Cae}{[\widehat{\text{Ca}}^{2+}]}
+\newcommand{\Cav}{\ve{C}}%[\ve{\text{Ca}}^{2+}]}
+\newcommand{\sml}{\sqrt{\ma{\lambda}}}
+\newcommand{\ml}{\ma{\lambda}}
+\newcommand{\nw}{\widehat{n}}
+\newcommand{\nv}{\vec{n}}
+\newcommand{\Ae}{\widehat{A}}
+\newcommand{\te}{\widehat{\tau}}
+\newcommand{\maxn}{\max_{\ve{n}: n_t \geq 0}}
+% \newcommand{\V}{\text{Var}}
+
+\providecommand{\mc}[1]{\mathcal{#1}}
+\providecommand{\mb}[1]{\boldsymbol{#1}}
+\providecommand{\mbb}[1]{\mathbb{#1}}
+\providecommand{\mv}[1]{\vec{#1}}
+\providecommand{\mh}[1]{\hat{#1}}
+\providecommand{\mt}[1]{\widetilde{#1}}
+\providecommand{\mhc}[1]{\hat{\mathcal{#1}}}
+\providecommand{\mtc}[1]{\widetilde{\mathcal{#1}}}
+\providecommand{\mhb}[1]{\hat{\boldsymbol{#1}}}
+\providecommand{\mvb}[1]{\vec{\boldsymbol{#1}}}
+\providecommand{\mtb}[1]{\widetilde{\boldsymbol{#1}}}
+
+\newcommand{\mP}{\mathbb{P}}
+
+\newcommand{\del}{\delta}
+\newcommand{\sig}{\sigma}
+\newcommand{\lam}{\lambda}
+\newcommand{\gam}{\gamma}
+\newcommand{\eps}{\varepsilon}
+
+\newcommand{\Del}{\Delta}
+\newcommand{\Sig}{\Sigma}
+\newcommand{\Lam}{\Lambda}
+\newcommand{\Gam}{\Gamma}
+
+\newcommand{\dvs}{\dot{\bs}_t}
+\newcommand{\dvw}{\dot{\bw}_t}
+\newcommand{\dvx}{\dot{\bx}_t}
+\newcommand{\dvy}{\dot{\by}_t}
+
+\newcommand{\ft}{f_{\ve{\thet}}}
+\newcommand{\gt}{g_{\ve{\thet}}}
+\newcommand{\hht}{h_{\thetn}}
+
+\newcommand{\Real}{\mathbb{R}}
+
+\newcommand{\wconv}{\overset{i.p.}{\rightarrow}}
+\newcommand{\sconv}{\overset{i.p.}{\rightarrow}}
+\newcommand{\conv}{\rightarrow}
+\newcommand{\pconv}{\overset{p}{\conv}}
+\newcommand{\mcE}{\mathcal{E}}
+\newcommand{\mcT}{\mathcal{T}}
+\newcommand{\mcG}{\mathcal{G}}
+\newcommand{\mcM}{\mathcal{M}}
+\newcommand{\mcL}{\mathcal{L}}
+\newcommand{\hatmcE}{\widehat{\mcE}}
+\newcommand{\hatp}{\widehat{p}}
+\newcommand{\hatP}{\widehat{P}}
+\newcommand{\hatQ}{\widehat{Q}}
+\newcommand{\hatL}{\widehat{L}}
+\newcommand{\mhP}{\widehat{\PP}}
+\newcommand{\tildeA}{\widetilde{A}}
+
+\newcommand{\defa}{\begin{defi}}
+\newcommand{\defb}{\end{defi}}
+\newcommand{\defeq}{\overset{\triangle}{=}}
+
+\newcommand{\rqap}{\texttt{rQAP} }
+\newcommand{\rqapa}{\texttt{rQAP}$_1$ }
+\newcommand{\rqapb}{\texttt{rQAP$_{100}$} }
+\newcommand{\rqapm}{\texttt{rQAP$_m$} }
+
+
+% \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+% \renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+
+
+% \newcommand{\ss}{\mc{S}}
+% \newcommand{\mhc}{\mh{\mc{S}}_n}
+
+% \newcommand{\Real}{\mathbb{R}}
+% \newcommand{\bTh}{\mb{\Theta}}
+% \newcommand{\ra}{\rightarrow}
+% \newcommand{\la}{\leftarrow}
+% \newcommand{\bx}{\mb{x}}
+% \newcommand{\bv}{\mb{v}}
+% \newcommand{\ba}{\mb{a}}
+% \newcommand{\bd}{\mb{d}}
+% \newcommand{\balpha}{\mb{\alpha}}
+% \newcommand{\conv}{\rightarrow}  
+% \newcommand{\xx}{\langle \bx_u^\la, \bx_v^\ra\rangle}  
+% \DeclareMathOperator*{\argmax}{arg \hspace{1pt} max \hspace{2pt}}
+% \DeclareMathOperator*{\argmin}{arg \hspace{1pt} min \hspace{2pt}}
+% \newcommand{\norm}[1]{\left \lVert#1 \right  \rVert}
+% 
+
+
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+
+\DeclareMathOperator{\Delti}{\mathbf{\Delta}^{-1}}
+\DeclareMathOperator{\Delt}{Q} %\mathbf{\Delta}}
+% \DeclareMathOperator{\Gam}{\mathbf{\Gamma}}
+\DeclareMathOperator{\Gami}{\mathbf{\Gamma}^{-1}}
+\DeclareMathOperator{\Sigb}{\mathbf{\Sigma}}
+\DeclareMathOperator{\Ri}{\mathbf{\R}^{-1}}
+\DeclareMathOperator{\A}{A}
+\DeclareMathOperator{\W}{\mathbf{W}}
+\DeclareMathOperator{\V}{\mathbf{V}}
+\DeclareMathOperator{\U}{\mathbf{U}}
+\DeclareMathOperator{\C}{\mathbf{C}}
+\DeclareMathOperator{\uvec}{\mathbf{u}}
+\DeclareMathOperator{\D}{\mathbf{D}}
+\DeclareMathOperator{\Q}{\mathbf{Q}}
+\DeclareMathOperator{\R}{R} %\mathbf{P}}
+\DeclareMathOperator{\Y}{\mathbf{Y}}
+\DeclareMathOperator{\B}{\mathbf{B}}
+\DeclareMathOperator{\Hmat}{\mathbf{H}}
+\DeclareMathOperator{\Gmat}{\mathbf{G}}
+\DeclareMathOperator{\X}{\mathbf{X}}
+\DeclareMathOperator{\Cmat}{C} %\mathbf{L}}
+\DeclareMathOperator{\Pmat}{\mathbf{P}}
+\DeclareMathOperator{\veta}{\mathbf{\mb{v}}}
+\DeclareMathOperator*{\minimize}{\mathrm{minimize}}
+\DeclareMathOperator*{\maximize}{\mathrm{maximize}}
+\DeclareMathOperator*{\Ymod}{\mathbf{\Y}}
+\DeclareMathOperator*{\Bmod}{\mathbf{B}}
+\DeclareMathOperator*{\Hmod}{\mathbf{H}}
+\DeclareMathOperator*{\Lmod}{\mathbf{L}}
+\DeclareMathOperator*{\Xmod}{\mathbf{\X}}
+% \DeclareMathOperator*{\mb{v}mod}{\mathbf{\mb{v}}}
+
+
+
+
+
 \hyphenation{op-tical net-works semi-conduc-tor}
 % \newcommand{\Qqap}{\Qqap}
 \usepackage{caption}
@@ -47,8 +325,8 @@ E-mail: \{joshuav,def,cep\}@jhu.edu, \{conroyjohnm,ljpodra,sgkratz\}@gmail.com, 
 \thanks{This work was partially supported by the Research Program in Applied Neuroscience.}}
  
 % The paper headers
-\markboth{SUBMITTED}
-{Fast Inexact Graph Matching}
+\markboth{UNDER REVIEW}%
+{Graph Classification}
 
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
@@ -496,7 +774,7 @@ In \emph{all} cases, \texttt{rQAP}$_3$ outperforms the previous best result, oft
 
 \begin{figure}[htbp]
 	\centering			
-	\includegraphics[width=1.0\linewidth]{../figs/benchmarks.pdf}
+	\includegraphics[width=1.0\linewidth]{benchmarks.pdf}
 	\caption{\texttt{rQAP}$_3$ outperforms the previous state-of-the-art (PSOA) on all 16 benchmark graph matching problems.  Moreover, \rqapa outperforms PSOA on 12 of 16 tests.  For 3 of 16 tests, \rqapb achieves the minimum (none of the other algorithms ever find the absolute minimum), as indicated by a black dot.  Let $f_*$ be the minimum and $\mh{f}_x$ be the minimum achieved by algorithm $x$.  Error is $\mh{f}_x/f_*-1$.  }
 	\label{fig:fwpath}
 \end{figure}
@@ -515,7 +793,7 @@ As mentioned above, GM is computationally difficult; even those special cases fo
 
 \begin{figure}[htbp]
 	\centering			
-	\includegraphics[width=1.0\linewidth]{../figs/digraph_qap2}
+	\includegraphics[width=1.0\linewidth]{digraph_qap2}
 	\caption{Performance of \rqap as function of number of vertices. Data was sampled from an Erd\"os-R\'enyi model with $p=log(n)/n$.  Each dot represents a single simulation.  The solid line is the best fit cubic function.  Note the leading constant is $10^{-7}$ seconds. }
 	\label{fig:scaling}
 \end{figure}
@@ -635,10 +913,10 @@ In conclusion, this manuscript has presented a GM algorithm that is fast, effect
 % \begin{IEEEbiographynophoto}{Carey E. Priebe}
 % % Buddha in training.
 % \end{IEEEbiographynophoto}
-% 
-% % Can be used to pull up biographies so that the bottom of the last one
-% % is flush with the other column.
-% % \enlargethispage{-5in}
+
+% Can be used to pull up biographies so that the bottom of the last one
+% is flush with the other column.
+% \enlargethispage{-5in}
 
 \end{document}
 
