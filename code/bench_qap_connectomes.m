@@ -1,17 +1,19 @@
 %% connectome times
 clear, clc
 
-load('~/Research/data/EM/c_elegans/ConnOrdered_040903.mat')
+load('../data/elegansGraph.mat')
 
-[times,errors,iters]=bench_qap(A_init_t_ordered);
+[chem.times,chem.errors,chem.iters]=bench_qap(Achem);
 
-[median(times); mad(times)]
-[median(errors); mad(errors)]
-[median(iters); mad(iters)]
+[median(chem.times); mad(chem.times)]
+[median(chem.errors); mad(chem.errors)]
+[median(chem.iters); mad(chem.iters)]
 
 
-[times,errors,iters]=bench_qap(Ag_t_ordered);
+[gap.times,gap.errors,gap.iters]=bench_qap(Agap);
 
-[median(times); mad(times)]
-[median(errors); mad(errors)]
-[median(iters); mad(iters)]
+[median(gap.times); mad(gap.times)]
+[median(gap.errors); mad(gap.errors)]
+[median(gap.iters); mad(gap.iters)]
+
+load('../data/elegansGraph_results.mat')
