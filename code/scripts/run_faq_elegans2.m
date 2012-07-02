@@ -48,7 +48,7 @@ gap.iters=iters;
 save([rootDir, 'data/results/elegans_connectomes2.mat'])
 
 
-% Agam with multiple restarts
+%% Agam with multiple restarts
 times=zeros(niters,1);
 errors=times;
 iters=errors;
