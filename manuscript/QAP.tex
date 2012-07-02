@@ -19,10 +19,12 @@
 \usepackage{url}
 \usepackage{enumerate}
 % \usepackage{hyperref}
-% 
+\usepackage{color}
+
 \input{/Users/jovo/Research/other/latex/latex_commands.tex}
 
 % \newcommand{\texttt{PATH}}{\texttt{PATH}}
+
 
 
 \hyphenation{op-tical net-works semi-conduc-tor}
@@ -34,12 +36,12 @@
 
 \begin{document}
 
-\title{Fast Approximate Quadratic Assignment \\ for (Brain) Graph Matching}
+\title{(Brain) Graph Matching via \\ Fast Approximate Quadratic Programming}
 
 % \huge{A Fast Approximate Quadratic Assignment Problem Algorithm for Brain Graph Matching}} % \\ with Applications in Statistical Connectomics}
 % \title{A Quadratic Assignment Problem Approach to Graph Matching: Applications in Statistical Connectomics}
 
-\author{Joshua T.~Vogelstein, John M.~Conroy, Louis J.~Podrazik, Steven G.~Kratzer, 
+\author{Joshua T.~Vogelstein, John M.~Conroy, Louis J.~Podrazik, Steven G.~Kratzer, Eric T.~Harley,
         Donniell E.~Fishkind, 
 		R.~Jacob~Vogelstein,
         and~Carey~E.~Priebe% <-this % stops a space
@@ -59,12 +61,20 @@ E-mail: \{joshuav,def,cep\}@jhu.edu, \{conroyjohnm,ljpodra,sgkratz\}@gmail.com, 
 
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-The quadratic assignment problem (QAP) arises in numerous disparate applications, ranging from traveling salesman problems to various machine vision problems.  We are particularly interested in a special case of QAP often called the (weighted) graph matching problem---the process of determining which permutation assigns vertices of one graph to those of another. Our work is motivated by a particular application: brain-graph matching.  A brain-graph (or connectome), is a graph in which vertices correspond to (collections of) neurons, and edges are either functional or structural connections between them.  
-% that is matching one connectome (brain-graph) to another. We are further interested in a specific application of graph matching applied to ``connectomes'' (networks comprising whole brains), which we call \emph{brain-graph matching}.  
-Brain-graphs have between $n=\mc{O}(10^2)$ and $\mc{O}(10^{11})$ vertices, making exact graph matching algorithms computationally infeasible, even for the smallest brains.  We cast our brain-graph matching problem as a quadratically constrained quadratic program.  Relaxing the quadratic constraints yields a simpler quadratic problem with linear constraints.  Our Fast Approximate Quadratic Assignment Problem algorithm, \texttt{FAQAP}, finds a local minimum of this problem in $\mc{O}(n^3)$ time, outperforming the current state-of-the-art inexact (heuristic) algorithms on a number of QAP benchmarks.  Moreover, we prove that our relaxed optimization function has the same solution as the original problem in certain scenarios. Applying \texttt{FAQAP} to a synthetic \emph{Caenorhabditis elegans} connectome problem demonstrates that brain-graph matching is much more difficult than many standard QAP benchmarks.  Utilizing multiple random restarts, however, often yields optimal performance on this task with $\approx 300$ vertices.  Unfortunately, the computational complexity of our approach scales too poorly to hope that it can be used for our motivating application.  We therefore hope to inspire further development of approximate solutions to these problems.
+	
+Graph matching (GM)---the process of finding an optimal permutation of the vertices of one graph to align with the vertices of another---is rapidly becoming an increasingly important computational problem, arising in fields ranging from machine vision to chemical engineering to neuroscience. Because GM is NP-hard, exact algorithms are unsuitable for today's massive graphs; yet, scalable GM algorithms have received short shrift.  GM can be formulated as a quadratic program with linear and binary constraints.  We develop a fast approximate quadratic (\FAQ) assignment algorithm to approximately solve a relaxed quadratic program with only linear constraints.  \FAQ scales cubicly with the number of vertices, and demonstrates marked improvements over previous state-of-the-art on nearly all benchmarks. Moreover, our non-convex formulation facilitates multiple restarts; $2-3$ wisely chosen initial conditions yield the best objective function on \emph{all} benchmarks. We find qualitatively similar results for our motivating application: brain-graph matching.  Unfortunately, the computational complexity of \FAQ scales too poorly to use it for mammalian brain-graphs, with millions or billions of vertices.  To inspire further development of approximate solutions to these problems, this work is available from on the first author's website, \url{http://jovo.me}.
+
+
+% The quadratic assignment problem (QAP) arises in numerous disparate applications, ranging from traveling salesman problems to various machine vision problems.  We are particularly interested in a special case of QAP often called the (weighted) graph matching problem---the process of determining which permutation assigns vertices of one graph to those of another. 
+% Our work is motivated by a particular graph matching problem: 
+% Unfortunately, FAQ does not scale up to graphs with millions or billions of vertices, the size of mammalian brain-graphs.  
+% A brain-graph (or connectome), is a graph in which vertices correspond to (collections of) neurons, and edges are either functional or structural connections between them.  
+% % that is matching one connectome (brain-graph) to another. We are further interested in a specific application of graph matching applied to ``connectomes'' (networks comprising whole brains), which we call \emph{brain-graph matching}.  
+% Brain-graphs have between $n \dot{\approx} 10^2$ and $\dot{\approx} 10^{11}$ vertices, making exact graph matching algorithms computationally infeasible, even for the smallest brains.  We cast our brain-graph matching problem as a nonlinearly constrained quadratic program.  Relaxing the constraints yields a simpler quadratic problem with linear constraints.  Our Fast Approximate Quadratic Assignment Problem algorithm, \texttt{FAQ}, finds a local minimum of this problem in $\mc{O}(n^3)$ time, outperforming the current state-of-the-art inexact (heuristic) algorithms on a number of QAP benchmarks.  Moreover, we prove that our relaxed optimization function has the same solution as the original problem in certain scenarios. Applying \texttt{FAQ} to a synthetic \emph{Caenorhabditis elegans} connectome problem demonstrates that brain-graph matching is much more difficult than many standard QAP benchmarks.  Utilizing multiple random restarts, however, often yields optimal performance on this task with $\dot{\approx} 300$ vertices.  
+% .  To that end, 
 % , and share our code 
 % The formalism and algorithm we utilize here are designed for extending performance on larger and more complicated QAPs. 
-All our code is available from on the first author's website, \url{http://jovo.me}.
+
 
  % This work presents an inexact strategy for GM.  Specifically, we frame GM as a quadratic assignment problem, and then relax the feasible region to its convex hull.  We prove that our relaxed optimization function has the same solution as the original problem, yet it is continuously differentiable. Because the objective function is not necessarily convex, we consider multiple principled initializations.  Performance exceeds the previous state-of-the-art in \emph{all} of 16 benchmark tests.  Moreover, this approach is fast, scaling cubically with the number of vertices, requiring only about a minute on a laptop for graphs with a few hundred vertices.  We illustrate this approach via a brain-graph application (the Caenorhabditis elegans ``connectome'').  We find that we can find the optimal solution for nearly every random permutation of the connectome that we sample.  Although this strategy already natively operates on weighted graphs, either directed or undirected, we propose a number of possible extensions, and make all code available.
 \end{abstract}
@@ -84,129 +94,34 @@ graph theory, network theory, statistical inference, structural pattern recognit
 
 \section{Introduction}
 
-\IEEEPARstart{G}{raph} matching---the process of finding an optimal permutation of the vertices of one graph to align with the vertices of another---is a famously computationally daunting problem \cite{Conte2004}. Specifically, graph matching is a kind of $\mc{NP}$-hard problem, that is, no known polynomial time algorithm can solve it \cite{Papadimitriou1998}.  Perhaps the most prominent special case of graph matching is the traveling salesman problem \cite{Burkard2009}. As such, performance of graph matching algorithms are usually evaluated on graphs with $\mc{O}(10)$ vertices, or at maximum $\mc{O}(100)$ (see \cite{Burkard1997} for a description of the standard set of benchmarks).  Yet, it is increasingly popular to represent large data sets by a graph, and thus increasingly desirable to consider matching large graphs.  
+\IEEEPARstart{G}{raph} matching---the process of finding an optimal permutation of the vertices of one graph to align with the vertices of another---is a famously computationally daunting problem (see, for example, ``Thirty Years of Graph Matching in Pattern Recognition''  \cite{Conte2004}). Specifically, graph matching is an $\mc{NP}$-hard problem, in particular, we do not know whether a polynomial time algorithm can solve it \cite{Papadimitriou1998}.  Perhaps the most prominent special case of graph matching is the traveling salesman problem \cite{Burkard2009}. As such, performance of graph matching algorithms are usually evaluated on graphs with $\dot{\approx} 10$ vertices, or at maximum $\dot{\approx} 100$ (see \cite{Burkard1997} for a description of the standard set of benchmarks).  Yet, it is increasingly popular to represent large data sets by a graph, and thus increasingly desirable to consider matching large graphs.  
 
-The motivating application for this work is \emph{brain-graph matching}.  A brain-graph (aka, a connectome) is a graph for which vertices represent (collections of) neurons and edges represent connections between them \cite{SpornsKotter05, Hagmann05}. Via  Magnetic resonance (MR) imaging, one can image the whole brain and estimate connectivity across voxels, yielding a voxelwise connectome with up to $\mc{O}(10^6)$ vertices and $\mc{O}(10^9)$ edges \cite{Zuo2011}.  Comparing brains is an important step for many neuroscience and neurology inference tasks.  For example, it is becoming increasingly popular to diagnose neurological diseases via comparing brain images \cite{Csernansky2004}.  To date, however, these comparisons have largely rested on anatomical (e.g., shape) comparisons, not graph comparisons.  This is despite the widely held doctrine that many
+The motivating application for this work is \emph{brain-graph matching}.  A brain-graph (aka, a connectome) is a graph for which vertices represent (collections of) neurons and edges represent connections between them \cite{SpornsKotter05, Hagmann05}. Via  Magnetic resonance (MR) imaging, one can image the whole brain and estimate connectivity across voxels, yielding a voxelwise connectome with up to $\dot{\approx} 10^6$ vertices and $\dot{\approx} 10^9$ edges \cite{Zuo2011}.  Comparing brains is an important step for many neurobiological inference tasks.  For example, it is becoming increasingly popular to diagnose neurological diseases via comparing brain images \cite{Csernansky2004}.  To date, however, these comparisons have largely rested on anatomical (e.g., shape) comparisons, not graph comparisons.  This is despite the widely held doctrine that many
 % Yet almost immediately after the ``neuron doctrine'' was conjectured (the idea that networks of neurons comprise brains), Wernicke and others began postulating that 
-psychiatric diseases are fundamentally ``connectopathies'', that is, disorders of the connections of the brain \cite{Kubicki2007,Calhoun2011,Fornito2012,Fornito2012a}. Currently available tests for connectopic explanation of psychiatric disorders  hedge upon first choosing some number of graph invariants to compare across populations. The graph invariant approach to classifying is both theoretically and practically inferior to comparing whole graphs via matching \cite{VP11_unlabeled}.  
+psychiatric disorders are fundamentally ``connectopathies'', that is, disorders of the connections of the brain \cite{Kubicki2007,Calhoun2011,Fornito2012,Fornito2012a}. Currently available tests for connectopic explanation of psychiatric disorders  hedge upon first choosing some number of graph invariants to compare across populations. The graph invariant approach to classifying is both theoretically and practically inferior to comparing whole graphs via matching \cite{VP11_unlabeled}.  
 
-More generally, state-of-the-art inference procedures for essentially any decision theoretic or inference task follow from constructing interpoint dissimilarity matrices \cite{Duin2011}.  Thus, we believe that graph matching of large graphs will become a fundamental subroutine of many statistical inference pipelines operating on graphs. Because the number of vertices of these graphs is so large, exact matching is intractable.   Instead, we require inexact matching algorithms (also called ``heuristics'') that will scale polynomially or better \cite{Conte2004}.  We develop an approach to graph matching based on a relaxation of the quadratic programming problem (QAP).  Our approach is only cubic in the number of vertices, and outperforms previously proposed inexact graph matching heuristics.  
-
-
-
-% To proceed, we cast graph matching as a quadratic programming problem (QAP).  We then show that a QAP is a special case of a nonlinearly constrained quadratic programming problem. After relaxing the constraints we apply a standard quadratic program algorithm, the Frank-Wolfe algorithm, to obtain a local optimum.  Via theory we demonstrate that our approach is optimal under certain conditions.  Via simulations, we demonstrate improved performance over the previous state-of-the-art for other polynomial time algorithms.  Finally, we extrapolate our run times to consider problems of the scale that motivate our approach, and discuss possible extensions to our work to achieve these goals.  
-
-
-% define a graph labeling function as any algorithm that assigns a label to each vertex of a graph: $Q_n: \mc{A}, \Xi^n \mapsto \mc{L}$, where $\Xi \subseteq \mc{G}$, for example, $\Xi=\mc{A}$ (note that we have actually defined a sequence of graph labeling functions).  Remember that we have defined $\mc{L}$ as a subset of $[n_v]$, so each vertex need not have a unique label.  
-
-% \IEEEPARstart{Q}{uadratic}  
-% 
-% Our motivation for this work includes the bourgeoning field called ``connectomics'': the study of brain-graphs.  In brain-graphs,  vertices represent (collections of) neurons and edges represent either functional dependencies or structural connections \cite{Sporns2010}.  In some scenarios, vertices are labeled.  For example, when vertices represent single neurons in invertebrates \cite{WhiteBrenner86} or macro-anatomical gyral regions in vertebrates \cite{Biswal2010, Bullmore2010}.  However, in other scenarios, even whether vertices can be labeled is questionable.  For example, if one desired to compare brain-(sub)graphs from parts of brains across species or within vertebrate organisms, there is no known vertex assignment.  In these scenarios QAP might be an important element of any statistical analysis of these brain-graphs \cite{VP11_sigsub, VP11_unlabeled}.  The number of vertices in these examples for contemporary datasets ranges from hundreds to tens of thousands; much larger than, for instance, all the benchmark examples in the standard QAP benchmark tests, QAPLIB \cite{Burkard1997}.
-% 
-% 
-% Previous strategies for tackling QAPs can be partitioned into \emph{exact} algorithms and \emph{approximate} algorithms.  Exact algorithms have the desirable property of finding the absolute minimum, which always exists, because the search is over a finite set.  Unfortunately, exact algorithms have the undesirable property of requiring up to exponential time to converge.  Approximate algorithms, on the other hand, have more modest goals, aspiring to find an acceptable solution, often a locally optimal solution (under some suitable notion of locality).  In return for their modest goals, they often require only polynomial time to converge.  Approximate algorithms can be further subdivided into a number of categories, including tree search, spectral methods, and continuous optimizations \cite{Conte2004}.  The approach that we develop here is a continuous optimization strategy.  More specifically, we first demonstrate that QAP can be considered either a quadratic program with binary and linear constraints or a quadratically constrained quadratic program (QCQP).  Relaxing the quadratic (binary) constraints yields a quadratic program with linear constraints.  Unfortunately, even this relaxed problem is not convex in general.  Nonetheless, we utilize a standard quadratic programming algorithm, the Frank-Wolfe algorithm, to find a local minimum given a suitable initial condition.  Our approach is therefore a Fast Approximate Quadratic Assignment Problem algorithm called \texttt{FAQAP}.
-% 
-% This approach has the following properties.  First, whenever the two graphs are simple and isomorphic, the solution to our relaxed problem is identical to the solution to the original $\mc{NP}$-hard problem. Second, the primary bottleneck in \texttt{FAQAP} is solving a linear assignment problem, which requires $\mc{O}(n^3)$ time.  Thus, we have reduce complexity from exponential to cubic in $n$.  Third, because our algorithm approximately solves a QAP, it can be used much more generally than only solving (weighted) graph matching.  Specifically, additional linear constraints may easily be incorporated.  Fourth, performance depends on initial conditions due to the non-convexity of the objective function of even the relaxed problem.  If the default initial condition fails, it is easy to sample other ``reasonable'' initial conditions.  In practice, we find that for ``hard'' problems, multiple random restarts is an effective tool for searching the global solution space.  
-
-% We therefore propose a novel inexact graph matching algorithm based on the quadratic assignment problem (QAP).  The intuition is relatively simple: GM is computationally difficult because the underlying feasible region is non-differentiable and the implied objective function is multimodal.  A common approach to approximating difficult nonlinear programming problems is to relax the constraints on the feasible region.  By relaxing the non-differentiable constraint, any gradient based algorithm may be applied to the problem \cite{Mangasarian1987}. Importantly, our relaxed version of the optimization problem (FAQAP) yields an identical solution to the original QAP problem whenever the two graphs are simple and isomorphic. Unfortunately, the multimodality of the solution space implies that the initialization will, in general, be important.  Multiple ``principled'' restarts can potentially facilitate an efficient stochastic search strategy.  
-
-% This manuscript describes an algorithm that approximately solves a relaxed version of graph matching in cubic time (with very small leading constants).  Via numerical experiments, we demonstrate that this approach outperforms several state-of-the-art algorithms on all tests in a standard benchmark library \cite{Burkard1997}, indicating both its efficiency and its effectivity. We then test this approach on a brain-graph matching problem: matching the brain-graph (connectome) of a small nematode with $302$ vertices with a permuted version of itself.  We are able to find the optimal solution after $3$ restarts for each randomly permuted example of its chemical connectome, and typically $<30$ restarts for each randomly permuted example of its electrical connectome.  We are therefore optimistic that this algorithm will be useful for the massive graphs ($\mc{O}(10^5)$ vertices)  promised to arise due to various ongoing connectome projects \cite{HCP,OCP}.
-
-
-% \section{Methods} % (fold)
-% \label{sec:methods}
-
-
-\section{Quadratic Assignment Problems} % (fold)
-\label{ssub:linear_assignment_problems}
-
-% subsubsection linear_assignment_problems (end)
-
-% Let $A=(a_{ik}) \in \Real^{n \times n}$, $B=(b_{jl}) \in \Real^{m \times m}$, and $C=(c_{ij}) \in \Real^{m \times n}$.  Without loss of generality, assume that $m \geq n$.  Let $\pi \colon [n] \to [m]$ be a mapping from $n$ elements to $m$ elements, and $\Pi$ is the set of all such mappings.   
-
-Quadratic assignment problems (QAPs) were first introduced in 1957 to deal with the location of indivisible economical activities.  Since then, QAPs have found a dazzling array of applications and special cases, including, perhaps most famously, the traveling salesman problem \cite{Burkard2009}.    Perhaps due to its complex computational properties---it is $\mc{NP}$-hard \cite{Garey1979}---QAP  has received widespread attention in both the mathematical graph theory and computer science communities \cite{Conte2004}.  Moreover, the potential span of applications of QAP algorithms is vast, ranging from neural coding \cite{Richiardi2010} to machine vision \cite{Wiskott1997}. 
-
-Let $A=(a_{ik})$,  $B=(b_{jl})$, and $C=(c_{ij})  \in \Real^{n \times n}$ be real-valued matrices,  $\pi \colon [n] \to [n]$ be a permutation function for $n$ elements, $[n]=\{1,2,\ldots,n\}$, and $\Pi$ be the set of all such permutation functions.    Koopmans and Beckman \cite{Koopmans1957} introduced QAP in its original form:
-\begin{subequations} \label{eq:QAP1}
-\begin{align}
-	\text{(KBP) } \quad &\underset{\pi}{\text{minimize}}  \sum_{i,j \in [n]} a_{\pi(i)\pi(j)} b_{ij}  + \sum_{k \in [n]} c_{k\pi(k)} \\
-	&\text{subject to }  \pi \in \Pi.
-\end{align}
-\end{subequations}
-Eq. \eqref{eq:QAP1} can be written in terms of a permutation matrix, $P=(p_{ij}) \in \mc{P}$, where $\mc{P}$ is the set of all permutation matrices:
-\begin{subequations} \label{eq:QAP2}
-\begin{align}
-	\text{(QAP) } \quad &\underset{P}{\text{minimize}}  &&\sum_{i,j,k,l \in [n]} a_{ik} b_{jl} p_{ij}p_{kl}  + \sum_{i,j \in [n]} c_{ij}p_{ij} \\
-	&\text{subject to } && \sum_{i \in [n]} p_{ij} = 1 \, \forall i\in[n]  \label{eq:QAP2C1}\\
-	&&& \sum_{j \in [n]} p_{ij} = 1 \, \forall j\in[n]  \label{eq:QAP2C2}\\
-	&&&p_{ij} \in \{0,1\} \, \forall i,j \in [n]. \label{eq:QAP2C3}
-\end{align}
-\end{subequations}
-Eq. \eqref{eq:QAP2} indicates why this problem is a \emph{quadratic} assignment problem.  To make the relationship to the quadratic form more explicit, consider the following re-parameterization.  Let $H=-A \otimes B$ be the Kronecker product of $A$ and $B$, that is,
-\begin{align}
-	H=-
-\begin{bmatrix}
-a_{11} B & a_{12} B &\cdots& a_{1n} B \\
-a_{21} B & 	a_{22}B & \cdots & a_{2n} B \\
-\vdots & \vdots & \ddots & \vdots \\
-a_{n1} B & \cdots & \cdots & a_{nn} B
-\end{bmatrix}.
-\end{align}
-Then, let $x=vec(P)=(p_{11}, p_{12}, \ldots, p_{1n}, p_{21}, \ldots, p_{nn})\T$, and let $f=vec(C)$.  The objective function of Eq. \eqref{eq:QAP2} can therefore be written $x\T H x + f\T x$.  But what about the constraints?  The first two sets of constraints, Eqs. \eqref{eq:QAP2C1} and \eqref{eq:QAP2C2}, impose that rows and columns must sum to unity.  We can construct a matrix $K \in \{0,1\}^{n^2 \times 2n}$ such that
-\begin{align}
-	K_{ij}=
-	\begin{cases}
-		1 & \forall (i,j) : i \in [n] \cap j \in \{i,i+n,\ldots, i+n(n-1)\} \\
-		0 & \text{ otherwise}.
-	\end{cases}
-\end{align}
-Thus, $Kx=\mb{1}$ is equivalent to Eqs. \eqref{eq:QAP2C1} and \eqref{eq:QAP2C2}, where $\mb{1}$ is a column vector of ones of appropriate size. Binary constraints, such as the ones in Eq. \eqref{eq:QAP2C3}, can be achieved by enforcing the following quadratic constraint: $x_i(x_i-1)=0$.  Together, we can rewrite Eq. \eqref{eq:QAP2} as a quadratically constrained quadratic program (QCQP):
-\begin{subequations} \label{eq:QCQP}
-\begin{align}
-	\text{(QCQP) } \quad &\underset{\pi}{\text{minimize}} && x\T H x + f\T x \\
-	&\text{subject to } &&  Kx = \mb{1} \\
-	&&& x_i  (x_i - 1) = 0 \, \forall i \in [n] \label{eq:QC}
-\end{align}
-\end{subequations}
-% The first set of constraints 
+More generally, state-of-the-art inference procedures for essentially any decision-theoretic or inference task follow from constructing interpoint dissimilarity matrices \cite{Duin2011}.  Thus, we believe that graph matching of large graphs will become a fundamental subroutine of many statistical inference pipelines operating on graphs. Because the number of vertices of these graphs is so large, exact matching is intractable.   Instead, we require inexact matching algorithms (also called ``heuristics'') that will scale polynomially or even linear \cite{Conte2004}.  We develop an approach to graph matching based on a relaxation of the quadratic programming problem (QAP).  Our approach is only cubic in the number of vertices, and outperforms previously proposed approximate graph matching heuristics on a wide range of benchmark datasets as well as our motivating application.  
 
 
 
-% 
-% 
-% \section{Assignment Problems} % (fold)
-% \label{sub:assignment_problems}
-% 
-% Both GI and GM can be cast as assignment problems.  Let $A=(a_{ij})$ and $B=(b_{ij})$ correspond to the adjacency matrix representations of graphs $G_1$ and $G_2$, respectively.  That is, $a_{ij}=1$ if and only if $(u,v) \in \mc{E}_1$, and zero otherwise (and similarly for $B$ and $G_2$). Now, GI may be stated thusly:  does there exist a $\pi \in \Pi$ such that $a_{ij}=b_{\pi(u)\pi(v)}$ for all $u,v \in [n]=\{1,\ldots, n\}$.  Although assignment problems do not restrict $A$ and $B$ to correspond to adjacency matrices, when $A$ and $B$ are adjacency matrices, GM and the quadratic assignment problem (QAP) are equivalent.  Our approach is based on a continuous relaxation and quadratic optimization approach, as will be described below.  Because a linear assignment problem (LAP) will be a subroutine of our approach, we introduce LAP first, followed by QAP.   A permutation matrix is a matrix $P=(p_{ij})$ that satisfies the following three conditions:
-% \begin{enumerate}
-% \item	$P\mb{1} = \mb{1}$,
-% \item	$P\T \mb{1}=\mb{1}$, %\\
-% \item 	$P \in  \{0,1\}^{n \times n}$.	
-% \end{enumerate}
-% Let $\mc{P}$ be the set of all such permutation matrices. Note that while the first two constraints are linear, the third constraint is \emph{binary}.  This nonlinearity motivates our approach.
-% 	 %\\
-% % \end{align}
-% 
-% 
-% 
-% 
-% % Given a pair of adjacency matrices, $A$ and $B$, to graph match $A$ with $B$ is to find a permutation matrix $Q$ such that $QAQ\T=B$. In this work, we propose a novel inexact graph matching algorithm, essentially a Frank-Wolfe algorithm with multiple restarts.  We demonstrate the efficacy of this algorithm over the previous state-of-the-art on a reference library of benchmarks.
 
 \section{Graph Matching} % (fold)
 \label{sec:graph_matching}
 
 
-A labeled graph $G=(\mc{V},\mc{E})$ consists of a vertex set $\mc{V}$, where $|\mc{V}|=n$ is number of vertices, and an edge set $\mc{E}$, where $|\mc{E}| \leq n^2$. Note that we are not restricting our formulation to be directed or exclude self-loops. Given a pair of graphs, $G_1=(\mc{V}_1,\mc{E}_1)$ and $G_2=(\mc{V}_2,\mc{E}_2)$, where $|\mc{V}_1|=|\mc{V}_2|=n$, 
-let $\pi: \mc{V}_1 \to \mc{V}_2$ be a permutation function (bijection),
-and let $\Pi$ be the set of all such permutation functions.  Now consider the following two closely related problems:
+A labeled graph $G=(\mc{V},\mc{E})$ consists of a vertex set $\mc{V}$, where $|\mc{V}|=n$ is number of vertices, and an edge set $\mc{E}$. %, where $|\mc{E}| \leq n^2$. 
+Note that we are not restricting our formulation to be directed or exclude self-loops. Given a pair of graphs, $G_A=(\mc{V}_A,\mc{E}_A)$ and $G_B=(\mc{V}_B,\mc{E}_B)$, where $|\mc{V}_A|=|\mc{V}_B|=n$, 
+let $\Pi$ be the set of permutation functions (bijections), $\Pi=\{\pi \from \mc{V}_A \to \mc{V}_B\}$.
+% $\pi: \mc{V}_1 \to \mc{V}_2$ be a permutation function (bijection), and let $\Pi$ be the set of all such permutation functions.  
+Now consider the following two closely related problems:
 % A pair of graphs, $G_1$ and $G_2$, are isomorphic if and only if the following \emph{isomorphism criterion} holds: there exists a $\pi \in \Pi$ such that . 
 % Let $A$ be the adjacency matrix representation of graph such that $A_{ij}=1$ if there is an edge from $u$ to $v$, and $A_{ij}=0$ otherwise. 
 % Note that the below follows for directed/undirected and loopy/non-loopy graphs.
 % $u \sim v \in \mc{E}$ and $A_{ij}=0$ otherwise.  
 % Let  $\Pi$ be the set of permutation functions, where a permutation function (bijection) $\pi: \mc{V} \to \mc{V}$ (re-)orders the elements of the set $\mc{V}$.  Given a pair of $n \times n$ adjacency matrices, $A=(a_{ij})$ and $B=(b_{ij})$, consider the following two problems:
 \begin{itemize}
-	\item \textbf{Graph Isomorphism (GI):}  Does there exist a $\pi \in \Pi$ such that $(u,v) \in \mc{E}_1$ if and only if $(\pi(u),\pi(v)) \in \mc{E}_2$. 
-		\item \textbf{Graph Matching (GMP):} Which $\pi$ (if any) satisfies the above isomorphism criterion?
+	\item \textbf{Graph Isomorphism (GI):}  Does there exist a $\pi \in \Pi$ such that $(u,v) \in \mc{E}_A$ if and only if $(\pi(u),\pi(v)) \in \mc{E}_B$. 
+		\item \textbf{Graph Matching (GM):} Which $\pi$ (if any) satisfies the above isomorphism criterion?
 \end{itemize}
 
 % \begin{itemize}
@@ -223,9 +138,9 @@ and let $\Pi$ be the set of all such permutation functions.  Now consider the fo
 
 Both GI and GM are computationally difficult. GM is at least as hard as GI, since solving GM also solves GI, but not vice versa. It is not known whether GI is in complexity class $\mc{P}$ \cite{Fortin1996}.  In fact, GI is one of the few problems for which, if $\mc{P} \neq \mc{NP}$, then GI might reside in an intermediate complexity class called $\mc{GI}$-complete.  GM, however, is known to be $\mc{NP}$-hard.    
  % There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be $\mc{NP}$-hard, it remains unclear whether GI is in $\mc{P}$, $\mc{NP}$, or its own intermediate complexity class, $\mc{NP}$-isomorphism (or isomorphism-complete).  
-Yet, for large classes of GI and GM problems, linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(\exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GI or GM algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all vertices have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  
+Yet, for large classes of GI and GM problems, linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(\exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GI or GM algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all vertices have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ (yes, that is a factorial!) \cite{Chen1994}.  
 
-Because we are interested in solving GM for graphs with $\mc{O}(10^6)$ or more vertices, exact GM solutions will be computationally intractable. As such, we develop a fast inexact graph matching algorithm.   Our approach is based on formulating GM as a quadratic assignment problem.  %Below, we introduce assignment problems, and reiterate their close relationship to GI and GM \cite{Burkard2009}.
+Because we are interested in solving GM for graphs with $\dot{\approx} 10^6$ or more vertices, exact GM solutions will be computationally intractable. As such, we develop a fast approximate graph matching algorithm.   Our approach is based on formulating GM as a quadratic assignment problem (QAP).  %Below, we introduce assignment problems, and reiterate their close relationship to GI and GM \cite{Burkard2009}.
 
 % section graph_matching (end)
 
@@ -237,18 +152,21 @@ Because we are interested in solving GM for graphs with $\mc{O}(10^6)$ or more v
 % 
 % Formally, let $G=(V,E)$ be a graph, where $V$ is the set of $|V|=n$ vertices and $E$ is the set of edges between them.  Let $i\sim j$ indicate the presence of an edge from $i$ to $j$.  The \emph{adjacency matrix} representations of a graph is a matrix, $A \in \Real^{n \times n}$, where $a_{ij}=0$ if and only if $i\sim j$.  In a weighted graph, $G=(V,E,A)$, each edge's weight can be non-binary, that is, $a_{ij} \in \Real$.
 
-The weighted graph matching problem (WGMP) can be formulated as a QAP.  Let $A$ and $B$ correspond to the adjacency matrix representations of two graphs that we desire to match, and assume that $|V(A)|=|V(B)|=n$.  We therefore have the following problem:  
+Graph matching can be formulated as a quadratic assignment problem (QAP).  Let $A=(a_{uv}) \in \{0,1\}^{n \times n}$ and $B=(b_{uv}) \in \{0,1\}^{n \times n}$ correspond to the adjacency matrix representations of two graphs that we desire to match. That is, let $a_{uv}=1$ if and only if $(u,v) \in \mc{E}_A$, and similarly for $b_{uv}$.  Moreover, let $\mc{P}$ be the set of  $n \times n$ \emph{permutation matrices}  $\mc{P}=\{P : P\T \mb{1} = P \mb{1} = \mb{1}, P \in \{0,1\}^{n \times n}\}$, where $\mb{1}$ is an $n$-dimensional column vector.
+% 
+% % Let , and assume that $|V(A)|=|V(B)|=n$.  
+We therefore have the following problem:  
 \begin{subequations} \label{eq:GM}
 \begin{align}
-\text{(WGMP)} \qquad 	&\argmin_{\pi \in \Pi} \sum_{i,j \in [n]} (a_{\pi(i) \pi(j)} - b_{ij})^2 =\\
-	&\argmin_{\PmcP} \norm{PAP\T - B}_F = \\
+\text{(QAP)} \quad 	&\argmin_{\pi \in \Pi} \sum_{i,j \in [n]} (a_{ij} - b_{\pi(i) \pi(j)})^2= \\
+	&\argmin_{\PmcP} \norm{A - PBP\T}_F = \\
 	% &\argmin_{\PmcP} \norm{PAP\T - B}_F =
 	% \\&
 	% \argmin_{\PmcP} \norm{PA - BP\T} =\\
 	% &\argmin_{\PmcP} (PAP\T-B)\T (PAP\T-B) \\ 
-	&\argmin_{\PmcP} tr(PAP\T - B)\T (PAP\T - B)  =\\
+	&\argmin_{\PmcP} tr(A - PBP\T)\T (A - PBP\T) = \\
 	% &\argmin_{\PmcP}  tr(P\T A\T P\T P A P\T) - 2tr(PAP\T B) + tr(B\T B)  = \\ %- tr(B\T PAP\T)
-	&\argmin_{\PmcP} - tr(B\T PAP\T). \label{eq:trQAP} %\\ % - tr(PAP\T B),			
+	&\argmin_{\PmcP} - tr(B P\T AP), \label{eq:trQAP} %\\ % - tr(PAP\T B),			
 	% &\argmin_{\PmcP} tr (A\T P\T PA) - tr(2PA) + tr(B\T B)=\\ 
 	% &\argmin_{\PmcP}  - tr(B\T PAP\T)=\\
 	% &\argmin_{\PmcP}  -\sum_{u \in \mc{V}} p_{ij} a_{ij} b_{ij} p_{ji} 
@@ -258,65 +176,87 @@ The weighted graph matching problem (WGMP) can be formulated as a QAP.  Let $A$ 
 	 % =\\
 \end{align}
 \end{subequations}
-Note that Eq. \eqref{eq:trQAP} demonstrates that WGMP is indeed a QAP, although the $C$ matrix has been dropped. Our approach follows from relaxing the quadratic/binary constraint of the QCQP formulation of QAP \eqref{eq:QCQP}.  Specifically, we relax the binary constraint to a non-negative constraint.  Thus, instead of constraining our search space to permutation matrices, the feasible space becomes the doubly stochastic matrices, that is, all matrices whose rows and columns both sum to unity, and whose elements are all non-negative, $\mc{D}=\{P : P\T \mb{1} =  P \mb{1} = \mb{1}, P \succeq 0\}$, where $\succeq$ indicates an element-wise inequality. Because the equalities in Eq. \eqref{eq:GM} follow from $P$ being a permutation matrix, relaxing the constraints for different formulations yields different optimization problems.  We relax the binary constraints to non-negative constraints in the trace formulation of the QAP, Eq. \eqref{eq:trQAP}:
-\begin{subequations} \label{eq:FAQAP}
+where the last equality follows from dropping terms that cancel because $P$ is a permutation matrix. Note that the above algebraic formulation of GM facilitates generalizing the original problem statement. In particular, one can now search for the permutation that minimizes a particular objective function, $f(P)=- tr(B P\T AP)$.  Moreover, it is natural to consider ``weighted graph matching'' (WGM) problems, in which each edge is associated with a weight, $a_{uv} \in \Real$.  
+
+
+
+
+% Note that Eq. \eqref{eq:trQAP} demonstrates that WGMP is indeed a QAP, although the $C$ matrix has been dropped. 
+Our approach follows from relaxing the above binary constraints
+ % of Eq. \eqref{eq:trQAP} 
+to be non-negative constraints, yielding a quadratic program with \emph{linear} constraints.  %Specifically, we relax the binary constraint to a non-negative constraint.  
+Thus, the feasible region expands to the convex hull of the permutation matrices: the doubly stochastic matrices, $\mc{D}=\{P : P\T \mb{1} =  P \mb{1} = \mb{1}, P \succeq 0\}$, where $\succeq$ indicates an element-wise inequality:
+% the feasible space becomes the doubly stochastic matrices; that is, all matrices whose rows and columns both sum to unity, and whose elements are all non-negative, $\mc{D}=\{P : P\T \mb{1} =  P \mb{1} = \mb{1}, P \succeq 0\}$, where $\succeq$ indicates an element-wise inequality. Because the equalities in Eq. \eqref{eq:GM} follow from $P$ being a permutation matrix, relaxing the constraints for different formulations yields different optimization problems.  We relax the binary constraints in the trace formulation, yielding:
+\begin{subequations} \label{eq:FAQ}
 \begin{align}
-		\text{(FAQAP) } \quad &\underset{P}{\text{minimize}}  && - tr(B\T PAP\T) \label{eq:FAQAP1}  \\
+		\text{(rQAP) } \quad &\underset{P}{\text{minimize}}  && - tr(B\T PAP\T) \label{eq:FAQ1}  \\
 		&\text{subject to } && P \in \mc{D}.
 \end{align}
 \end{subequations}
-FAQAP, which stands for ``Fast Approximate Quadratic Assignment Problem'', is therefore a quadratic problem with linear constraints, meaning that relatively standard solvers may be employed.
-
-
-Importantly, the convex hull of permutation matrices is the set of doubly stochastic matrices, implying that this is a ``natural'' relaxation in a very meaningful sense.    Moreover, although the objective function $- tr(B\T PAP\T)$ is quadratic, it is not necessarily convex.  This follows from computing the Hessian of the objective function with respect to $P$:
+% FAQ---the above Fast Approximate Quadratic problem---is therefore a quadratic program with linear constraints, meaning that relatively standard solvers may be employed to search for approximately optimal solutions to an $\mc{NP}$-hard problem.
+% 
+% Importantly, the convex hull of permutation matrices is the set of doubly stochastic matrices, implying that this is a ``natural'' relaxation in a very meaningful sense.    Moreover, a
+rQAP---the above relaxed Quadratic Assignment Problem---is quadratic but not necessarily convex, 
+% Although the objective function  $f(P)= - tr(B\T PAP\T)$ of  FAQ is ,
+because the Hessian of its objective function, $f(P)= - tr(B\T PAP\T)$, is not necessarily positive definite:
 \begin{align}
-	\nabla_P^2  =  B \otimes A + B\T \otimes A\T,
+	\nabla^2 f(P)  =  B \otimes A + B\T \otimes A\T,
 \end{align}
-which is not necessarily positive definite ($\otimes$ indicates the Kronecker product). This means that the solution space will potentially be multimodal, making initialization important.  With this in mind, below, we describe an algorithm to find a local optimum of FAQAP.
+where $\otimes$ indicates the Kronecker product. This means that the solution space will potentially be multimodal, making initialization important.  With this in mind, below, we describe an algorithm to find a local optimum of rQAP.
 
 
 
 % subsection preliminaries (end)
 
 
-% We therefore determined the average complexity of our algorithm \emph{and} the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\approx 10^{-7}$ seconds), making using this algorithm feasible for even reasonably large graphs.
+% We therefore determined the average complexity of our algorithm \emph{and} the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\dot{\approx} 10^{-7}$ seconds), making using this algorithm feasible for even reasonably large graphs.
 
 
 
 \section{Fast Approximate Quadratic Assignment Problem Algorithm} % (fold)
-\label{ssub:graph_matching}
+\label{sec:faq}
 
 
-Our algorithm, called \texttt{FAQAP}, has three components:
-\begin{enumerate}[I.]
-	\item Choose an initial estimate.
-	\item Find a local solution to Eq. \eqref{eq:FAQAP}.
-	\item Project that solution onto the set of permutation matrices.
+Our algorithm, called \texttt{FAQ}, has three components:
+\begin{enumerate}[A.]
+	\item Choose a suitable initial position. % $P^{(0)} \in \mc{D}$.
+	\item Find a local solution to rQAP. %, $\mh{D} \in \mc{D}$.
+	\item Project onto the set of permutation matrices. %, yielding $\mh{P} \in \mc{P}$.
 \end{enumerate}
-% We refer to one run of the above three steps as \texttt{FAQAP}.  For any integer $m$, upon using $m$ restarts, we report only the best solution, and we refer to the whole procedure as \texttt{FAQAP}$_m$.  
+% We refer to one run of the above three steps as \texttt{FAQ}.  For any integer $m$, upon using $m$ restarts, we report only the best solution, and we refer to the whole procedure as \texttt{FAQ}$_m$.  
 Below, we provide details for each component.
 
-\textbf{I: Find a suitable initial position $P^{(0)} \in \mc{D}$}  While any doubly stochastic matrix would be a feasible initial point, two choices seem natural: (i) the ``flat doubly  stochastic matrix,'' $J=\ve{1} \cdot \ve{1}\T/n$, which is the center of the feasible region, and (ii) the identity matrix, which is a permutation matrix.  We elect to use the flat matrix as our default initial starting point.
-% Therefore, if we run \faqap  once, we always start with one of those two.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $K$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let $P^{(0)}=(J+K)/2$. %Given this initial estimate, we iterate the following five steps until convergence.
+\textbf{A: Find a suitable initial position.}  While any doubly stochastic matrix would be a feasible initial point, we choose the 
+% two choices seem natural: (i) the 
+``flat doubly  stochastic matrix,'' $J=\ve{1} \cdot \ve{1}\T/n$, which is the barycenter of the feasible region.
+% , and (ii) the identity matrix, which is a permutation matrix.  We elect to use the barycenter as our default initial starting point.
+% Therefore, if we run \FAQ  once, we always start with one of those two.  If we use multiple restarts, each initial point is ``near'' the flat matrix.  Specifically, we sample $K$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let $P^{(0)}=(J+K)/2$. %Given this initial estimate, we iterate the following five steps until convergence.
 
 
-\textbf{II: Find a local solution to Eq. \eqref{eq:FAQAP}} As mentioned above, Eq. \eqref{eq:FAQAP} is a quadratic problem with linear equality and boundary constraints.  A number of off-the-shelf algorithms are readily available for finding local optima in such problems.  We utilize the Frank-Wolfe (FW) algorithm, which is both (i) a kind of projection descent algorithm
+\textbf{B: Find a local solution to rQAP.} As mentioned above, rQAP is a quadratic problem with linear constraints.  A number of off-the-shelf algorithms are readily available for finding local optima in such problems.  We utilize the Frank-Wolfe algorithm (\texttt{FW}), a successive linear programing problem originally devised to solve quadratic problems with linear constraints \cite{Frank1956, Bradley1977}.
+% both (i) a kind of projection descent algorithm
 % called the 
-% We therefore develop a nonlinear programing algorithm for approximately solving Eq. \eqref{eq:FAQAP} using multiple restarts.
+% We therefore develop a nonlinear programing algorithm for approximately solving FAQ using multiple restarts.
    % Our approach can be thought of as a 
 % Frank-Wolfe (FW) algorithm, which is also 
-and (ii) a successive linear programming algorithm.  The FW algorithm was originally designed for solving quadratic problems with linear (equality and/or inequality) constraints \cite{Frank1956}. It later became used more generally for nonlinear programming problems  \cite{Bradley1977}.  Specifically, it can be used to solve optimization problems of the following form:
-\begin{subequations} \label{eq:FW}
-\begin{align}
-		\text{(FWP) } \quad &\underset{x}{\text{minimize}}  && f(x)  \\
-		&\text{subject to } && x \in \mc{S},
-\end{align}
-\end{subequations}
-where $\mc{S} \subset \Real^d$ is a polyhedral set (a set described by linear constraints) and the function $f: \mc{S} \to \Real$ is continuously differentiable.  Generally, the Frank-Wolfe algorithm consists of the following steps.  Given an initial position, $x^{(0)}$, recurse the following steps until some convergence criterium (e.g., computational budget) is met.  Let $\mt{x}^{(i)}$ be the optimal solution that minimizes the first-order Taylor series approximation of $f$ around $x^{(i)}$ such that  $\mt{x}^{(i)} \in \mc{S}$.  Next, let $x^{(i+1)}$ minimize $f(x)$ such that $x^{(i+1)}$ is on the line segment from $x^{(i)}$ to $\mt{x}^{(i)}$ in $\mc{S}$.  
+% and (ii) a successive linear programming algorithm.  
+% FW was originally designed for solving quadratic problems with linear constraints \cite{Frank1956}, though it later became used more generally for nonlinear programming problems  \cite{Bradley1977}.  Specifically, it 
+% \texttt{FW} can be used to solve optimization problems of the following form:
+% \begin{subequations} \label{eq:FW}
+% \begin{align}
+% 		% \text{(FWP) } \quad 
+% 		&\underset{x}{\text{minimize}}  && f(x)  \\
+% 		&\text{subject to } && x \in \mc{S},
+% \end{align}
+% \end{subequations}
+% where $\mc{S} \subset \Real^d$ is a polyhedral set (a set described by linear constraints) and the function $f: \mc{S} \to \Real$ is continuously differentiable.  Generally, \texttt{FW} consists of the following steps.  Given an initial position, $x^{(0)}$, recurse the following two steps until some convergence criterion is met (e.g., computational budget).  First, find $\mt{x}^{(i)}$, the minimum of the first-order Taylor series approximation of $f$ around $x^{(i)}$ such that  $\mt{x}^{(i)} \in \mc{S}$.  Second, let $x^{(i+1)}$ minimize $f(x)$ such that $x^{(i+1)}$ is on the line segment from $x^{(i)}$ to $\mt{x}^{(i)}$ in $\mc{S}$.  
 % The function $\mt{f}^{(i)}: \mc{S} \to \Real$ is defined to be the first-order (i.e., linear) approximation to $f$ at $x^{(i)}$---that is $f^{(i)} \defn f(x^{(i)}) + \nabla f(x^{(i)})\T (x-x^{(i)})$.  Next, solve the following linear program: minimize $\mt{f}^{(i)}(x)$ such that $x \in \mc{S}$ (this can be done efficiently since it is a linear objective function with linear constraints).  Note that by ignoring additive constants the objective function of this subproblem can be abbreviated: minimize $\nabla f(x^{(i)})\T x$ such that $x \in \mc{S}$.  Let $\mt{x}^{(i)}$ be the solution to this problem.  Now, the point $x^{(i)} \in \mc{S}$ is defined as the solution to: minimize $f(x)$ such that $x$ is on the line segment from $x^{(i)}$ to $\mt{x}^{(i)}$ in $\mc{S}$.  Because this is a one-dimensional quadratic optimization problem, it can be analytically solved exactly.   Go to the next $i$ and terminate this iterative procedure when $x^{(i)}$ stops changing much or develops a gradient sufficiently close to zero.
 % The FW algorithm iteratively finds the direction of steepest descent, projects the direction into the feasible region, and takes a step of optimal size.  
-
-Below we provide a detailed view of applying FW to FAQAP. Let our objective function be that of Eq. \eqref{eq:FAQAP1}, $f(P)=tr(B\T PAP\T)$. Given an initial position, $P^{(0)}$, iterate the following four steps.
+% 
+Although \texttt{FW} is a relatively standard solver, especially as a subroutine for QAP algorithms \cite{Anstreicher03}, below we provide a detailed view of applying \texttt{FW} to rQAP.
+% , where our objective function is %. Let our objective function be that of Eq. \eqref{eq:FAQ1}, 
+% $f(P)=tr(B\T PAP\T)$. 
+Given an initial position, $P^{(0)}$, iterate the following four steps.
 
 \emph{Step 1: Compute the gradient $\nabla f(P^{(i)})$:}  The gradient $f$ with respect to $P$ is given by
 % \emph{Step 1: Compute the gradient} The gradient of $f$ with respect to $P$ is given by
@@ -327,11 +267,11 @@ Below we provide a detailed view of applying FW to FAQAP. Let our objective func
 \end{align}
 
 
-\emph{Step 2: Compute the direction $\mt{P}^{(i+1)}$:} The direction is given by the argument that minimizes a first-order Taylor series approximation to $f(P)$ around the current estimate, $P^{(i)}$. The first-order Taylor series approximation to $f(P)$ is given by
+\emph{Step 2: Compute a new putative point $\mt{P}^{(i+1)}$:} The new putative point is given by the argument that minimizes a first-order Taylor series approximation to $f(P)$ around the current estimate, $P^{(i)}$. The first-order Taylor series approximation to $f(P)$ is given by
 \begin{align}
 	\mt{f}^{(i)}(P) \defn f(P^{(i)}) + \nabla f(P^{(i)})\T(P - P^{(i)}).
 \end{align}
-Thus, Step 2 of FW is
+Thus, Step 2 of \texttt{FW} is
 % \begin{align}
 % 		\text{(FW1) } \quad &\underset{P}{\text{minimize}}  && \mt{f}(P)  \\
 % 		&\text{subject to } && P \in \mc{D},
@@ -344,11 +284,11 @@ Thus, Step 2 of FW is
 	 % \\ &=\argmin_{P \in \mc{D}}  \langle \nabla f(P^{(i)}), P \rangle, 
 \end{align}
 \end{subequations}
-As it turns out, Eq. \eqref{eq:dotFW1} can be solved as a \emph{Linear Assignment Problem} (LAP).  The details of LAPs are well known \cite{Burkard2009}, so we relegate them to the appendix.  Suffice it to say here, LAPs can be solved via  the ``Hungarian Algorithm'', named after three Hungarian mathematicians \cite{Kuhn1955, Konig1931, Egevary1931}.  Modern variants of the Hungarian algorithm are cubic in $n$, that is, $\mc{O}(n^3)$, or even faster in the case of sparse or otherwise structured graphs \cite{Jonker1987, Burkard2009}.
+As it turns out, Eq. \eqref{eq:dotFW1} can be solved as a \emph{Linear Assignment Problem} (LAP).  The details of LAPs are well known \cite{Burkard2009}, so we relegate them to the appendix.  Suffice it to say here, LAPs can be solved via  the ``Hungarian Algorithm'', named after three Hungarian mathematicians \cite{Kuhn1955, Konig1931, Egevary1931}.  Modern variants of the Hungarian algorithm are cubic in $n$, that is, $\mc{O}(n^3)$, or even faster in the case of sparse or otherwise structured graphs \cite{Jonker1987, Burkard2009}.  The $\mc{O}(n^3)$ computational complexity of \texttt{FW} was the primary motivating factor for utilizing \texttt{FW}; generic linear programs can require up to $\mc{O}(n^7)$.
 
 % Thus, we can solve the first step of FW upon computing 
 
-\emph{Step 3: Compute the step size $\alpha^{(i)}$} Given $\mt{P}^{(i+1)}$, the new direction is given maximizing the \emph{original} optimization problem, Eq. \eqref{eq:FAQAP}, along the line segment from $P^{(i)}$ to $\mt{P}^{(i+1)}$ in $\mc{D}$.    
+\emph{Step 3: Compute the step size $\alpha^{(i)}$} Given $\mt{P}^{(i+1)}$, the new point is given maximizing the \emph{original} optimization problem, rQAP, along the line segment from $P^{(i)}$ to $\mt{P}^{(i+1)}$ in $\mc{D}$.    
 % 
 % \begin{align}
 % 	d^{(i)}=L^{(i)}-P^{(i)}.
@@ -371,21 +311,21 @@ This can be performed exactly, because $f$ is a quadratic function.
 
 % paragraph step_5_update_q_ (end)
 
-\emph{Stopping criteria} Steps 1--4 are iterated until some stopping criterion is met (computational budget limits, $P^{(i)}$ stops changing much, or $\nabla f(P^{(i)})$ is close to zero).  These four steps collectively comprise the FW algorithm for solving Eq. \eqref{eq:FAQAP}.  %Note that while $P^{(i)}$ will generally not be a permutation matrix, we do not project $P^{(i)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time.
+\emph{Stopping criteria} Steps 1--4 are iterated until some stopping criterion is met (computational budget limits, $P^{(i)}$ stops changing much, or $\nabla f(P^{(i)})$ is close to zero).  These four steps collectively comprise the Frank-Wolfe algorithm for solving rQAP.  %Note that while $P^{(i)}$ will generally not be a permutation matrix, we do not project $P^{(i)}$ back onto the set of permutation matrices between each iteration, as that projection requires $\mc{O}(n^3)$ time.
 
 
-\textbf{III: Projecting onto the set of permutation matrices}   Let $P^{(I)}$ be the doubly stochastic matrix resulting from the final iteration.  We project $P^{(I)}$ onto the set of permutation matrices, yielding
+\textbf{C: Project onto the set of permutation matrices.}   Let $\wh{D}$ be the doubly stochastic matrix resulting from the final iteration of \texttt{FW}.  We project $\wh{D}$ onto the set of permutation matrices, yielding
 \begin{align} \label{eq:proj}
-	\mh{P} = \argmin_{\PmcP} -\langle P^{(I)}, P \rangle,
+	\wh{P} = \argmin_{\PmcP} -\langle \wh{D}, P \rangle,
 \end{align}
 where $\langle \cdot,\cdot \rangle$ %the equality on the second to last line defines 
 is the usual Euclidean inner product, i.e., $\langle X,Y\rangle \defn tr(X\T Y)= \sum_{ij} x_{ij} y_{ij}$.  Note that Eq. \eqref{eq:proj} is a LAP (again, see appendix for details).
 
-% which is also a LAP.  %Thus, this completes one restart of \texttt{FAQAP}.
+% which is also a LAP.  %Thus, this completes one restart of \texttt{FAQ}.
 
 % paragraph the_final_iteration (end)
 
-% \textbf{Multiple restarts} We refer to multiple re-starts of \faqap with subscripts; that is, the performance of \faqapm is the best result of $m$ pseudo-random re-starts of \texttt{FAQAP}.  We continue restarting until either we converge to a known global solution or we exceed our computational budget. Note that \faqap natively operates on matrices, which could correspond to either weighted or unweighted, directed or undirected graphs.  
+% \textbf{Multiple restarts} We refer to multiple re-starts of \FAQ with subscripts; that is, the performance of \FAQm is the best result of $m$ pseudo-random re-starts of \texttt{FAQ}.  We continue restarting until either we converge to a known global solution or we exceed our computational budget. Note that \FAQ natively operates on matrices, which could correspond to either weighted or unweighted, directed or undirected graphs.  
 
 % Algorithm \ref{alg:1} shows pseudo-code for the complete algorithm.
 
@@ -397,7 +337,7 @@ is the usual Euclidean inner product, i.e., $\langle X,Y\rangle \defn tr(X\T Y)=
 % 		\FOR{$n=1,\ldots, n_{max}$}
 % 		\STATE Initialize estimate $Q^{(0)}$
 % 		\FOR{$j=1,2,\ldots$}
-% 		\STATE Do \faqap until convergence
+% 		\STATE Do \FAQ until convergence
 % 		% \STATE Find closest doubly stochastic matrix using Eq. \eqref{eq:LAP} using the Hungarian algorithm
 % 		% \STATE Update the direction using Eq. \eqref{eq:dir}
 % 		% \STATE Find optimal step size using Eq. \eqref{eq:step}
@@ -417,17 +357,129 @@ is the usual Euclidean inner product, i.e., $\langle X,Y\rangle \defn tr(X\T Y)=
 \label{sec:theoretical_results}
 
 
-\subsection{FAQAP solves QAP in certain special cases} % (fold)
+
+
+
+\subsection{Algorithm Complexity and leading constants} % (fold)
+\label{sub:algorithm_complexity_and_leading_constants}
+
+% Both GM and its closely related counterpart, graph isomorphism (GI), are computationally difficult.  There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be $\mc{NP}$-hard, it remains unclear whether GI is in $\mc{P}$, $\mc{NP}$, or its own intermediate complexity class, $\mc{NP}$-isomorphism (or isomorphism-complete).  Yet, for large classes of GI and GM problems, linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(\exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GM or GI algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all graphs have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  
+As mentioned above, GM is computationally difficult; even those special cases for which polynomial time algorithms are available, the leading constants are intractably large for all but the simplest cases. We therefore determined the average complexity of our algorithm and the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\dot{\approx} 10^{-7}$ seconds), making using this algorithm feasible for even reasonably large graphs.
+
+
+
+\begin{figure}[htbp]
+	\centering			
+	\includegraphics[width=1.0\linewidth]{../figs/ErdosRenyi_results.pdf}
+	\caption{Performance of \FAQ as function of number of vertices. Data was sampled from an Erd\"os-R\'enyi model with $p=log(n)/n$.  Each dot represents a single simulation, with five simulations per $n$.  The solid line is the best fit cubic function.  Note the leading constant is $\dot{\approx} 10^{-7}$ seconds. }
+	\label{fig:scaling}
+\end{figure}
+
+% subsection algorithm_complexity_and_leading_constants (end)
+
+
+\subsection{QAP Undirected Benchmarks}
+\label{sub:undirected}
+
+We next assess the computational properties of \FAQ in comparison with other the previous state-of-the-art algorithms.  We therefore compare \FAQ to other approaches using a selection of the QAP benchmark library, QAPLIB \cite{Burkard1997}.  Specifically, \cite{Zaslavskiy2009} created a path following algorithm (\texttt{PATH}) based on a convex and concave relaxation of QAP.  In that manuscript, the authors considered 16 datasets from the QAPLIB benchmark, the same 16 datasets as were used in \cite{Schellewald2001}, which are known to be ``particularly difficult''.  \texttt{PATH} was shown to outperform other state-of-the-art algorithms on 14 of 16 tests.  Specifically, \texttt{PATH} was compared to the Quadratic Programming Bound approach (\texttt{QGP}) of \cite{Anstreicher2001}, the graduated assignment algorithm (\texttt{GRAD}) of \cite{Gold1996}, and Umeyama's algorithm (\texttt{U}) \cite{Umeyama1988}.  Because either \texttt{PATH} or \texttt{QBP} outperformed \texttt{GRAD} and \texttt{U} on every dataset, Table \ref{tab:1} shows the performance of \FAQ versus \texttt{PATH} and \texttt{QBP}.  \FAQ outperforms both of the previous state-of-the-art cubic algorithms on 13 out of 16 benchmarks.  Figure \ref{fig:path16} presents the same data graphically. The top panel compares both \FAQ and \texttt{PSOA}---which is the minimum of the previous state-of-the-art (either \texttt{PATH} or \texttt{QBP} here)---to the absolute minimum; \FAQ get closer than \texttt{PSOA} to the minimum on 13 of 16. The bottom panel shows the ratio of \FAQ to \texttt{PSOA}. 
+
+
+\begin{table}[h!]
+\caption{Comparison of \FAQ with the optimal solution and previous state-of-the-art on a set of 16 standard benchmarks from QAPLIB.  The best (lowest) solution is in \textbf{bold}. The number of vertices for each problem is the number in its name (second column).}
+\begin{center}
+\begin{tabular}{|r|r|r||l|l|l|l|l|}
+\hline
+\# & Problem  &   Optimal   & \FAQ & \texttt{PATH} & \texttt{QBP} \\
+\hline
+1&    chr12c &   11156 &    \textbf{13072} &   18048 	& 20306\\
+2&    chr15a &    9896 &    27584 &   \textbf{19086} 	& 26132\\
+3&    chr15c &    9504 &    \textbf{11936}  &   16206 	& 29862\\
+4&   chr20b &    2298 & \textbf{3068} &    5560 		& 6674\\
+5&    chr22b &    6194 &    \textbf{8482} &    8500 		& 9942\\
+6&    esc16b & 292 &    320 & 300 		& \textbf{296}\\
+7& rou12 &  235528 &    \textbf{253684} &  256320 	& 278834\\
+8& rou15 &  354210 &    \textbf{371458} &  391270 	& 381016\\
+9& rou20 &  725522 &    \textbf{743884} &  778284 	& 804676\\
+10&    tai10a &  135028 &   157954 &  \textbf{152534} 	& 165364\\
+11&    tai15a &  388214 &   \textbf{397376} &  419224 	& 455778\\
+12&    tai17a &  491812 &   \textbf{529134} &  530978 	& 550862\\
+13&    tai20a &  703482 &   \textbf{734276} &  753712 	& 799790\\
+14&    tai30a & 1818146 &  	\textbf{1894640} & 1903872 	& 1996442\\
+15&    tai35a & 2422002 & 	\textbf{2460940} & 2555110 	& 2720986\\
+16&    tai40a & 3139370 &  	\textbf{3227612} & 3281830 	& 3529402\\
+    \hline
+\end{tabular}
+\end{center}
+\label{tab:1}
+\end{table}%
+
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=1.0\linewidth]{../figs/path16.pdf}
+	\caption{Performance of \FAQ relative to the previous state-of-the-art (\texttt{PSOA}) algorithms on the undirected QABLIB benchmarks.  Top: The optimal error ratio is defined: $(\mh{f} - f^*)/f^*$, for $\mh{f}$ being the minimum function value found by each algorithm, and $f^*$ is the optimal (minimum) value.  Bottom: Ratio of \FAQ minimum to \texttt{PSOA} minimum.  Note that both panels indicate that \FAQ gets closer to the minimum on 13 of 16 benchmarks.}
+	\label{fig:path16}
+\end{figure}
+
+
+\subsection{QAP Directed Benchmarks}
+\label{sub:directed}
+
+Nothing in the development of our algorithm depends on the graphs being simple; indeed, \FAQ applies equally well to directed graphs.  To assess the performance of \FAQ on directed graphs, we compare the performance of our algorithm to the previous state-of-the-art. Liu et al.  recently developed an extended path following algorithm for directed graphs \cite{Liu2012}. They compare the performance of their algorithm (\texttt{EPATH}) with several other algorithms on a set of 16 benchmarks from QAPLIB.  In particular, they consider \texttt{U} and \texttt{GRAD}, as well as an algorithm called \texttt{QCV}, which solves a convex relaxation similar to our approach.  The \texttt{EPATH} algorithm achieves at least as low objective value as the other algorithms on 15 of 16 benchmarks.  Our algorithm, \texttt{FAQ}, always gets the best of the five algorithms.  Table \ref{tab:directed} shows the numerical results comparing \FAQ to \texttt{EPATH} and \texttt{GRAD}, which sometimes did better than \texttt{EPATH}.  Note that some of the algorithms achieve the absolute minimum on some benchmarks.  Figure \ref{fig:lipa16} compares \FAQ to whichever other algorithm did best, clearly indicating that \FAQ is the best on these benchmarks.
+
+
+\begin{table}[h!]
+\caption{Comparison of \FAQ with optimal solution and previous state-of-the-art for undirected graphs.  The best (lowest) solution is in \textbf{bold}. Asterisks indicate achievement of the global minimum.  The number of vertices for each problem is the number in its name (second column).}
+\begin{center}
+\begin{tabular}{|r|r|r||l|l|l|l|l|}
+	\hline 
+	          \# &  Problem &      Optimal & \texttt{FAQ} & \texttt{EPATH} & \texttt{GRAD} \\
+	\hline 
+	           1 &  lipa20a &     3683 & \textbf{3791} &     3885 &     3909 \\ 
+	           2 &  lipa20b &    27076 & \textbf{27076}$^*$ &    32081 &    \textbf{27076}$^*$ \\ 
+	           3 &  lipa30a &    13178 & \textbf{13571} 	&    13577 &    13668 \\ 
+	           4 &  lipa30b &   151426 & \textbf{151426}$^*$ & \textbf{151426}$^*$ &   \textbf{151426}$^*$ \\ 
+	           5 &  lipa40a &    31538 & \textbf{32109} 	&    32247 &    32590 \\ 
+	           6 &  lipa40b &   476581 & \textbf{476581}$^*$ &   \textbf{476581}$^*$ &   \textbf{476581}$^*$ \\ 
+	           7 &  lipa50a &    62093 & \textbf{62962} &    63339 &    63730 \\ 
+	           8 &  lipa50b &  1210244 & \textbf{1210244}$^*$ &  \textbf{1210244}$^*$ &  \textbf{1210244}$^*$ \\ 
+	           9 &  lipa60a &   107218 & \textbf{108488} &   109168 &   109809 \\ 
+	          10 &  lipa60b &  2520135 & \textbf{2520135}$^*$ &  \textbf{2520135}$^*$ &  \textbf{2520135}$^*$ \\ 
+	          11 &  lipa70a &   169755 & \textbf{171820} &   172200 &   173172 \\ 
+	          12 &  lipa70b &  4603200 & \textbf{4603200}$^*$ &  \textbf{4603200}$^*$ &  \textbf{4603200}$^*$ \\ 
+	          13 &  lipa80a &   253195 & \textbf{256073} &   256601 &   258218 \\ 
+	          14 &  lipa80b &  7763962 & \textbf{7763962}$^*$ &  \textbf{7763962}$^*$ &  \textbf{7763962}$^*$ \\ 
+	          15 &  lipa90a &   360630 & \textbf{363937} &   365233 &   366743 \\ 
+	          16 &  lipa90b & 12490441 & \textbf{12490441}$^*$ & \textbf{12490441}$^*$ & \textbf{12490441}$^*$ \\ 
+	\hline
+	\end{tabular}
+\end{center}
+\label{tab:directed}
+\end{table}%
+
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=1.0\linewidth]{../figs/lipa16.pdf}
+	\caption{Performance of \FAQ relative to the previous state-of-the-art (\texttt{PSOA}) algorithms on the undirected QABLIB benchmarks. Top and Bottom panels as in Figure \ref{fig:path16}.  Note that \FAQ gets closer to the minimum on all 8 benchmarks for which the \FAQ and \texttt{PSOA} answer differ.}
+	\label{fig:lipa16}
+\end{figure}
+
+
+
+\subsection{rQAP solves QAP in certain special cases} % (fold)
 \label{sub:rqap_solves_qap_}
 
-Because FAQAP relaxes the constraints of QAP, in certain important special cases, the minimum of FAQAP will be identical to the minimum of QAP.  This insight leads to the following theorem:
-% Although, rLAP and LAP are always equivalent, in general, it is not the case that FAQAP and QAP are equivalent.  However, in a certain important special case, FAQAP and QAP are equivalent.
-\begin{thm}
-	If $A$ and $B$ are the adjacency matrices of simple graphs (symmetric, hollow, and binary) that are isomorphic to one another, then the minimum of FAQAP is equal to the minimum QAP.
-\end{thm}
+The above numerical results can be strengthened by the below theoretical results.  
+% results inspire us to consider when \FAQ achieves the absolute minimum. Because 
+Note that rQAP relaxes the constraints of QAP, which suggests that in certain important special cases, the minimum of rQAP will be identical to the minimum of QAP.  This insight leads to the following theorem:
+% Although, rLAP and LAP are always equivalent, in general, it is not the case that FAQ and QAP are equivalent.  However, in a certain important special case, FAQ and QAP are equivalent.
+\begin{lem}
+	If $A$ and $B$ are the adjacency matrices of simple graphs (symmetric, hollow, and binary) that are isomorphic to one another, then the minimum of rQAP is equal to the minimum of QAP.
+\end{lem}
 \begin{proof}
-Because any feasible solution to QAP is also a feasible solution to FAQAP, we must only show that the optimal solution to FAQAP can be no better than the optimal solution to QAP.  Let $A=PBP\T$, so that $\langle A, PBP\T\rangle=2m$, where $m$ is the number of edges in $A$.  If FAQAP could achieve a lower objective value, then it must be that there exists a $D \in \mc{D}$ such that $\langle A, DBD\T\rangle > \langle A, PBP\T\rangle = 2m$ (remember that we are minimizing the negative Euclidean inner product). For that to be the case, it must be that $(DBD\T)_{ij} \geq 1$ for some $(u,v)$.  That this is not so may be seen by the submultiplicativity of the $\ell_{\infty}$ norm:
-$\norm{Px}_\infty \leq \norm{P}_\infty \norm{x}_\infty$.  Applying this twice (once for each permutation matrix multiplication) yields our result.
+Because any feasible solution to QAP is also a feasible solution to rQAP, we must only show that the optimal solution to rQAP can be no better than the optimal solution to QAP.  Let $A=PBP\T$, so that $\langle A, PBP\T\rangle=2m$, where $m$ is the number of edges in $A$.  If rQAP could achieve a lower objective value, then it must be that there exists a $D \in \mc{D}$ such that $\langle A, DBD\T\rangle > \langle A, PBP\T\rangle = 2m$ (remember that we are minimizing the negative Euclidean inner product). For that to be the case, it must be that $(DBD\T)_{ij} \geq 1$ for some $(u,v)$.  That this is not so may be seen by the submultiplicativity of the norm induced by the $\ell_{\infty}$ norm:
+$\norm{Dx}_\infty \leq \norm{D}_{\infty,\infty} \norm{x}_\infty$.  Applying this twice (once for each doubly stochastic matrix multiplication) yields our result.
 % Consider $d_i=\langle D, \text{col}_i(BD\T) \rangle$, where $\text{col}_i(\cdot)$ indicates the $i^{th}$ column of the matrix.  $d_i \leq 1$ for all $i \in [n]$, therefore, our result holds.
 \end{proof}
 % subsection rqap_solves_qap_ (end)
@@ -442,128 +494,57 @@ $\norm{Px}_\infty \leq \norm{P}_\infty \norm{x}_\infty$.  Applying this twice (o
 % subsection numerical_results (end)
 
 
-
-\subsection{Algorithm Complexity and leading constants} % (fold)
-\label{sub:algorithm_complexity_and_leading_constants}
-
-% Both GM and its closely related counterpart, graph isomorphism (GI), are computationally difficult.  There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be $\mc{NP}$-hard, it remains unclear whether GI is in $\mc{P}$, $\mc{NP}$, or its own intermediate complexity class, $\mc{NP}$-isomorphism (or isomorphism-complete).  Yet, for large classes of GI and GM problems, linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(\exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GM or GI algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all graphs have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  
-As mentioned above, GM is computationally difficult; even those special cases for which polynomial time algorithms are available, the leading constants are intractably large for all but the simplest cases. We therefore determined the average complexity of our algorithm \emph{and} the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\approx 10^{-7}$ seconds), making using this algorithm feasible for even reasonably large graphs.
-
-
-
-\begin{figure}[htbp]
-	\centering			
-	\includegraphics[width=1.0\linewidth]{../figs/digraph_qap2}
-	\caption{Performance of \faqap as function of number of vertices. Data was sampled from an Erd\"os-R\'enyi model with $p=log(n)/n$.  Each dot represents a single simulation.  The solid line is the best fit cubic function.  Note the leading constant is $10^{-7}$ seconds. }
-	\label{fig:scaling}
-\end{figure}
-
-% subsection algorithm_complexity_and_leading_constants (end)
-
-
-\subsection{QAP benchmarks}
-
-Having demonstrated the theoretical properties of our approach, we are also interested in assessing its computational properties in comparison with other the previous state-of-the-art.  We therefore compare \faqap to other approaches using a selection of the QAP benchmark library \cite{Burkard1997}.  Specifically, \cite{Zaslavskiy2009} created a path following algorithm (\texttt{PATH}) based on a convex and concave relaxation of QAP.  In that manuscript, the authors considered 16 datasets from the QAP benchmark, the same 16 datasets as were used in \cite{Schellewald2001}, which are known to be ``particularly difficult''.  \texttt{PATH} was shown to outperform other state-of-the-art algorithms on 14 of 16 tests.  Specifically, \texttt{PATH} was compared to the Quadratic Programming Bound approach (\texttt{QGP}) of \cite{Anstreicher2001}, the graduated assignment algorithm (\texttt{GRAD}) of \cite{Gold1996}, and Umeyama's algorithm (\texttt{U}) \cite{Umeyama1988}.  Because either \texttt{PATH} or \texttt{QBP} outperformed \texttt{GRAD} and \texttt{U} on every dataset, Table \ref{tab:1} shows the performance of \faqap versus \texttt{PATH} and \texttt{QBP}.  \faqap outperforms both of the previous state-of-the-art inexact cubic algorithms on 12 out of 16 benchmarks.
-
-
-\begin{table}[h!]
-\caption{Comparison of \faqap with Minimum Solution and Previous State-of-the-Art.  The best (lowest) solution is in \textbf{bold}. The number of vertices for each problem is the number in its name (second column).}
-\begin{center}
-\begin{tabular}{|r|r|r||r|r|r|r|r|}
-\hline
-\# & Problem  &   Min   & \faqap & \texttt{PATH} & \texttt{QBP} \\
-\hline
-1&    chr12c &   11156 &    \textbf{13072} &   18048 	& 20306\\
-2&    chr15a &    9896 &    27584 &   \textbf{19086} 	& 26132\\
-3&    chr15c &    9504 &    17324 &   \textbf{16206} 	& 29862\\
-4&   chr20b &    2298 &     \textbf{3068} &    5560 		& 6674\\
-5&    chr22b &    6194 &    \textbf{8482} &    8500 		& 9942\\
-6&    esc16b &     292 &    320 &     300 		& \textbf{296}\\
-7&     rou12 &  235528 &    \textbf{253684} &  256320 	& 278834\\
-8&     rou15 &  354210 &    \textbf{371458} &  391270 	& 381016\\
-9&     rou20 &  725522 &    \textbf{743884} &  778284 	& 804676\\
-10&    tai10a &  135028 &   157954 &  \textbf{152534} 	& 165364\\
-11&    tai15a &  388214 &   \textbf{397376} &  419224 	& 455778\\
-12&    tai17a &  491812 &   \textbf{529134} &  530978 	& 550862\\
-13&    tai20a &  703482 &   \textbf{734276} &  753712 	& 799790\\
-14&    tai30a & 1818146 &  	\textbf{1894640} & 1903872 	& 1996442\\
-15&    tai35a & 2422002 & 	\textbf{2460940} & 2555110 	& 2720986\\
-16&    tai40a & 3139370 &  	\textbf{3227612} & 3281830 	& 3529402\\
-    \hline
-\end{tabular}
-\end{center}
-\label{tab:1}
-\end{table}%
-
 \subsection{Multiple Restarts} % (fold)
 \label{sub:multiple_restarts}
 
-Although \faqap outperformed \texttt{PATH} on 13 of 16 benchmarks, it was annoying to us to not be the best cubic time approximate QAP solver available.  
-% Note that the computational bottleneck of both \faqap and \texttt{PATH} is the Hungarian algorithm which solves a LAP. 
-In \texttt{PATH}, the algorithm finds the minimum of a convex path between two extremes, $F_0$ and $F_1$.  Similarly, \texttt{QBP} finds the minimum of a convex program.  Our approach, on the other hand, does not construct a convex problem to solve, rather, it chooses an initial starting point and then finds a local optimum (note that the initial position of the \texttt{PATH} algorithm could also be variable, because $F_0$ is not convex as they assert, so their starting point depends on their initialization). 
-
- The non-convexity of our approach is both a feature and a bug.  It is a bug, of course, because it means that the solution depends on the initial condition.  It is a feature, however, if (i) we have some reason to believe that better solutions exist (many algorithms efficiently compute relatively tight lower bounds \cite{Anstreicher2009}), and (ii) we can efficiently search the space of initial conditions.  Although we  lack any supporting theory of optimality, we do know how to sample feasible starting points.  Specifically, we desire that our starting points are ``near'' the flat matrix.  Therefore, we can sample $K \in \mc{D}$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let our initial guess be $P^{(0)}=(J+K)/2$, where $J$ is the doubly flat matrix.  We can therefore use any number of restarts with this approach.  
-
-Table \ref{tab:2} shows the performance of running \faqap 3 and 100 times, reporting only the best result, and comparing it to the best performing result from Table \ref{tab:1}.  It only required three restarts to outperform all other cubic algorithms on all the benchmarks.  Moreover, after 100 restarts, \faqap finds the absolute minimum.  Note that restarting \faqap multiple times is still cubic, although with an arbitrary number of random restarts, stating that it is cubic is somewhat meaningless.  
-
-
-%In \texttt{PATH}, the authors iteratively solve a LAP for each $d\lambda$, as they march along the path from $F_0$ to $F_1$ (see \cite{Zaslavskiy2009} for details).  The number of LAPs they must solve therefore dep  
-
-
-% reported improved performance in all but two cases, in which the QPB method of Cremers et al. \cite{Schellewald2001} achieved a lower minimum.  
-% % We compare \faqapm with the previous state-of-the-art algorithm.  
-% In \emph{all} cases, \texttt{FAQAP}$_3$ outperforms the previous best result, often by orders of magnitude in terms of relative error. In three cases, \faqapb achieves the absolute minimum.  In 12 out of 16 cases, the simple \faqapa algorithm outperforms the others (starting with the flat doubly stochastic matrix).  See Figure \ref{fig:fwpath} for quantitative comparisons.
-
-
-
-% Problem       FW1           FW3        FW10
-%     lipa20a         3791         3779         3779
-%     lipa20b        27076        27076        27076
-%     lipa30a        13571        13474        13449
-%     lipa30b       151426       151426       151426
-%     lipa40a        32109        32109        32094
-%     lipa40b       476581       476581       476581
-%     lipa50a        62962        62962        62906
-%     lipa50b      1210244      1210244      1210244
-%     lipa60a       108488       108488       108488
-%     lipa60b      2520135      2520135      2520135
-%     lipa70a       171820       171785       171611
-%     lipa70b      4603200      4603200      4603200
-%     lipa80a       256073       255779       255779
-%     lipa80b      7763962      7763962      7763962
-%     lipa90a       363937       363937       363884
-%     lipa90b     12490441     12490441     12490441
+Although \FAQ outperformed \texttt{PSOA} on 13 of 16 undirected benchmarks, and always did the best amongst 16 of 16 directed benchmarks, it was annoying to us that we did not do best on all 32 benchmarks.  
+% Note that the computational bottleneck of both \FAQ and \texttt{PATH} is the Hungarian algorithm which solves a LAP. 
+% \FAQ strives to solve a non-convex problem.
+% In \texttt{PATH}, the algorithm finds the minimum of a convex path between two extremes, $F_0$ and $F_1$.  Similarly, \texttt{QBP} finds the minimum of a convex program.  Our approach, on the other hand, does not construct a convex problem to solve, rather, it chooses an initial starting point and then finds a local optimum (note that the initial position of the \texttt{PATH} algorithm could also be variable, because $F_0$ is not convex as they assert, so their starting point depends on their initialization). 
 % 
+We utilize the non-convexity of rQAP is as a feature, although it can equally well be regarded as a bug  (because rQAP is non-convex so the solution found by \FAQ depends on the initial condition).  It is a feature, however, if (i) we have some reason to believe that better solutions exist (many algorithms efficiently compute relatively tight lower bounds \cite{Anstreicher2009}), and (ii) we can efficiently search the space of initial conditions.  Although we  lack any supporting theory of optimality, we do know how to sample feasible starting points.  Specifically, we desire that our starting points are ``near'' the flat matrix, and satisfy the conditions.  Therefore, we  sample $K \in \mc{D}$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let our initial guess be $P^{(0)}=(J+K)/2$, where $J$ is the doubly flat matrix.  We can therefore use any number of restarts with this approach.  
+
+Table \ref{tab:2} shows the performance of running \FAQ 3 and 100 times, reporting only the best result (indicated by \texttt{FAQ}$_3$ and \texttt{FAQ}$_{100}$, respectively), and comparing it to the best performing result from Table \ref{tab:1}.  It only required three restarts to outperform all other cubic algorithms on all 16 of 16 benchmarks.  Moreover, after 100 restarts, \FAQ finds the absolute minimum on 3 of the 16 benchmarks. Figure \ref{fig:restarts} graphically demonstrates these results. 
+ Note that restarting \FAQ a fixed number of multiple times is still cubic.  Future work could investigate performance as a function of the number of restarts. %, although with an arbitrary number of random restarts, stating that it is cubic is somewhat meaningless.  
+
 
 
 \begin{table}[h!]
-\caption{Comparison of \faqap with Minimum Solution and the best result from Table \ref{tab:1}, called \texttt{BEST}.  Benchmarks for which 100 restarts of \faqap found the global minimum are \textbf{bold}.}
+\caption{Comparison of \FAQ with optimal solution and the best result from Table \ref{tab:1} on undirected benchmarks.  Note that \FAQ restarted 100 times finds the optimal solution in 3 of 16 benchmarks, and that \FAQ restarted 3 times finds a solution better than the PSOA on all 16 benchmarks.}
 \begin{center}
-\begin{tabular}{|r|r|r||r|r|r|r|r|}
+\begin{tabular}{|r|r|r||l|l|l|l|l|}
 \hline
-\# & Problem  &   Min    & \texttt{FAQAP}$_{100}$ & \texttt{FAQAP}$_{3}$ & \texttt{BEST} \\
+\# & Problem  &   Optimal    & \texttt{FAQ}$_{100}$ & \texttt{FAQ}$_{3}$ & min(\FAQ,\texttt{PSOA}) \\
 \hline
-1&    chr12c &   11156 &   12176 &   13072 &     13072 \\
-2&    chr15a &    9896 &    \textbf{9896} &   17272 &      19086 \\
-3&    chr15c &    9504 &   10960 &   14274 &      16206 \\
-4&   chr20b &    2298 &    2786 &    3068 &        3068 \\
-5&    chr22b &    6194 &    7218 &    7876 &       8482 \\
-6&    esc16b &     292 &     \textbf{292} &     294 &        296 \\
-7&     rou12 &  235528 &  \textbf{235528} &  238134 &    253684 \\
-8&     rou15 &  354210 &  356654 &  371458 &    371458 \\
-9&     rou20 &  725522 &  730614 &  743884 &    743884 \\
-10&    tai10a &  135028 &  135828 &  148970 &    152534 \\
-11&    tai15a &  388214 &  391522 &  397376 &    397376 \\
-12&    tai17a &  491812 &  496598 &  511574 &    529134 \\
-13&    tai20a &  703482 &  711840 &  721540 &    734276 \\
-14&    tai30a & 1818146 & 1844636 & 1890738 &  1894640 \\
-15&    tai35a & 2422002 & 2454292 & 2460940 &  2460940 \\
-16&    tai40a & 3139370 & 3187738 & 3194826 &  3227612 \\
+1&    chr12c &   11156 &    \textbf{12176} &   13072 & 13072 \\
+2&    chr15a &    9896 &    \textbf{9896}$^*$ &   17272 &  19086 \\
+3&    chr15c &    9504 &    \textbf{10960} &   14274 &  16206 \\
+4&   chr20b &    2298 &     \textbf{2786} &    3068 &    3068 \\
+5&    chr22b &    6194 &    \textbf{7218} &    7876 &   8482 \\
+6&    esc16b & 	292 & 		\textbf{292}$^*$ & 294 &    296 \\
+7& 	   rou12 &  235528 &  \textbf{235528}$^*$ &  238134 &    253684 \\
+8& 	   rou15 &  354210 &  \textbf{356654} &  371458 &    371458 \\
+9&      rou20 &  725522 &  \textbf{730614} &  743884 &    743884 \\
+10&    tai10a &  135028 &  \textbf{135828} &  148970 &    152534 \\
+11&    tai15a &  388214 &  \textbf{391522} &  397376 &    397376 \\
+12&    tai17a &  491812 &  \textbf{496598} &  511574 &    529134 \\
+13&    tai20a &  703482 &  \textbf{711840} &  721540 &    734276 \\
+14&    tai30a & 1818146 & \textbf{1844636} & 1890738 &  1894640 \\
+15&    tai35a & 2422002 & \textbf{2454292} & 2460940 &  2460940 \\
+16&    tai40a & 3139370 & \textbf{3187738} & 3194826 &  3227612 \\
     \hline
 \end{tabular}
 \end{center}
 \label{tab:2}
 \end{table}%
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=1.0\linewidth]{../figs/path16_restarts.pdf}
+	\caption{Performance of \FAQ with multiple restarts on the undirected benchmarks.}
+	\label{fig:restarts}
+\end{figure}
+
 
 % subsection multiple_restarts (end)
 
@@ -571,7 +552,7 @@ Table \ref{tab:2} shows the performance of running \faqap 3 and 100 times, repor
 % \begin{figure}[htbp]
 % 	\centering			
 % 	\includegraphics[width=1.0\linewidth]{../figs/benchmarks.pdf}
-% 	\caption{\texttt{FAQAP}$_3$ outperforms the previous state-of-the-art (PSOA) on all 16 benchmark graph matching problems.  Moreover, \faqapa outperforms PSOA on 12 of 16 tests.  For 3 of 16 tests, \faqapb achieves the minimum (none of the other algorithms ever find the absolute minimum), as indicated by a black dot.  Let $f_*$ be the minimum and $\mh{f}_x$ be the minimum achieved by algorithm $x$.  Error is $\mh{f}_x/f_*-1$.  }
+% 	\caption{\texttt{FAQ}$_3$ outperforms the previous state-of-the-art (PSOA) on all 16 benchmark graph matching problems.  Moreover, \FAQa outperforms PSOA on 12 of 16 tests.  For 3 of 16 tests, \FAQb achieves the minimum (none of the other algorithms ever find the absolute minimum), as indicated by a black dot.  Let $f_*$ be the minimum and $\mh{f}_x$ be the minimum achieved by algorithm $x$.  Error is $\mh{f}_x/f_*-1$.  }
 % 	\label{fig:fwpath}
 % \end{figure}
 
@@ -580,51 +561,73 @@ Table \ref{tab:2} shows the performance of running \faqap 3 and 100 times, repor
 \subsection{Brain-Graph Matching} % (fold)
 \label{sub:connectome_classification}
 
-A ``connectome'' is a brain-graph in which vertices correspond to (collections of) neurons, and edges correspond to connections between them. The \emph{Caenorhabditis elegans} (\emph{C. elegans}) is a small worm (nematode) with $302$ labeled vertices.  We consider the subgraph with $279$ somatic neurons that form edges with other neurons \cite{WhiteBrenner86, Varshney2011}.  Two distinct kinds of edges exist between vertices: chemical and electrical ``synapses'' (edges). Any pair of vertices may have several edges of each type. Moreover, some of the synapses are hyper-edges amongst more than two vertices.   Thus, the connectome of a \emph{C. elegans} may be thought of as a weighted multi-hypergraph, where the weights are the number of edges of each type.  \faqap natively operates on weighted or unweighted graphs.  We therefore conducted the following synthetic experiments.  
+A ``connectome'' is a brain-graph in which vertices correspond to (collections of) neurons, and edges correspond to connections between them. The \emph{Caenorhabditis elegans} (\emph{C. elegans}) is a small worm (nematode) with $302$ labeled vertices.  We consider the subgraph with $279$ somatic neurons that form edges with other neurons \cite{WhiteBrenner86, Varshney2011}.  Two distinct kinds of edges exist between vertices: chemical and electrical ``synapses'' (edges). Any pair of vertices may have several edges of each type. Moreover, some of the synapses are hyper-edges amongst more than two vertices.   Thus, the connectome of a \emph{C. elegans} may be thought of as a weighted multi-hypergraph, where the weights are the number of edges of each type.  \FAQ natively operates on weighted or unweighted graphs.  We therefore conducted the following synthetic experiments.  
 
-Let $A_{ij;z} \in \{0,1,2,\ldots\}$ be the number of synapses from neuron $i$ to neuron $j$ of type $z$ (either chemical $c$ or electrical $e$), and let $A_z=\{A_{ij;z}\}_{i,j \in [279]}$ for $z \in \{e,c\}$ correspond to the electrical or chemical connectome.  To generate synthetic data, we let $B_z^{(k)}=Q_z^{(k)} A_z {Q_z^{(k)}}\T$, for some $Q_z^{(k)}$ chosen uniformly at random from $\mc{P}$, effectively shuffling the vertex labels of the connectome.  Then, we tried to graph match $A_z$ to $B_z^{(k)}$, for $z \in \{e,c\}$ and for $k \in [10]$, that is, we repeat the experiment 10 times.  We define accuracy by the value of our objective function, $f(P_z^{(k)})$.  To evaluate the impact of multiple restarts, for both connectomes, we restarted \faqap up to 30 times.   Specifically, our stopping criteria on the number of restarts was either (i) perfect assignment or (ii) 30 restarts.
+Let $A_{ij;z} \in \{0,1,2,\ldots\}$ be the number of synapses from neuron $i$ to neuron $j$ of type $z$ (either chemical $c$ or electrical $e$), and let $A_z=\{A_{ij;z}\}_{i,j \in [279]}$ for $z \in \{e,c\}$ correspond to the electrical or chemical connectome.  To generate synthetic data, we let $B_z^{(k)}=Q_z^{(k)} A_z {Q_z^{(k)}}\T$, for some $Q_z^{(k)}$ chosen uniformly at random from $\mc{P}$, effectively shuffling the vertex labels of the connectome.  Then, we try to graph match $A_z$ to $B_z^{(k)}$, for $z \in \{e,c\}$ and for $k =1,2,\ldots, 10$, that is, we repeat the experiment 100 times.  We define accuracy as the fraction of vertices correctly assigned. We always start with the doubly flat matrix.
+% by the value of our objective function, $f(P_z^{(k)})$.  
+% To evaluate the impact of multiple restarts, for both connectomes, we restarted \FAQ up to 30 times.   Specifically, our stopping criteria on the number of restarts was either (i) perfect assignment or (ii) 30 restarts.
 
-Table \ref{tab:1} shows the mean (standard deviation) of accuracy, number of restarts, and solution time for both connectomes.  For the chemical connectome, \faqap always found the optimal solution.  For the electrical one, the mean number of restarts was  $<30$ times, meaning that \faqap sometimes found the optimal solution. The properties of these connectomes are analyzed in \cite{Varshney2011}, but it remains unclear to us why the chemical connectome was so much easier to graph match than the electrical one. Both ran very quickly, only requiring tens of seconds.  Note that the number of vertices in this brain-graph matching problem is about an order of magnitude larger than the largest of the 16 benchmarks used above. 
+% Table \ref{tab:1} shows the mean (standard deviation) of accuracy and solution time for both connectomes.  For the chemical connectome, \FAQ always found the optimal solution, but not so for the electrical connectome.  
 
- % of applying \faqapm to both $A_c$ and $A_e$ for $s=10$ times.  
+Figure \ref{fig:connectomes} displays the results of \FAQ along with three previous state-of-the-art algorithms on the two connectomes (\texttt{U}, \texttt{QCV} and \texttt{PATH}).  For the chemical connectome, \FAQ \emph{always} found the optimal solution, whereas none of the other algorithms \emph{ever} found the optimal solution.  On the other hand, for the electrical connectome, none of the four algorithms ever found the optimal.
+% For the electrical one, the mean number of restarts was  $<30$ times, meaning that \FAQ sometimes found the optimal solution. 
+The properties of these connectomes are analyzed in \cite{Varshney2011}; a cursory evaluation of the properties of these graphs does not suggest to us why the chemical connectome was so much easier to graph match than the electrical one. \FAQ found the optimal solution very quickly, only requiring an average of 42 ($\pm 0.42$) seconds.  \FAQ ran about twice as long while searching for the optimal solution for the electrical connectome. 
+% Both ran very quickly, only requiring tens of seconds.  
+One hundred restarts of \FAQ failed to significantly improve the results for the electrical connectome. 
+Note that the number of vertices in this brain-graph matching problem is significantly larger than the largest of the 32 benchmarks used above. 
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[width=1.0\linewidth]{../figs/connectomes.pdf}
+	\caption{Performance of \texttt{U}, \texttt{QCV}, \texttt{PATH}, and \FAQ on synthetic C.~elegans connectome data.  Error is the fraction of vertices correctly matched.  Circle indicates the median, thick black bars indicate the quartiles, thin black lines indicate extreme but non-outlier points, and plus signs are outliers.	For the chemical connectome, \FAQ always obtained the optimal solution, whereas none of the other algorithms ever found the optimal.  On the other hand, for the electrical connectome, none of the algorithms ever found the optimal.}
+	\label{fig:connectomes}
+\end{figure}
+
+% We also evaluated the performance of a number of other algorithms on these graph matching problems.  In particular, we acquired the `graphm' package, and ran all five algorithms, including the \texttt{PATH} algorithm, which outperformed the four from the package on these problems.  Specifically, the \texttt{PATH} algorithm got $60  (\pm 0.21) \%$  and $87  (\pm 0.02)\%$ accuracy on the chemical and electrical connectomes, respectively.  Interestingly, the performance of \texttt{PATH} is significantly worse for the chemical connectome, but significantly better for the electrical connectome.  This motivated us to consider multiple restarts of \FAQ for the electrical connectome.  Results are XXXXX.
+
+ % of applying \FAQm to both $A_c$ and $A_e$ for $s=10$ times.  
 % Note that average solution time is actually smaller than predicted via simulations.  Further n
 % Note that while the electrical connectome was more difficult, the median number of restarts was less than $30$. 
 % 
 %   Therefore, this approach achieved perfect assignment sometimes, even on this harder assignment problem.
 
-To investigate the performance of \faqap on undirected graphs, we repeated the above analysis using binarized symmeterized versions of the graphs ($A_{ij;z}=1$ if and only if $A_{ij;z}\geq 1$ or $A_{ji;z} \geq 1$).  The resulting summary statistics are nearly identical to those presented in Table \ref{tab:1}, although speed increased by greater than a factor of two.
+To investigate the performance of \FAQ on undirected graphs, we ran \FAQ on binarized symmeterized versions of the graphs ($A_{ij;z}=1$ if and only if $A_{ij;z}\geq 1$ or $A_{ji;z} \geq 1$).  The resulting errors are nearly identical to those presented in Figure \ref{fig:connectomes}, although speed increased by greater than a factor of two.
 
-\begin{table}
-\caption{Brain-graph matching summary statistics for both the chemical and electrical connectome. }
-	\label{tab:3}
-\begin{center}
-\begin{tabular}{|l|c|c|c|}
-	\hline  		& unit		& chemical 	& electrical \\ \hline
-	Accuracy  		& \%	  	& 100  (0)  & 59 (0.30)  \\
-	Restarts 	  	& \#		& 3    (0)  & 25 (6.7)   \\
-	Solution Time  	& sec.		& 42 (0.42)	& 79 (20)  	 \\ \hline
-\end{tabular} 
-\end{center}
-\end{table}
+% \begin{table}
+% \caption{Brain-graph matching summary statistics for both the chemical and electrical connectome. }
+% 	\label{tab:3}
+% \begin{center}
+% \begin{tabular}{|l|c|c|c|}
+% 	\hline  		& unit		& chemical 	& electrical \\ \hline
+% 	Accuracy  		& \%	  	& 100  (0)  & 59 (0.30)  \\
+% 	% Restarts 	  	& \#		& 3    (0)  & 25 (6.7)   \\
+% 	Solution Time  	& sec.		& 42 (0.42)	& 79 (20)  	 \\ \hline
+% \end{tabular} 
+% \end{center}
+% \end{table}
 
  
 
 
 \section{Discussion}
+\label{sec:discussion}
 
-This work presents a fast approximate quadratic assignment problem algorithm \faqap for approximately solving large (brain-) graph matching problems.  Our key insight was to relax the binary constraint of the QCQP to its continuous and non-negative counterpart---the doubly stochastic matrix---which is the convex hull of the original feasible region.  We then demonstrate that the solution to our relaxed optimization problem, FAQAP, is identical to that for QAP whenever the two graphs are simple and isomorphic to one another. Numerically, we demonstrated that not only is \faqap cubic in time, but also its leading constants are quite small.  Moreover, it achieves better performance than previous state-of-the-art cubic-time algorithms on 12 of the 16 standard QAP benchmarks.  Finally, it solved a brain-graph matching problem, which has an order of magnitude more vertices than any of the 16 QAP benchmarks.
+This work presents a fast approximate quadratic assignment problem algorithm called \FAQ for approximately solving large graph matching problems, motivated by brain-graphs.  Our key insight was to relax the binary constraint of QAP to its continuous and non-negative counterpart---the doubly stochastic matrix---which is the convex hull of the original feasible region.  
+Numerically, we demonstrated that not only is \FAQ cubic in time, but also its leading constants are quite small, suggesting that it might scale up reasonably well.  Moreover, it achieves better performance than previous state-of-the-art cubic-time algorithms on 29 of the 32 standard QAP benchmarks, including both directed and undirected graph matching problems.  Because rQAP is non-convex, we also consider multiple restarts, and achieve improved performance for the remaining three benchmarks using only two or three restarts.  We then demonstrate that the solution to our relaxed optimization problem, rQAP, is identical to that for QAP whenever the two graphs are simple and isomorphic to one another.  Finally, we used it to match C.~elegans connectomes to permuted versions of themselves. For the chemical connectome, of the four state-of-the-art algorithms, \FAQ achieved perfect performance $100\%$ of the time, whereas none of the other three algorithms ever achieved perfect performance. On the other hand, all the algorithms struggled with the electrical connectome.   Note that these connectomes have 302 vertices, significantly more than all the benchmarks. 
+
+% our motivating application: brain-graph matching.  \FAQ solved a brain-graph matching problem, which has an order of magnitude more vertices than any of the 16 QAP benchmarks.
 
 % These insights led to an approximate QAP solver with a few distinct features. %While others have incorporated the FW algorithm as a subroutine of a graph matching strategy \cite{Zaslavskiy2009}, we modified the FW algorithm for GM in a few ways.  
 
-% First, after finding a local solution to the relaxed problem, we project the resulting doubly stochastic matrix onto the set of permutation matrices.  Second, we initialize the algorithm using either the identity matrix or the doubly flat matrix (the matrix where all elements are $1/n$).  These choices seem to us to be the most obvious places to start if one must choose.  Third, if one of those choices does not work, we restart FW with other ``nearby'' initial points.  These modifications facilitate improved performance on \emph{all} the benchmarks we considered.  Moreover, although the algorithm scales cubically with the number of vertices, the leading constants are very small ($\mc{O}(10^{-7})$ seconds), so the algorithm runs quite fast on reasonably sized networks (e.g., $n \approx 100$).  Indeed, on a biologically inspired GM problem, \emph{C. elegans} connectome mapping, this approach was both fast and effective.  
+% First, after finding a local solution to the relaxed problem, we project the resulting doubly stochastic matrix onto the set of permutation matrices.  Second, we initialize the algorithm using either the identity matrix or the doubly flat matrix (the matrix where all elements are $1/n$).  These choices seem to us to be the most obvious places to start if one must choose.  Third, if one of those choices does not work, we restart FW with other ``nearby'' initial points.  These modifications facilitate improved performance on \emph{all} the benchmarks we considered.  Moreover, although the algorithm scales cubically with the number of vertices, the leading constants are very small ($\mc{O}(10^{-7})$ seconds), so the algorithm runs quite fast on reasonably sized networks (e.g., $n \dot{\approx} 100$).  Indeed, on a biologically inspired GM problem, \emph{C. elegans} connectome mapping, this approach was both fast and effective.  
 
-Fortunately, our work is not done. Even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve of Figure \ref{fig:scaling}, this algorithm would take about 2 years to finish (on a standard laptop from 2011) when $n=20,000$.  We hope to be able to approximately solve FAQAP on graphs much larger than that, given that the number of neurons in even a fly brain, for example, is $\mc{O}(10^5)$.  Therefore, more efficient implementations are of interest.  
+Fortunately, our work is not done. Even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve of Figure \ref{fig:scaling}, this algorithm would take about 2 years to finish (on a standard laptop from 2011) when $n=20,000$.  We hope to be able to approximately solve rQAP on graphs much larger than that, given that the number of neurons in even a fly brain, for example, is $\mc{O}(10^5)$.  Therefore, more efficient implementations are of interest.  
 
-% Although \faqapm consistently found the optimal solution for the \emph{C. elegans} chemical connectome, connectomes for different organisms even within a species are unlikely to be identical. Even if all connectomes of a particular species were identical, measurement error will likely persist \cite{Helmstaedter2011}. Therefore, \texttt{FAQAP}$_m$'s scientific utility will largely rest on its performance under noisy conditions, which we aim to explore in future work.  
+% Although \FAQm consistently found the optimal solution for the \emph{C. elegans} chemical connectome, connectomes for different organisms even within a species are unlikely to be identical. Even if all connectomes of a particular species were identical, measurement error will likely persist \cite{Helmstaedter2011}. Therefore, \texttt{FAQ}$_m$'s scientific utility will largely rest on its performance under noisy conditions, which we aim to explore in future work.  
 
-Additional future work might generalize \faqap in a number of ways.  First, many (brain) graphs of interest will be errorfully observed \cite{Priebe2011}, that is, vertices might be missing and putative edges might exhibit both false positives and false negatives.  Explicitly dealing with this error source is both theoretically and practically of interest \cite{VP11_unlabeled}.  
+Additional future work might generalize \FAQ in a number of ways.  First, many (brain-) graphs of interest will be errorfully observed \cite{Priebe2011}, that is, vertices might be missing and putative edges might exhibit both false positives and false negatives.  Explicitly dealing with this error source is both theoretically and practically of interest \cite{VP11_unlabeled}.  
 % that QAP and LAP are so similar suggests that perhaps one could simply implement a single iteration of QAP starting from the identity.  While not changing the order of complexity, it could reduce computational time by at least an order of magnitude, without drastically changing performance properties (because convergence typically requires around $5-15$ iterations for the graphs we tested).  The relative performance/computational cost trade-off merits further theoretical investigations.  
-Second, for many brain-graph matching problems, the number of vertices will not be the same across the brains.  Recent work from \cite{Zaslavskiy2009, Zaslavskiy2010} and \cite{Escolano2011} suggest that extensions in this direction would be both relatively straightforward and effective. Third, the most ``costly'' subroutine is LAP.  Fortunately, LAP is a quadratic optimization problem with linear constraints.  A number of parallelized optimization strategies could therefore potentially be brought to bear on this problem \cite{Boyd2011}.  Fourth, our matrices have certain special properties, namely sparsity, which makes more efficient algorithms (such as ``active set'' algorithms) readily available for further speed increases.  Fourth, for brain-graphs, we have some prior information that could easily be incorporated in the form of vertex attributes.  For example, position in the brain, cell type, etc., could be used to measure ``dissimilarity'' between vertices.  The WGMP could easily incorporate these dissimilarities, in fact, the original QAP formulation already encodes them via the matrix $C$; that matrix was simply dropped when WGMP was originally proposed.  
+Second, for many brain-graph matching problems, the number of vertices will not be the same across the brains.  Recent work from \cite{Zaslavskiy2009, Zaslavskiy2010} and \cite{Escolano2011} suggest that extensions in this direction would be both relatively straightforward and effective. Third, the most ``costly'' subroutine is LAP.  Fortunately, LAP is a quadratic optimization problem with linear constraints.  A number of parallelized optimization strategies could therefore potentially be brought to bear on this problem \cite{Boyd2011}.  Fourth, our matrices have certain special properties, namely sparsity, which makes more efficient algorithms (such as ``active set'' algorithms) readily available for further speed increases.  Fourth, for brain-graphs, we have some prior information that could easily be incorporated in the form of vertex attributes.  For example, position in the brain, cell type, etc., could be used to measure ``dissimilarity'' between vertices.  %The WGMP could easily incorporate these dissimilarities, in fact, the original QAP formulation already encodes them via the matrix $C$; that matrix was simply dropped when WGMP was originally proposed.  
 % The objective function could then be modified to give
 % \begin{align} \label{eq:Jqap}
 % 	\mt{Q}_{AB}= \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F + \lambda J(Q),
@@ -660,7 +663,7 @@ The standard way of writing a Linear Assignment Problem (LAP) is
 	&\text{subject to } \pi \in \Pi,
 \end{align}
 \end{subequations}
-which can be written equivalently in a number of ways using the notion of permutation matrix introduced above:
+which can be written equivalently in a number of ways using the notion of permutation matrix introduced in the main text:
 \begin{subequations} \label{eq:LAP2}
 \begin{align}
 	&\argmin_{\PmcP} \norm{PA - B}_F =\\
@@ -743,13 +746,13 @@ This relaxation motivates our approach to approximating QAP.
 % % % \begin{align} \label{eq:grad2}
 % % 	$\partial f'/\partial Q = 2A B\T$. 
 % % % \end{align}
-% Comparing this gradient to the gradient of the QAP objective function---Eq. \eqref{eq:grad}---one can see that when (i) $P^{(i)}$ is the identity matrix and (ii) both $A$ and $B$ are symmetric (for example, for undirected graphs), the two gradients are identical.  Thus, if QAP is initialized at the identity matrix and the graphs are undirected, the first permutation matrix---the output of \emph{Step 2} in our \faqap algorithm---is identical to the LAP solution; although the line search will make $P^{(1)}$ not equal the LAP solution in general. %$ \neq Q_{LAP}$, in general.  %Moreoever, projecting a matrix onto the closest permutation matrix can be written as a LAP because of the following relationship:
+% Comparing this gradient to the gradient of the QAP objective function---Eq. \eqref{eq:grad}---one can see that when (i) $P^{(i)}$ is the identity matrix and (ii) both $A$ and $B$ are symmetric (for example, for undirected graphs), the two gradients are identical.  Thus, if QAP is initialized at the identity matrix and the graphs are undirected, the first permutation matrix---the output of \emph{Step 2} in our \FAQ algorithm---is identical to the LAP solution; although the line search will make $P^{(1)}$ not equal the LAP solution in general. %$ \neq Q_{LAP}$, in general.  %Moreoever, projecting a matrix onto the closest permutation matrix can be written as a LAP because of the following relationship:
 % % \begin{align}
 % % 	\argmin_{\PmcP} \norm{QA\T - I}_F^2 &= \argmin_{\PmcP} (QA\T-I)\T (QA\T-I) 
 % % \nonumber\\ &=\argmin_{\PmcP} AQ\T QA\T -2QA\T - II = \argmin_{\PmcP}  -\langle Q, A\T \rangle  
 % % \end{align}
 % 
-% % In the above simulation, the first iteration of \faqap is essentially the only useful one.  Thus, we compare the performance of \texttt{BPI}$\circ$\texttt{LAP} (dark gray).  The performance of LAP and QAP are not statistically different for this simulation.  This suggests that for certain problems, LAP (which is $\mc{O}(n^3)$) is both an efficient and useful approximation to solving $\mc{NP}$-hard graph matching problems. We were unable to find a model for simple graphs in which multiple iterations of \faqap improved performance over LAP. %We confirm this intuition by substituting QAP with LAP in the above simulations (black line).  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic time complexity, will often suffice.
+% % In the above simulation, the first iteration of \FAQ is essentially the only useful one.  Thus, we compare the performance of \texttt{BPI}$\circ$\texttt{LAP} (dark gray).  The performance of LAP and QAP are not statistically different for this simulation.  This suggests that for certain problems, LAP (which is $\mc{O}(n^3)$) is both an efficient and useful approximation to solving $\mc{NP}$-hard graph matching problems. We were unable to find a model for simple graphs in which multiple iterations of \FAQ improved performance over LAP. %We confirm this intuition by substituting QAP with LAP in the above simulations (black line).  As depicted in the above figures, this intuition is consistent with the numerical results. In other words, while naively one might implement an algorithm with exponential time complexity, LAP, which is only quadratic time complexity, will often suffice.
 % 
 % 
 % % subsection lap_vs_qap (end)
@@ -825,6 +828,9 @@ The authors would like to acknowledge two helpful reviewers as well as Lav Varsh
 % % Can be used to pull up biographies so that the bottom of the last one
 % % is flush with the other column.
 % % \enlargethispage{-5in}
+
+\input{../PAMI/QAP-response.tex}
+
 
 \end{document}
 

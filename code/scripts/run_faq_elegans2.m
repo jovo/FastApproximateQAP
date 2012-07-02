@@ -1,0 +1,75 @@
+%% connectome times
+clear, clc
+rootDir=['~/Research/projects/primary/FastApproximateQAP/'];
+
+load([rootDir, 'data/elegans/elegans_connectomes2.mat'])
+
+[nvertices foo niters]=size(permed_Achem);
+x0=[1/nvertices*ones(nvertices^2,1);1/nvertices*ones(nvertices^2,1)];
+
+
+%% Achem
+times=zeros(niters,1);
+errors=times;
+iters=errors;
+parfor idx=1:niters
+    
+    display(['chem ', idx])
+    tic;
+    [~,myq,~,iters(idx)]=sfw(Achem,-permed_Achem(:,:,idx),30);
+    times(idx)=toc;
+    errors(idx)=sum(myq~=perms(:,idx)');
+end
+
+chem.times=times;
+chem.errors=errors;
+chem.iters=iters;
+
+save([rootDir, 'data/results/elegans_connectomes2.mat'])
+
+%% Agam
+times=zeros(niters,1);
+errors=times;
+iters=errors;
+parfor idx=1:niters
+    
+    display(['gap ', num2str(idx)])
+    tic;
+    [~,myq,~,iters(idx)]=sfw(Agap,-permed_Agap(:,:,idx),30);
+    times(idx)=toc;
+    errors(idx)=sum(myq~=perms(:,idx)');
+    
+end
+
+gap.times=times;
+gap.errors=errors;
+gap.iters=iters;
+    
+save([rootDir, 'data/results/elegans_connectomes2.mat'])
+
+
+% Agam with multiple restarts
+times=zeros(niters,1);
+errors=times;
+iters=errors;
+for idx=1:niters
+    
+    tic;
+    parfor restart=1:100
+        display(['idx ', num2str(idx), ' restart ', num2str(restart)])
+        if restart==1
+            [~,myq,~,iters(idx,restart)]=sfw(Agap,-permed_Agap(:,:,idx),30);
+        else
+            [~,myq,~,iters(idx,restart)]=sfw(Agap,-permed_Agap(:,:,idx),30,-1);
+        end
+        times(idx,restart)=toc;
+        errors(idx,restart)=sum(myq~=perms(:,idx)');
+        
+    end
+    gap100.times=times;
+    gap100.errors=errors;
+    gap100.iters=iters;
+    
+    save([rootDir, 'data/results/elegans_connectomes2.mat'])
+end
+
