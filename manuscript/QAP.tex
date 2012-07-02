@@ -189,7 +189,7 @@ Thus, the feasible region expands to the convex hull of the permutation matrices
 % the feasible space becomes the doubly stochastic matrices; that is, all matrices whose rows and columns both sum to unity, and whose elements are all non-negative, $\mc{D}=\{P : P\T \mb{1} =  P \mb{1} = \mb{1}, P \succeq 0\}$, where $\succeq$ indicates an element-wise inequality. Because the equalities in Eq. \eqref{eq:GM} follow from $P$ being a permutation matrix, relaxing the constraints for different formulations yields different optimization problems.  We relax the binary constraints in the trace formulation, yielding:
 \begin{subequations} \label{eq:FAQ}
 \begin{align}
-		\text{(rQAP) } \quad &\underset{P}{\text{minimize}}  && - tr(B\T PAP\T) \label{eq:FAQ1}  \\
+		\text{(rQAP) } \quad &\underset{P}{\text{minimize}}  && - tr(B P\T AP) \label{eq:FAQ1}  \\
 		&\text{subject to } && P \in \mc{D}.
 \end{align}
 \end{subequations}
@@ -198,7 +198,7 @@ Thus, the feasible region expands to the convex hull of the permutation matrices
 % Importantly, the convex hull of permutation matrices is the set of doubly stochastic matrices, implying that this is a ``natural'' relaxation in a very meaningful sense.    Moreover, a
 rQAP---the above relaxed Quadratic Assignment Problem---is quadratic but not necessarily convex, 
 % Although the objective function  $f(P)= - tr(B\T PAP\T)$ of  FAQ is ,
-because the Hessian of its objective function, $f(P)= - tr(B\T PAP\T)$, is not necessarily positive definite:
+because the Hessian of its objective function is not necessarily positive definite:
 \begin{align}
 	\nabla^2 f(P)  =  B \otimes A + B\T \otimes A\T,
 \end{align}
