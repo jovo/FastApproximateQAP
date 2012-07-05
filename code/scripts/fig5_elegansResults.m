@@ -124,3 +124,7 @@ if savestuff==1
     saveas(gcf,figName)
 end
 
+%%
+percentiles=[0.05, .25, .5, .75, .95];
+chemFAQTimePercentiles=quantile(time(1,1:100,1),percentiles)
+chemFAQTimeIQR=chemFAQTimePercentiles(4)-chemFAQTimePercentiles(2)
