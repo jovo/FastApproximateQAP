@@ -121,21 +121,11 @@ Now consider the following two closely related problems:
 % Let  $\Pi$ be the set of permutation functions, where a permutation function (bijection) $\pi: \mc{V} \to \mc{V}$ (re-)orders the elements of the set $\mc{V}$.  Given a pair of $n \times n$ adjacency matrices, $A=(a_{ij})$ and $B=(b_{ij})$, consider the following two problems:
 \begin{itemize}
 	\item \textbf{Graph Isomorphism (GI):}  Does there exist a $\pi \in \Pi$ such that $(u,v) \in \mc{E}_A$ if and only if $(\pi(u),\pi(v)) \in \mc{E}_B$. 
-		\item \textbf{Graph Matching (GM):} Which $\pi$ minimizes adjacency disagreements between 
-	$(u,v) \in \mc{E}_A$ and $(\pi(u),\pi(v)) \in \mc{E}_B$?
+		\item \textbf{Graph Matching (GM):}
+		% Which $\pi \in \Pi$ minimizes the number of pairs of vertices $u,v \in \mc{V}_A$ such that $(u,v) \in \mc{E}_A$ and $(\pi (u) ,\pi (v)) \not \in \mc{E}_B$ or $(u,v) \not \in \mc{E}_A$ and  $(\pi (u) ,\pi (v)) \in \mc{E}_B$
+		 Which $\pi \in \Pi$ minimizes adjacency disagreements between $\mc{E}_A$ and the permuted $\mc{E}_B$?
 \end{itemize}
 
-% \begin{itemize}
-% 	% $\PmcP$ (if any) satisfies $QAQ\T=B$?
-% 	\item \textbf{Linear Assignment Problem (LAP):} 
-% 	\begin{align}
-% 		\text{minimize}_{\pi \in \Pi} \sum_{u \in \mc{V}} a_{u \pi(v)}
-% 	\end{align}
-% 	\item \textbf{Quadratic Assignment Problem (QAP):} 
-% 	\begin{align}
-% 		\text{minimize}_{\pi \in \Pi} \sum_{u,v \in \mc{V}} a_{\pi(u) \pi(v)}b_{ij}
-% 	\end{align}
-% \end{itemize}
 
 Both GI and GM are computationally difficult. GM is at least as hard as GI, since solving GM also solves GI, but not vice versa. It is not known whether GI is in complexity class $\mc{P}$ \cite{Fortin1996}.  In fact, GI is one of the few problems for which, if $\mc{P} \neq \mc{NP}$, then GI might reside in an intermediate complexity class called $\mc{GI}$-complete.  GM, however, is known to be $\mc{NP}$-hard.    
  % There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be $\mc{NP}$-hard, it remains unclear whether GI is in $\mc{P}$, $\mc{NP}$, or its own intermediate complexity class, $\mc{NP}$-isomorphism (or isomorphism-complete).  
@@ -325,7 +315,7 @@ As mentioned above, GM is computationally difficult; even those special cases fo
 \begin{figure}[htbp]
 	\centering			
 	\includegraphics[width=1.0\linewidth]{../figs/ErdosRenyi_results.pdf}
-	\caption{Running time of \FAQ as function of number of vertices. Data was sampled from an Erd\"os-R\'enyi model with $p=log(n)/n$.  Each dot represents a single simulation, with five simulations per $n$.  The solid line is the best fit cubic function.  Note the leading constant is $\dot{\approx} 10^{-7}$ seconds. \FAQ the optimal objective function value in every simulation.}
+	\caption{Running time of \FAQ as function of number of vertices. Data was sampled from an Erd\"os-R\'enyi model with $p=log(n)/n$.  Each dot represents a single simulation, with 100 simulations per $n$.  The solid line is the best fit cubic function.  Note the leading constant is $\dot{\approx} 10^{-7}$ seconds. \FAQ the optimal objective function value in every simulation.}
 	\label{fig:scaling}
 \end{figure}
 
@@ -523,35 +513,27 @@ Let $A_{ij;z} \in \{0,1,2,\ldots\}$ be the number of synapses from neuron $i$ to
 
 % Table \ref{tab:1} shows the mean (standard deviation) of accuracy and solution time for both connectomes.  For the chemical connectome, \FAQ always found the optimal solution, but not so for the electrical connectome.  
 
-Figure \ref{fig:connectomes} displays the results of \FAQ along with three previous state-of-the-art algorithms on the two connectomes (\texttt{U}, \texttt{QCV} and \texttt{PATH}).  For the chemical connectome, \FAQ \emph{always} found the optimal solution, whereas none of the other algorithms \emph{ever} found the optimal solution.  On the other hand, for the electrical connectome, none of the four algorithms ever found the optimal. One hundred restarts of \FAQ failed to significantly improve the results. The properties of these connectomes are analyzed in \cite{Varshney2011}; a cursory evaluation of the properties of these graphs does not suggest to us why the chemical connectome was so much easier to graph match than the electrical one. 
-
-\FAQ ran very quickly, finding the optimal solution for the chemical connectome in 4.3 seconds ($0.1$ interquartile range), and converging for the electrical connectome in 4.1 seconds ($1.1$ interquartile range).  Although computer times are not directly comparable, as our \FAQ implementation is in Matlab, and the other algorithms are coded in C, consider \FAQ versus \texttt{PATH}.  The bottleneck in both is \texttt{FW}.  In \texttt{PATH}, the number of \texttt{FW}s depends on a parameter, $d\lambda$, which sets the step size along the path. The \texttt{PATH} paper, \cite{Zaslavskiy2009}, describes an adaptive scheme for updating $d\lambda$, with a lower bound of $10^{-5}$, clearly indicating that sometimes, \texttt{FW} is run many times.  On the other hand, in \texttt{FAQ}, \texttt{FW} is always run only once.  
-
 
 \begin{figure}[htbp]
 	\centering
-		\includegraphics[width=1.0\linewidth]{../figs/connectomes.pdf}
-	\caption{Performance of \texttt{U}, \texttt{QCV}, \texttt{PATH}, and \FAQ on synthetic C.~elegans connectome data.  Error is the fraction of vertices correctly matched.  Circle indicates the median, thick black bars indicate the quartiles, thin black lines indicate extreme but non-outlier points, and plus signs are outliers.	For the chemical connectome, \FAQ always obtained the optimal solution, whereas none of the other algorithms ever found the optimal.  On the other hand, for the electrical connectome, none of the algorithms ever found the optimal.}
+		\includegraphics[width=1.1\linewidth]{../figs/connectomes.pdf}
+	\caption{Performance of \texttt{U}, \texttt{QCV}, \texttt{PATH}, and \FAQ on synthetic C.~elegans connectome data.  Error is the fraction of vertices correctly matched.  Circle indicates the median, thick black bars indicate the quartiles, thin black lines indicate extreme but non-outlier points, and plus signs are outliers. For the chemical connectome, \FAQ always obtained the optimal solution, whereas none of the other algorithms ever found the optimal.  On the other hand, for the electrical connectome, none of the algorithms ever found the optimal.}
 	\label{fig:connectomes}
 \end{figure}
 
-To investigate the performance of \FAQ on undirected graphs, we ran \FAQ on binarized symmeterized versions of the graphs ($A_{ij;z}=1$ if and only if $A_{ij;z}\geq 1$ or $A_{ji;z} \geq 1$).  The resulting errors are nearly identical to those presented in Figure \ref{fig:connectomes}, although speed increased by greater than a factor of two. Note that the number of vertices in this brain-graph matching problem is significantly larger than the largest of the 32 benchmarks used above. 
+
+Figure \ref{fig:connectomes} displays the results of \FAQ along with three previous state-of-the-art algorithms on the two connectomes: (i) Umeyama's algorithm\texttt{U}, (ii) a quadratic convex relaxation \texttt{QCV} (which follows from relaxing the permutation matrix constraint to the doubly stochastic constraint in Eq. \eqref{eq:trQAP2}), and (iii) \texttt{PATH}.  The top left panel indicates that \FAQ \emph{always} found the optimal solution for the chemical connectome, whereas none of the other algorithms \emph{ever} found the optimal solution.  On the other hand, the top right panel shows that for the electrical connectome, none of the four algorithms ever found the optimal. One hundred restarts of \FAQ failed to significantly improve the results. 
+
+The bottom panels compare the wall time of the various algorithms, running on an 2.2 GHz Apple MacBook. Note that we have only a Matlab implementation of \texttt{FAQ}, whereas the other algorithms are implemented in C.  Nonetheless, \FAQ runs nearly as quickly as both \texttt{U} and \texttt{QCV}, and significantly faster than \texttt{PATH}, for both connectomes.  %This suggests that lower level language implementation of \FAQ might be 
+
+ % \FAQ ran very quickly, finding the optimal solution for the chemical connectome and converging for the electrical connectome, in only a few seconds.  Although computer times are not directly comparable, as our \FAQ implementation is in Matlab, and the other algorithms are coded in C, consider \FAQ versus \texttt{PATH}.  The bottleneck in both is \texttt{FW}.  In \texttt{PATH}, the number of \texttt{FW}s depends on a parameter, $d\lambda$, which sets the step size along the path. The \texttt{PATH} paper, \cite{Zaslavskiy2009}, describes an adaptive scheme for updating $d\lambda$, with a lower bound of $10^{-5}$, clearly indicating that sometimes, \texttt{FW} is run many times.  On the other hand, in \texttt{FAQ}, \texttt{FW} is always run only once.  
+
+The properties of these connectomes are analyzed in \cite{Varshney2011}; a cursory evaluation of the properties of these graphs does not suggest to us why the chemical connectome was so much easier to graph match than the electrical one. 
 
 
-% \begin{table}
-% \caption{Brain-graph matching summary statistics for both the chemical and electrical connectome. }
-% 	\label{tab:3}
-% \begin{center}
-% \begin{tabular}{|l|c|c|c|}
-% 	\hline  		& unit		& chemical 	& electrical \\ \hline
-% 	Accuracy  		& \%	  	& 100  (0)  & 59 (0.30)  \\
-% 	% Restarts 	  	& \#		& 3    (0)  & 25 (6.7)   \\
-% 	Solution Time  	& sec.		& 42 (0.42)	& 79 (20)  	 \\ \hline
-% \end{tabular} 
-% \end{center}
-% \end{table}
+To investigate the performance of \FAQ on undirected graphs, we ran \FAQ on binarized symmeterized versions of the graphs ($A_{ij;z}=1$ if and only if $A_{ij;z}\geq 1$ or $A_{ji;z} \geq 1$).  The resulting errors are nearly identical to those presented in Figure \ref{fig:connectomes}, although speed increased by greater than a factor of two. Note that the number of vertices in this brain-graph matching problem---279---is several times larger than the largest of the 32 benchmarks used above. 
 
- 
+
 
 
 \section{Discussion}

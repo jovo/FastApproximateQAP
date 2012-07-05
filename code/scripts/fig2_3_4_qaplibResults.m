@@ -4,21 +4,21 @@
 
 
 clear
-rootDir='~/Research/projects/primary/FastApproximateQAP/qaplib/';
+rootDir='~/Research/projects/primary/FastApproximateQAP/data/';
 
 bench='path16';
 switch bench
     case 'all'
-        fname=[rootDir, 'mat_files/problems_all'];
+        dataFileName=[rootDir, 'results/problems_all'];
     case 'path16'
-        fname=[rootDir, 'mat_files/problems16'];
+        dataFileName=[rootDir, 'results/problems16'];
     case 'lipa16'
-        fname=[rootDir, 'mat_files/problems16_lip'];
+        dataFileName=[rootDir, 'results/problems16_lip'];
 end
 
-load([fname, '_results'])
+load([dataFileName, '_results'])
 [foo n_qaps]=size(S);
-
+savestuff=0;
 
 
 %%
@@ -131,43 +131,11 @@ err10=best_known./min(S)';
 
 %%
 
-
-figure(1), clf,
-ncols=5;
-nrows=1;
-
-subplot(ncols,nrows,1)
-plot(n_vertices(IX),S(1,IX))
-set(gca,'yscale','log')
-
-subplot(ncols,nrows,2)
-errorbar(n_vertices(IX),time_dist(3,IX),time_dist(2,IX),time_dist(4,IX))
-set(gca,'yscale','log')
-xlim([min(n_vertices) max(n_vertices)])
-ylim([0.001,100])
-set(gca,'YTick',[0.001,0.1,10])
-
-subplot(ncols,nrows,3)
-errorbar(n_vertices(IX),obj_dist(3,IX),obj_dist(2,IX),obj_dist(4,IX))
-hold all
-plot(best_known(IX))
-set(gca,'yscale','log')
-xlim([min(n_vertices) max(n_vertices)])
-% ylim([0.001,100])
-% set(gca,'YTick',[0.001,0.1,10])
-
-subplot(ncols,nrows,4)
-plot(n_vertices(IX), err10(IX))
-
-subplot(ncols,nrows,5)
-plot(time_dist(3,IX),err10(IX),'.')
-% set(gca,'yscale','log')
-
-%%
-
 figure(2),clf
 switch bench
     case 'path16'
+        
+        % start from barycenter figure
         all=[best_known'; s1; s3; s10; s100; min([path; qbp])]';
         psoa=min([path; qbp]);
         [foo nalgs]=size(all);
@@ -196,14 +164,16 @@ switch bench
         xlabel('problem number')
         axis('tight')
         
+        if savestuff
+            figName=[rootDir, '../figs/path16'];
+            wh=[3 2]*1.5;
+            set(gcf,'PaperSize',wh,'PaperPosition',[0 0 wh],'Color','w');
+            print('-dpdf',figName)
+            print('-dpng',figName)
+            saveas(gcf,figName)
+        end
         
-        figName=[rootDir, '../figs/path16'];
-        wh=[3 2]*1.5;
-        set(gcf,'PaperSize',wh,'PaperPosition',[0 0 wh],'Color','w');
-        print('-dpdf',figName)
-        print('-dpng',figName)
-        saveas(gcf,figName)
-        
+        % multiple restart figure
         figure(3), clf
         ncols=2;
         nrows=1;
@@ -231,14 +201,14 @@ switch bench
         xlabel('problem number')
         axis('tight')
         
-        
-        figName=[rootDir, '../figs/path16_restarts'];
-        wh=[3 2]*1.5;
-        set(gcf,'PaperSize',wh,'PaperPosition',[0 0 wh],'Color','w');
-        print('-dpdf',figName)
-        print('-dpng',figName)
-        saveas(gcf,figName)
-        
+        if savestuff
+            figName=[rootDir, '../figs/path16_restarts'];
+            wh=[3 2]*1.5;
+            set(gcf,'PaperSize',wh,'PaperPosition',[0 0 wh],'Color','w');
+            print('-dpdf',figName)
+            print('-dpng',figName)
+            saveas(gcf,figName)
+        end
         
     case 'lipa16'
         all=[best_known'; s1; s3; s10; min([GA; EPATH])]';
@@ -271,12 +241,14 @@ switch bench
         xlabel('problem #')
         axis('tight')
         
-        figName=[rootDir, '../figs/lipa16'];
-        wh=[3 2]*1.5;
-        set(gcf,'PaperSize',wh,'PaperPosition',[0 0 wh],'Color','w');
-        print('-dpdf',figName)
-        print('-dpng',figName)
-        saveas(gcf,figName)
+        if savestuff
+            figName=[rootDir, '../figs/lipa16'];
+            wh=[3 2]*1.5;
+            set(gcf,'PaperSize',wh,'PaperPosition',[0 0 wh],'Color','w');
+            print('-dpdf',figName)
+            print('-dpng',figName)
+            saveas(gcf,figName)
+        end
         
         % make table
         clc

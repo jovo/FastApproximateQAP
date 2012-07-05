@@ -6,7 +6,7 @@ load([rootDir, 'data/elegans/elegans_connectomes2.mat'])
 
 [nvertices foo niters]=size(permed_Achem);
 x0=[1/nvertices*ones(nvertices^2,1);1/nvertices*ones(nvertices^2,1)];
-
+savestuff=0;
 
 %% Achem
 times=zeros(niters,1);
@@ -25,7 +25,9 @@ chem.times=times;
 chem.errors=errors;
 chem.iters=iters;
 
+if savestuff
 save([rootDir, 'data/results/elegans_connectomes2.mat'])
+end
 
 %% Agam
 times=zeros(niters,1);
@@ -35,18 +37,20 @@ parfor idx=1:niters
     
     display(['gap ', num2str(idx)])
     tic;
-    [~,myq,~,iters(idx)]=sfw(Agap,-permed_Agap(:,:,idx),30);
+    [~,myq,~,iters(idx)]=sfw(Agap,-permed_Agap(:,:,idx),100);
     times(idx)=toc;
     errors(idx)=sum(myq~=perms(:,idx)');
-    
+    display(errors(idx)/279)
+    display(iters(idx))
 end
 
 gap.times=times;
 gap.errors=errors;
 gap.iters=iters;
     
+if savestuff
 save([rootDir, 'data/results/elegans_connectomes2.mat'])
-
+end
 
 %% Agam with multiple restarts
 times=zeros(niters,1);
