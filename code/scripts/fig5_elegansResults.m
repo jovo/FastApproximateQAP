@@ -1,11 +1,11 @@
 clear, clc
 rootDir='~/Research/projects/primary/FastApproximateQAP';
 rootDir0=rootDir;
-load([rootDir, '/data/results/elegans_results_faq_ericComp.mat']); % load FAQ results
+load([rootDir, '/data/results/elegans_results_all.mat']); % load FAQ results
+% rootDir=rootDir0;
+% load([rootDir, '/data/results/elegans_results_graphm_eric.mat']); % load FAQ results
 rootDir=rootDir0;
-load([rootDir, '/data/results/elegans_results_graphm_eric.mat']); % load FAQ results
-rootDir=rootDir0;
-savestuff=1;
+savestuff=0;
 
 %% scatter plots
 % Have to add FAQ runs.
@@ -57,11 +57,11 @@ algsKept=[1, 5:7];
 
 markersizes=12*ones(7,1);
 
-err(1,1:100,1)=1-chem.errors/279;
-err(1,1:100,2)=1-gap.errors/279;
-
-time(1,1:100,1)=chem.times;
-time(1,1:100,2)=gap.times;
+% err(1,1:100,1)=1-chem.errors/279;
+% err(1,1:100,2)=1-gap.errors/279;
+% 
+% time(1,1:100,1)=chem.times;
+% time(1,1:100,2)=gap.times;
 
 n = 279;
 
@@ -79,7 +79,7 @@ height=0.3;
 %% error
 figure(1); clf
 subplot(221) %'Position',[left bottom1 width height]);
-boxplot(1-err(algsKept,1:100,1)'...
+boxplot(allErrors(algsKept,:,1)'...
     ,'labels',{'FAQ','U','QCV','PATH'}...
     ,'labelorientation','horizontal'...
     ,'color','k','symbol','k+','plotstyle','compact'); %...
@@ -90,7 +90,7 @@ set(gca,'YTick',0:.5:1)
 ylim([0 1])
 
 subplot(222) %'Position',[left bottom2 width height]);
-boxplot(1-err(algsKept,1:100,2)'...
+boxplot(allErrors(algsKept,:,2)'...
     ,'labels',{'FAQ','U','QCV','PATH'}...
     ,'labelorientation','horizontal'...
     ,'color','k','symbol','k+','plotstyle','compact');
@@ -101,14 +101,14 @@ title('Electrical')
 %% time
 % figure(1); clf
 subplot(223), cla %'Position',[left bottom1 width height]);
-boxplot(time(algsKept,1:100,1)'...
+boxplot(allTimes(algsKept,1:100,1)'...
     ,'labels',{'FAQ','U','QCV','PATH'}...
     ,'labelorientation','horizontal'...
     ,'color','k','symbol','k+','plotstyle','compact'); %...
 ylabel('time (seconds)')
 
 subplot(224), cla %'Position',[left bottom2 width height]);
-boxplot(time(algsKept,1:100,2)'...
+boxplot(allTimes(algsKept,1:100,2)'...
     ,'labels',{'FAQ','U','QCV','PATH'}...
     ,'labelorientation','horizontal'...
     ,'color','k','symbol','k+','plotstyle','compact');
@@ -126,5 +126,5 @@ end
 
 %%
 percentiles=[0.05, .25, .5, .75, .95];
-chemFAQTimePercentiles=quantile(time(1,1:100,1),percentiles)
+chemFAQTimePercentiles=quantile(allTimes(1,1:100,1),percentiles)
 chemFAQTimeIQR=chemFAQTimePercentiles(4)-chemFAQTimePercentiles(2)

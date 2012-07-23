@@ -1,0 +1,201 @@
+RE: TPAMI-2011-11-0845, "Fast Inexact Graph Matching
+with Applications in Statistical Connectomics"
+Manuscript Type: Short
+
+Dear Dr. Joshua Vogelstein,
+
+We have completed the review process of the above referenced paper that was submitted to the IEEE Transactions on Pattern Analysis and Machine Intelligence.  Enclosed are your reviews. We hope that you will find the editor's and reviewers’ comments and suggestions helpful.
+
+I regret to inform you that based on the reviewer feedback, we could not recommend publishing your paper. Final decisions on acceptance are based on the referees' reviews and such factors as restriction of space, topic, and the overall balance of articles.
+
+We hope that this decision does not deter you from submitting to us again. Thank you for your interest in the IEEE Transactions on Pattern Analysis and Machine Intelligence.
+
+Sincerely,
+
+Prof. Ramin Zabih,
+EIC
+IEEE Transactions on Pattern Analysis and Machine Intelligence
+
+
+***********
+Editor Comments
+
+Editor
+Comments to the Author:
+Two reviewers have reviewed the paper, and both have judged that the manuscript does not make enough contributions to be publishable in TPAMI.
+
+***********************
+
+Reviewer Comments
+
+
+Reviewer: 1
+
+Recommendation: Reject
+
+Comments:
+The authors are concerned with finding approximate solutions of a
+graph matching problem involving graphs of the same size. This
+problem can be reformulated as quadratic assignment (QAP) problem.
+They use a standard relaxation of the quadratic assignment problem
+to the domain of doubly stochastic matrices. Then they use
+random doubly stochastic matrices with a bias towards
+more equalized matrix-elements as start-points for finding a local
+minima of the relaxed quadratic assignment problem.
+The doubly stochastic matrix of the found local minimum is
+fitted to a (nearby) permutation matrix by solving a linear
+assignment problem. The random sampling is performed
+n =1,3 or 100 times and the best solution is kept.
+
+The report is written well but has several issues:
+
+1) A principle flaw:
+The suggested approach samples an generally NP-problem at n=1,3 or 100
+random points and search for a local minima in
+the usually highly non-convex function (the relaxed QAP).
+So, for increasing problem size the probability
+to obtain a good solution drops drastically.
+(The authors do not report on how repeatable the results
+are and seem to report a single event on the 16 QAPs.)
+
+2) Insufficient evaluation:
+A report on statistical properties of the approach
+would make an evaluation of the method possible, i.e, how often
+is the best solution found by the sampling depending on the
+the problem size.
+However such information is not provided in the report.
+
+3) Too few experiments:
+The authors have performed 16 experiments on
+the qaplib dataset which has in its standard form
+more than 100 problem instances.
+
+Developments reported for example in
+"N. Brixius and K. Anstreicher. Solving quadratic assignment problems
+using convex quadratic programing relaxations. Optimization Methods
+and Software, 16(1{4):49{68, 2001."
+are completely ignored.
+
+Other comments:
+
+On a different level it seems a bit unrealistic to assume that all the
+graphs they wish to compare are of equal size, however
+it is not discussed or even mentioned why the authors have
+reason to assume that the graphs are equally sized.
+
+The authors report a good performance on a quite large graph with
+302 nodes, but do not indicate how the graph looks like. That
+makes it difficult to speculate about reasons that make this problem
+solvable by just sampling at a few positions followed by the Frank-Wolfe
+algorithm. It might be that the structure of the problem is
+more easy (Can the assignment be found by a spectral analysis of the
+adjacency matrix?)
+
+minor comments: (The line numbers at the beginning refer to both columns...)
+Page1:
+16-17
+49  desired -> desires
+48 the sentence "whether vertices can be labeled is questionable" is unclear. (Which process can prevent a labeling?)
+49 "there is no known vertex assignment": unclear what kind of assignment one would expect
+46 What is a "principled" restart and will it be explained?
+60 Just a comment: from 3*10^2 vertices to 10^5 vertices is quite a jump for usually NP-hard problems.
+
+Page2:
+10: ..n is the number of vertices and E an edge set with |E|<=n^2
+13: G_2=(V_1,E_1) => G_2=(V_2,E_2)
+37: Do you mean:  if all NODES have a degree less than k
+37 <X,Y> := tr(X^T Y)
+
+Page3:
+54 "... is not necessarily convex" might be misleading as as such problems are likely to be highly non-convex.
+
+Page4
+42 the named author (Cremers) did not appear in the referenced paper? ...
+44 For QAP-problems the absolute values of the found minimum is more reasonable to report than the relative error.
+
+
+
+Additional Questions:
+1. Which category describes this manuscript?: Practice / Application / Case Study / Experience Report
+
+2. How relevant is this manuscript to the readers of this periodical? If you answer Not very relevant or Irrelevant please explain your rating under Public Comments below.: Relevant
+
+1. Please evaluate the significance of the manuscript’s research contribution.: Poor – This manuscript either has serious technical flaws, does not solve an important problem, or presents a variation of a well known technique.  It should not be published in TPAMI.
+
+2.  Please explain how this manuscript advances this field of research and/or contributes something new to the literature. : The authors are concerned with finding approximate solutions of a graph matching problem involving graphs of the same size. This problem can be reformulated as quadratic assignment (QAP) problem. They use a standard relaxation of the quadratic assignment problem to the domain of doubly stochastic matrices.
+
+Then they sample at n (=1,3 or 100)
+random points and search for a local minima in
+the relaxed highly non-convex function. They keep the
+best found solution as approximate solution.
+
+3. Is the manuscript technically sound? In the Public Comments section, please provide detailed explanations to support your assessment: No
+
+4. How thorough is the experimental validation (where appropriate)? Please discuss any shortcomings in the Public Comments section.: Insufficient; clearly inferior to state of the art, or necessary tests are absent
+
+1. Are the title, abstract, and keywords appropriate? If not, please comment in the Public Comments section.: Yes
+
+2.  Does the manuscript contain sufficient and appropriate references?  Please comment and include additional suggested references in the Public Comments section.: Important references are missing; more references are needed
+
+3.  Does the introduction state the objectives of the manuscript in terms that encourage the reader to read on? If not, please explain your answer in the Public Comments section.: Yes
+
+4.  How would you rate the organization of the manuscript? Is it focused? Please elaborate with suggestions for reorganization in the Public Comments section.: Satisfactory
+
+5. Please rate the readability of the manuscript. Explain your rating under Public Comments below. : Easy to read
+
+6. How is the length of the manuscript?  If changes are suggested, please make explicit recommendations in the Public Comments section.: About right
+
+7. Should the supplemental material be included? (Click on the Supplementary Files icon to view files): Does not apply, no supplementary files included
+
+8. If yes to 7, should it be accepted: As is
+
+Please rate the manuscript overall. Explain your choice.: Poor
+
+
+Reviewer: 2
+
+Recommendation: Reject
+
+Comments:
+Though this is a proposal of a QAP inexact solver, it is in principle limited to graphs of the same size. Even in this case, there is no reference neither experimental nor theoretical to the GA (Graduated Assignment) Algorithm (Gold and Rangarajan, PAMI'1996). This is surprising for there is reference to the Sinkhorn process which is the kernel of the GA. The proposed algorithm is based on working through the gradient of the objective function which is known to be multi-modal. This motivates mutiple-initialization in contrast to well known barycenter initializations (GA, Game-theoretic methods).
+Section 4. "Fast inexact matching" describes the process. Regarding the choosing of a suitable initial solution, the barycenter is contemplated as well as the identity matrix. These initializations are used if the algorithm is run once, but a sampling Sinkhorn-based scheme is preferred for multiple initializations.
+Regarding the finding of a "local solution" from the initialization, they use Frank-Wolfe algorithm (FW) as a gradient descent. This algorithm converges to a local minimum so many initializations are required. This is quite simplistic when comparing to the power of deterministic annealing implicit in GA to avoid local minima. A serious comparison between both schemes should be desirable.
+The latter dependence on mutli-initializations constrains the experimental results which the authors focus on the QAP benchmark. Of course, other authors have explored the limitations of GA ("[26] with QBP") but only small graphs are tested and the proposed techniques are proposed as "competitive with" but not "outperforming". In [25] it is proposed an algoritmh outperforming QBP. The method proposed here is quite similar to that in [25] (which is more focused on labeled graphs but based on FW) so I judge the proposal quite incremental. See similar algorithm in "Many-to-Many Graph Matching: a Continuous Relaxation Approach" in 2010 (arxiv).
+Anyway in the experiments only 16 tests where done and the analysis was focuses on the number of restarts. The proposed algorithms require 1-100 starts where in 12 of 16 it only requires 1 start (the van der Waerden matrix).
+No comments on the recently embedding methods for graph matching: see for instance:
+"Graph matching through entropic manifold alignment. CVPR 2011".
+Indeed only same-size graphs seem to be explored.
+
+Typos:
+line 37 (right): $tr(X^T,Y)$ should be $tr(X^TY)$
+
+Additional Questions:
+1. Which category describes this manuscript?: Research/Technology
+
+2. How relevant is this manuscript to the readers of this periodical? If you answer Not very relevant or Irrelevant please explain your rating under Public Comments below.: Not very relevant
+
+1. Please evaluate the significance of the manuscript’s research contribution.: Fair  - Even with the recommended changes, the contribution of this paper is unlikely be significant enough for publication in TPAMI.
+
+2.  Please explain how this manuscript advances this field of research and/or contributes something new to the literature. : Provides research into gradient-based graph matching methods for graphs of the same size.
+
+3. Is the manuscript technically sound? In the Public Comments section, please provide detailed explanations to support your assessment: Yes
+
+4. How thorough is the experimental validation (where appropriate)? Please discuss any shortcomings in the Public Comments section.: Insufficient; clearly inferior to state of the art, or necessary tests are absent
+
+1. Are the title, abstract, and keywords appropriate? If not, please comment in the Public Comments section.: Yes
+
+2.  Does the manuscript contain sufficient and appropriate references?  Please comment and include additional suggested references in the Public Comments section.: Important references are missing; more references are needed
+
+3.  Does the introduction state the objectives of the manuscript in terms that encourage the reader to read on? If not, please explain your answer in the Public Comments section.: Yes
+
+4.  How would you rate the organization of the manuscript? Is it focused? Please elaborate with suggestions for reorganization in the Public Comments section.: Satisfactory
+
+5. Please rate the readability of the manuscript. Explain your rating under Public Comments below. : Easy to read
+
+6. How is the length of the manuscript?  If changes are suggested, please make explicit recommendations in the Public Comments section.: About right
+
+7. Should the supplemental material be included? (Click on the Supplementary Files icon to view files): Yes, as part of the digital library for this submission if accepted
+
+8. If yes to 7, should it be accepted: After revisions.  Please include explanation under Public Comments below.
+
+Please rate the manuscript overall. Explain your choice.: Fair

@@ -11,6 +11,6 @@ np=p(1)*n^3+p(2)*n^2+p(3)*n+p(4);
 nyears=np/60/60/24/365;
 
 savestuff=0;
-rootDir = '~/Research/projects/primary/FastApproximateQAP';
+rootDir = '~/Research/projects/primary/FastApproximateQAP';    
 fileName= [rootDir, '/data/results/ErdosRenyi_results.mat'];
 if savestuff, save(fileName), end

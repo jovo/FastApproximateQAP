@@ -1,0 +1,13 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Graph Matching}{}% 2
+\BOOKMARK [1][-]{section.3}{Graph Matching as a QAP}{}% 3
+\BOOKMARK [1][-]{section.4}{Fast Approximate Quadratic Assignment Problem Algorithm}{}% 4
+\BOOKMARK [1][-]{section.5}{Results}{}% 5
+\BOOKMARK [2][-]{subsection.5.1}{Algorithm Complexity and leading constants}{section.5}% 6
+\BOOKMARK [2][-]{subsection.5.2}{QAP Undirected Benchmarks}{section.5}% 7
+\BOOKMARK [2][-]{subsection.5.3}{QAP Directed Benchmarks}{section.5}% 8
+\BOOKMARK [2][-]{subsection.5.4}{rQAP solves QAP in certain special cases}{section.5}% 9
+\BOOKMARK [2][-]{subsection.5.5}{Multiple Restarts}{section.5}% 10
+\BOOKMARK [2][-]{subsection.5.6}{Brain-Graph Matching}{section.5}% 11
+\BOOKMARK [1][-]{section.6}{Discussion}{}% 12
+\BOOKMARK [1][-]{section.A}{Linear Assignment Problems}{}% 13
