@@ -1,0 +1,67 @@
+***********************************
+Experiment parameters:
+graph_1=graphmdat/esc32d.dat_1
+graph_2=graphmdat/esc32d.dat_2
+C_matrix=../test_qap/null
+algo=I U RANK QCV rand PATH
+algo_init_sol=unif unif unif unif unif unif
+solution_file=solution_im.txt
+alpha_ldh=0
+cdesc_matrix=A
+cscore_matrix=A
+hungarian_max=10000
+algo_fw_xeps=0.01
+algo_fw_feps=0.01
+dummy_nodes=0
+dummy_nodes_fill=0
+dummy_nodes_c_coef=0.01
+qcvqcc_lambda_M=10
+qcvqcc_lambda_min=1e-05
+blast_match=0
+blast_match_proj=0
+exp_out_file=exp_out/esc32d.exp_out
+exp_out_format=Parameters Compact Permutation
+debugprint=0
+debugprint_file=debug.txt
+verbose_mode=1
+verbose_file=verbose/esc32d.verbose
+Experiment results:
+	 Alpha		I		U		RANK		QCV		rand		PATH		
+Gdist 	0.000000e+00	3.204000e+03	3.160000e+03	3.204000e+03	3.204000e+03	3.152000e+03	3.076000e+03
+F_perm 	0.000000e+00	8.249228e-01	8.135942e-01	8.249228e-01	8.249228e-01	8.115345e-01	7.919670e-01
+F_exact	0.000000e+00	8.249228e-01	8.135942e-01	8.249228e-01	4.678489e-01	8.115345e-01	7.919670e-01
+Time: 			0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	1.000000e+00
+Permutations:
+I U RANK QCV rand PATH 
+1 4 1 1 23 1 
+2 30 2 2 15 31 
+3 17 3 3 12 3 
+4 26 4 4 26 29 
+5 11 5 5 24 28 
+6 3 6 6 11 6 
+7 23 7 7 20 7 
+8 18 8 8 5 8 
+9 21 9 9 30 9 
+10 6 10 10 2 23 
+11 7 11 11 21 11 
+12 19 12 12 1 21 
+13 27 13 13 22 13 
+14 2 14 14 4 14 
+15 5 15 15 31 26 
+16 12 16 16 8 16 
+17 20 17 17 3 17 
+18 14 18 18 10 18 
+19 1 19 19 16 2 
+20 16 20 20 29 4 
+21 15 21 21 27 5 
+22 9 22 22 17 10 
+23 32 23 23 18 12 
+24 24 24 24 13 15 
+25 28 25 25 19 19 
+26 31 26 26 25 20 
+27 22 27 27 14 22 
+28 10 28 28 7 24 
+29 13 29 29 28 25 
+30 8 30 30 9 27 
+31 29 31 31 6 30 
+32 25 32 32 32 32 

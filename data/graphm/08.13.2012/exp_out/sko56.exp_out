@@ -1,0 +1,91 @@
+***********************************
+Experiment parameters:
+graph_1=graphmdat/sko56.dat_1
+graph_2=graphmdat/sko56.dat_2
+C_matrix=../test_qap/null
+algo=I U RANK QCV rand PATH
+algo_init_sol=unif unif unif unif unif unif
+solution_file=solution_im.txt
+alpha_ldh=0
+cdesc_matrix=A
+cscore_matrix=A
+hungarian_max=10000
+algo_fw_xeps=0.01
+algo_fw_feps=0.01
+dummy_nodes=0
+dummy_nodes_fill=0
+dummy_nodes_c_coef=0.01
+qcvqcc_lambda_M=10
+qcvqcc_lambda_min=1e-05
+blast_match=0
+blast_match_proj=0
+exp_out_file=exp_out/sko56.exp_out
+exp_out_format=Parameters Compact Permutation
+debugprint=0
+debugprint_file=debug.txt
+verbose_mode=1
+verbose_file=verbose/sko56.verbose
+Experiment results:
+	 Alpha		I		U		RANK		QCV		rand		PATH		
+Gdist 	0.000000e+00	6.188600e+04	6.318600e+04	6.007000e+04	5.769400e+04	5.955000e+04	4.983800e+04
+F_perm 	0.000000e+00	4.204612e-01	4.292935e-01	4.081231e-01	3.919802e-01	4.045901e-01	3.386056e-01
+F_exact	0.000000e+00	4.204612e-01	4.292935e-01	4.081231e-01	1.105876e-01	4.045901e-01	3.386056e-01
+Time: 			0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	6.000000e+00
+Permutations:
+I U RANK QCV rand PATH 
+1 29 5 36 18 36 
+2 24 4 33 27 37 
+3 23 45 47 10 23 
+4 9 32 52 38 26 
+5 30 13 13 45 13 
+6 44 18 14 11 9 
+7 41 33 55 34 46 
+8 49 29 27 21 5 
+9 3 20 12 43 22 
+10 32 46 46 6 48 
+11 47 48 26 17 30 
+12 28 49 51 1 47 
+13 1 40 1 4 49 
+14 54 26 48 42 54 
+15 8 8 11 50 7 
+16 27 24 9 53 55 
+17 18 56 22 33 20 
+18 35 17 56 52 56 
+19 34 2 54 24 33 
+20 37 19 35 23 15 
+21 42 43 32 44 2 
+22 22 16 3 31 41 
+23 17 34 17 29 25 
+24 40 6 20 36 18 
+25 50 30 28 3 24 
+26 43 10 40 49 19 
+27 20 54 16 5 51 
+28 26 39 38 39 39 
+29 31 38 39 15 35 
+30 21 15 2 40 16 
+31 33 1 53 28 53 
+32 52 14 30 19 28 
+33 53 22 44 32 44 
+34 4 7 25 41 3 
+35 25 41 10 12 21 
+36 39 21 19 2 38 
+37 56 3 41 8 43 
+38 15 31 21 55 11 
+39 12 25 42 54 42 
+40 13 55 7 20 45 
+41 48 12 18 7 50 
+42 38 11 34 22 40 
+43 7 47 31 46 6 
+44 19 51 43 14 34 
+45 16 35 15 30 1 
+46 45 42 49 47 52 
+47 2 44 6 35 17 
+48 46 9 50 26 12 
+49 6 27 5 37 27 
+50 36 23 45 48 4 
+51 5 28 4 25 14 
+52 51 53 24 13 32 
+53 55 52 8 51 8 
+54 10 37 37 16 31 
+55 14 50 23 9 10 
+56 11 36 29 56 29 

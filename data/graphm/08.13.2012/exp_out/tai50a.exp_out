@@ -1,0 +1,85 @@
+***********************************
+Experiment parameters:
+graph_1=graphmdat/tai50a.dat_1
+graph_2=graphmdat/tai50a.dat_2
+C_matrix=../test_qap/null
+algo=I U RANK QCV rand PATH
+algo_init_sol=unif unif unif unif unif unif
+solution_file=solution_im.txt
+alpha_ldh=0
+cdesc_matrix=A
+cscore_matrix=A
+hungarian_max=10000
+algo_fw_xeps=0.01
+algo_fw_feps=0.01
+dummy_nodes=0
+dummy_nodes_fill=0
+dummy_nodes_c_coef=0.01
+qcvqcc_lambda_M=10
+qcvqcc_lambda_min=1e-05
+blast_match=0
+blast_match_proj=0
+exp_out_file=exp_out/tai50a.exp_out
+exp_out_format=Parameters Compact Permutation
+debugprint=0
+debugprint_file=debug.txt
+verbose_mode=1
+verbose_file=verbose/tai50a.verbose
+Experiment results:
+	 Alpha		I		U		RANK		QCV		rand		PATH		
+Gdist 	0.000000e+00	4.060530e+06	4.143090e+06	4.025878e+06	3.505782e+06	4.019150e+06	2.481850e+06
+F_perm 	0.000000e+00	2.546664e-01	2.598444e-01	2.524931e-01	2.198740e-01	2.520712e-01	1.556555e-01
+F_exact	0.000000e+00	2.546664e-01	2.598444e-01	2.524931e-01	2.369243e-03	2.520712e-01	1.556555e-01
+Time: 			0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	6.000000e+00
+Permutations:
+I U RANK QCV rand PATH 
+1 18 46 6 32 22 
+2 37 29 8 21 20 
+3 11 33 28 24 23 
+4 39 40 5 40 40 
+5 15 48 22 20 35 
+6 14 9 49 37 13 
+7 17 21 4 36 36 
+8 26 31 39 48 48 
+9 20 47 9 5 9 
+10 47 7 15 46 27 
+11 5 2 2 47 30 
+12 42 14 24 9 12 
+13 10 8 35 18 45 
+14 16 39 30 15 29 
+15 36 17 26 29 39 
+16 2 44 1 34 1 
+17 30 49 20 25 3 
+18 38 5 27 2 43 
+19 45 43 43 3 41 
+20 23 6 18 28 18 
+21 25 1 44 4 6 
+22 43 28 16 44 19 
+23 31 35 46 38 5 
+24 1 13 23 27 26 
+25 28 16 33 42 33 
+26 12 18 11 16 46 
+27 24 22 31 39 31 
+28 19 45 21 35 47 
+29 4 10 10 10 11 
+30 46 15 48 1 25 
+31 29 23 45 7 2 
+32 7 19 34 49 37 
+33 3 34 37 13 15 
+34 22 4 47 17 24 
+35 48 36 19 6 42 
+36 27 11 40 19 21 
+37 40 37 13 30 44 
+38 33 3 14 12 7 
+39 34 20 32 26 32 
+40 32 42 7 41 34 
+41 35 24 29 31 14 
+42 13 41 42 23 28 
+43 50 26 17 33 38 
+44 49 50 12 43 16 
+45 44 38 38 22 10 
+46 6 12 36 11 49 
+47 8 30 3 45 17 
+48 21 25 50 14 4 
+49 9 32 25 8 50 
+50 41 27 41 50 8 

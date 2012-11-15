@@ -1,0 +1,95 @@
+clear
+load('../../data/graphm/09.20.2012/A.mat')
+%%
+
+names=fieldnames(A(1));
+len=length(A);
+
+for i=1:len
+    
+    for j=4:length(names)
+        times.(names{j})(i)=A(i).(names{j}).t;
+        obj.(names{j})(i)=A(i).(names{j}).obj;
+    end
+    
+    obj_p(i)=A(i).obj_p;
+    Nvertices(i)=length(A(i).FAQ.p);
+end
+
+minTime=inf;
+maxTime=-inf;
+
+minObj=inf;
+maxObj=-inf;
+
+for j=4:length(names)
+    rel.times.(names{j})=times.FAQ./times.(names{j});
+    rel.obj.(names{j})=obj.FAQ./obj.(names{j});
+    
+    minTime=min(minTime,min(rel.times.(names{j})));
+    maxTime=max(maxTime,max(rel.times.(names{j})));
+    
+    minObj=min(minObj,min(rel.obj.(names{j})));
+    maxObj=max(maxObj,max(rel.obj.(names{j})));
+    
+end
+
+
+%% plot relative time and obj value for all algorithms
+
+
+figure(1), clf
+
+algnames=fieldnames(times);
+useAlgs=[3 4 6 7 2];
+
+ncols=length(useAlgs);
+nrows=2;
+
+YTickObj=[0.1, 1];
+YTickTime=[1e-3 1e-1 10 600];
+gray=0.75*[1 1 1];
+
+for j=1:ncols
+    subplot(nrows,ncols,j), hold on
+        plot(Nvertices,rel.obj.(algnames{useAlgs(j)}),'k.')
+    plot([min(Nvertices) max(Nvertices)],[1 1],'color',gray)
+    set(gca,'Xscale','log','YScale','log')
+    set(gca,'YTickLabel',[])
+    if j==1
+        ylabel('relative objective value')
+        set(gca,'YTick',YTickObj,'YTickLabel',YTickObj)
+    end
+    title(algnames{useAlgs(j)})
+    axis([min(Nvertices) max(Nvertices) min(rel.obj.PATH) max(rel.obj.PATH)])
+   
+    
+    subplot(nrows,ncols,ncols+j), hold on
+    plot(Nvertices,rel.times.(algnames{useAlgs(j)}),'k.')
+    plot([min(Nvertices) max(Nvertices)],[1 1],'color',gray)
+    set(gca,'Xscale','log','YScale','log')
+    set(gca,'YTickLabel',[])
+    if j==1
+        ylabel('relative time')
+        xlabel('number of vertices')
+        set(gca,'YTick',YTickTime,'YTickLabel',YTickTime)
+    end
+    axis([min(Nvertices) max(Nvertices) min(rel.times.PATH) max(rel.times.PATH)])
+end
+
+
+%% plot absolute times
+
+figure(2), clf
+clc
+% useAlgs=[1 useAlgs];
+for j=1:ncols+1
+    subplot(1,ncols+1,j), 
+%     figure(j+1), clf, hold all
+    plot(Nvertices,times.(algnames{useAlgs(j)}),'.k');
+        set(gca,'Xscale','log','YScale','log')
+        title(algnames{useAlgs(j)})
+
+end
+
+

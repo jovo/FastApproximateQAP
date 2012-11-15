@@ -1,0 +1,90 @@
+***********************************
+Experiment parameters:
+graph_1=../test_simple/g
+graph_2=../test_simple/h
+C_matrix=../test_simple/null
+algo=I U RANK QCV rand PATH
+algo_init_sol=unif unif unif unif unif unif
+solution_file=solution_im.txt
+alpha_ldh=0
+cdesc_matrix=A
+cscore_matrix=A
+hungarian_max=10000
+algo_fw_xeps=0.01
+algo_fw_feps=0.01
+dummy_nodes=0
+dummy_nodes_fill=0
+dummy_nodes_c_coef=0.01
+qcvqcc_lambda_M=10
+qcvqcc_lambda_min=1e-05
+blast_match=1
+blast_match_proj=0
+exp_out_file=../test_simple/exp_out_file
+exp_out_format=Parameters Compact Permutation
+debugprint=0
+debugprint_file=debug.txt
+verbose_mode=1
+verbose_file=cout
+Experiment results:
+	 Alpha		I		U		RANK		QCV		rand		PATH		
+Gdist 	0.000000e+00	5.000000e+01	3.400000e+01	3.800000e+01	1.400000e+01	4.200000e+01	6.000000e+00
+F_perm 	0.000000e+00	5.813953e-01	3.953488e-01	4.418605e-01	1.627907e-01	4.883721e-01	6.976744e-02
+F_exact	0.000000e+00	5.813953e-01	3.953488e-01	4.418605e-01	1.364375e-02	4.883721e-01	6.976744e-02
+Time: 			0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00
+Permutations:
+I U RANK QCV rand PATH 
+1 2 1 2 1 2 
+2 10 6 6 6 9 
+3 4 3 8 5 3 
+4 1 2 1 4 1 
+5 3 10 9 8 6 
+6 8 9 3 9 10 
+7 7 8 7 7 7 
+8 5 7 5 3 5 
+9 6 5 4 2 8 
+10 9 4 10 10 4 
+***********************************
+Experiment parameters:
+graph_1=../test_simple/g
+graph_2=../test_simple/h
+C_matrix=c_gh
+algo=I U RANK QCV rand PATH
+algo_init_sol=unif unif unif unif unif unif
+solution_file=solution_im.txt
+alpha_ldh=0.44
+cdesc_matrix=A
+cscore_matrix=A
+hungarian_max=10000
+algo_fw_xeps=0.01
+algo_fw_feps=0.01
+dummy_nodes=0
+dummy_nodes_fill=0
+dummy_nodes_c_coef=0.01
+qcvqcc_lambda_M=10
+qcvqcc_lambda_min=1e-05
+blast_match=1
+blast_match_proj=0
+exp_out_file=../test_simple/exp_out_file
+exp_out_format=Parameters Compact Permutation
+debugprint=0
+debugprint_file=debug.txt
+verbose_mode=1
+verbose_file=cout
+Experiment results:
+	 Alpha		I		U		RANK		QCV		rand		PATH		
+Gdist 	4.400000e-01	5.000000e+01	3.400000e+01	3.400000e+01	3.400000e+01	4.200000e+01	2.600000e+01
+F_perm 	4.400000e-01	-1.394961e-01	-3.158493e-01	-4.842394e-01	-4.842394e-01	-7.932901e-02	-4.962396e-01
+F_exact	4.400000e-01	-1.394961e-01	-3.158493e-01	-4.842394e-01	-5.964503e-01	-7.932901e-02	-4.962396e-01
+Time: 			0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	1.000000e+00
+Permutations:
+I U RANK QCV rand PATH 
+1 2 10 10 1 2 
+2 10 4 4 6 4 
+3 4 8 8 5 8 
+4 1 1 1 4 1 
+5 3 6 6 8 6 
+6 6 3 3 9 3 
+7 7 7 7 7 7 
+8 5 5 5 3 5 
+9 8 2 2 2 9 
+10 9 9 9 10 10 

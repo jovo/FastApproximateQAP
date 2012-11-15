@@ -1,0 +1,4 @@
+graphm-0.51
+Bugs:
+Incorrect behavior of the replaceAll function on 64bit machines - fixed
+LDFLAGS (with static option) in Makefile - fixed

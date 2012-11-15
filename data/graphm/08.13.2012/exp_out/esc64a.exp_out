@@ -1,0 +1,99 @@
+***********************************
+Experiment parameters:
+graph_1=graphmdat/esc64a.dat_1
+graph_2=graphmdat/esc64a.dat_2
+C_matrix=../test_qap/null
+algo=I U RANK QCV rand PATH
+algo_init_sol=unif unif unif unif unif unif
+solution_file=solution_im.txt
+alpha_ldh=0
+cdesc_matrix=A
+cscore_matrix=A
+hungarian_max=10000
+algo_fw_xeps=0.01
+algo_fw_feps=0.01
+dummy_nodes=0
+dummy_nodes_fill=0
+dummy_nodes_c_coef=0.01
+qcvqcc_lambda_M=10
+qcvqcc_lambda_min=1e-05
+blast_match=0
+blast_match_proj=0
+exp_out_file=exp_out/esc64a.exp_out
+exp_out_format=Parameters Compact Permutation
+debugprint=0
+debugprint_file=debug.txt
+verbose_mode=1
+verbose_file=verbose/esc64a.verbose
+Experiment results:
+	 Alpha		I		U		RANK		QCV		rand		PATH		
+Gdist 	0.000000e+00	2.210800e+04	2.205600e+04	2.210800e+04	2.210800e+04	2.206400e+04	2.205600e+04
+F_perm 	0.000000e+00	9.775380e-01	9.752388e-01	9.775380e-01	9.775380e-01	9.755925e-01	9.752388e-01
+F_exact	0.000000e+00	9.775380e-01	9.752388e-01	9.775380e-01	7.124353e-01	9.755925e-01	9.752388e-01
+Time: 			0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	5.000000e+00
+Permutations:
+I U RANK QCV rand PATH 
+1 38 1 1 8 1 
+2 37 2 2 34 2 
+3 58 3 3 13 22 
+4 16 4 4 62 61 
+5 31 5 5 38 3 
+6 4 6 6 51 6 
+7 30 7 7 1 4 
+8 13 8 8 57 8 
+9 55 9 9 48 5 
+10 28 10 10 61 10 
+11 29 11 11 16 11 
+12 12 12 12 52 7 
+13 53 13 13 6 9 
+14 51 14 14 40 14 
+15 35 15 15 60 15 
+16 21 16 16 30 12 
+17 61 17 17 28 17 
+18 6 18 18 45 13 
+19 3 19 19 25 19 
+20 9 20 20 44 45 
+21 57 21 21 53 16 
+22 15 22 22 5 59 
+23 8 23 23 12 18 
+24 52 24 24 33 20 
+25 19 25 25 27 21 
+26 10 26 26 59 23 
+27 2 27 27 32 27 
+28 11 28 28 20 35 
+29 17 29 29 37 24 
+30 7 30 30 22 51 
+31 27 31 31 55 25 
+32 43 32 32 3 32 
+33 41 33 33 4 33 
+34 25 34 34 46 26 
+35 39 35 35 7 30 
+36 45 36 36 21 28 
+37 47 37 37 47 37 
+38 1 38 38 50 29 
+39 24 39 39 36 39 
+40 49 40 40 24 31 
+41 60 41 41 39 34 
+42 14 42 42 49 36 
+43 42 43 43 15 38 
+44 5 44 44 2 44 
+45 18 45 45 10 40 
+46 64 46 46 63 46 
+47 50 47 47 19 41 
+48 34 48 48 23 42 
+49 22 49 49 9 43 
+50 63 50 50 26 47 
+51 44 51 51 54 48 
+52 46 52 52 17 49 
+53 36 53 53 35 50 
+54 56 54 54 42 52 
+55 62 55 55 41 53 
+56 32 56 56 31 54 
+57 59 57 57 43 55 
+58 26 58 58 56 56 
+59 40 59 59 29 57 
+60 23 60 60 14 58 
+61 54 61 61 58 60 
+62 48 62 62 18 62 
+63 20 63 63 11 63 
+64 33 64 64 64 64 

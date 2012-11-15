@@ -1,0 +1,19 @@
+#!/bin/sh
+# GraphM package compilation.
+if [ $# -eq 0 ]
+then
+echo "LP algorithm is not supported (default)"
+export LDFLAGS="-lgsl -lgslcblas -static";
+export CFLAGS="-Wno-deprecated -O3 -fPIC"
+make -e
+exit 0
+fi
+
+if [ $1=="-LP" ]
+then
+echo "LP algorithm is supported"
+export LDFLAGS="-lgsl -lgslcblas -lglpk " 
+export CFLAGS="-Wno-deprecated -O3 -fPIC -D LP_INCLUDE"
+make -e
+exit 0
+fi

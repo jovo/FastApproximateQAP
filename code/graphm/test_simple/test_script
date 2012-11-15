@@ -1,0 +1,2 @@
+../bin/graphm config.txt
+../bin/graphm config.txt "C_matrix=c_gh s;alpha_ldh=0.44 d;"

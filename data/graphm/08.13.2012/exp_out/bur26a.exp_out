@@ -1,0 +1,61 @@
+***********************************
+Experiment parameters:
+graph_1=graphmdat/bur26a.dat_1
+graph_2=graphmdat/bur26a.dat_2
+C_matrix=../test_qap/null
+algo=I U RANK QCV rand PATH
+algo_init_sol=unif unif unif unif unif unif
+solution_file=solution_im.txt
+alpha_ldh=0
+cdesc_matrix=A
+cscore_matrix=A
+hungarian_max=10000
+algo_fw_xeps=0.01
+algo_fw_feps=0.01
+dummy_nodes=0
+dummy_nodes_fill=0
+dummy_nodes_c_coef=0.01
+qcvqcc_lambda_M=10
+qcvqcc_lambda_min=1e-05
+blast_match=0
+blast_match_proj=0
+exp_out_file=exp_out/bur26a.exp_out
+exp_out_format=Parameters Compact Permutation
+debugprint=0
+debugprint_file=debug.txt
+verbose_mode=1
+verbose_file=verbose/bur26a.verbose
+Experiment results:
+	 Alpha		I		U		RANK		QCV		rand		PATH		
+Gdist 	0.000000e+00	1.173113e+08	1.160959e+08	1.155806e+08	1.158009e+08	1.169753e+08	1.172101e+08
+F_perm 	0.000000e+00	9.087050e-01	9.010881e-01	8.972954e-01	8.985150e-01	9.077560e-01	9.094472e-01
+F_exact	0.000000e+00	9.087050e-01	9.010881e-01	8.972954e-01	1.439794e-01	9.077560e-01	9.094472e-01
+Time: 			0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00	0.000000e+00
+Permutations:
+I U RANK QCV rand PATH 
+1 11 18 1 9 4 
+2 3 19 18 19 10 
+3 4 1 19 3 26 
+4 18 5 7 23 7 
+5 20 20 20 12 14 
+6 14 11 23 1 17 
+7 16 13 13 8 21 
+8 24 6 22 16 12 
+9 10 16 26 4 25 
+10 25 17 24 14 23 
+11 12 7 15 2 22 
+12 15 15 8 24 8 
+13 6 2 21 21 9 
+14 13 3 12 25 19 
+15 22 21 2 18 11 
+16 17 24 25 17 13 
+17 7 10 10 13 2 
+18 23 22 17 10 1 
+19 26 25 16 15 6 
+20 9 8 9 20 18 
+21 19 12 4 11 16 
+22 1 4 5 6 24 
+23 5 9 14 22 15 
+24 2 14 3 7 3 
+25 8 26 6 5 20 
+26 21 23 11 26 5 

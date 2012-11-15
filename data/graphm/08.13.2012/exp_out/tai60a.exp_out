@@ -1,0 +1,95 @@
+***********************************
+Experiment parameters:
+graph_1=graphmdat/tai60a.dat_1
+graph_2=graphmdat/tai60a.dat_2
+C_matrix=../test_qap/null
+algo=I U RANK QCV rand PATH
+algo_init_sol=unif unif unif unif unif unif
+solution_file=solution_im.txt
+alpha_ldh=0
+cdesc_matrix=A
+cscore_matrix=A
+hungarian_max=10000
+algo_fw_xeps=0.01
+algo_fw_feps=0.01
+dummy_nodes=0
+dummy_nodes_fill=0
+dummy_nodes_c_coef=0.01
+qcvqcc_lambda_M=10
+qcvqcc_lambda_min=1e-05
+blast_match=0
+blast_match_proj=0
+exp_out_file=exp_out/tai60a.exp_out
+exp_out_format=Parameters Compact Permutation
+debugprint=0
+debugprint_file=debug.txt
+verbose_mode=1
+verbose_file=verbose/tai60a.verbose
+Experiment results:
+	 Alpha		I		U		RANK		QCV		rand		PATH		
+Gdist 	0.000000e+00	6.074640e+06	5.756616e+06	6.054348e+06	5.072248e+06	5.723680e+06	3.679952e+06
+F_perm 	0.000000e+00	2.639557e-01	2.501369e-01	2.630740e-01	2.203997e-01	2.487058e-01	1.599016e-01
+F_exact	0.000000e+00	2.639557e-01	2.501369e-01	2.630740e-01	2.163066e-03	2.487058e-01	1.599016e-01
+Time: 			0.000000e+00	0.000000e+00	0.000000e+00	1.000000e+00	0.000000e+00	8.000000e+00
+Permutations:
+I U RANK QCV rand PATH 
+1 14 31 50 30 51 
+2 44 16 37 7 15 
+3 51 1 1 31 12 
+4 49 14 6 39 9 
+5 13 15 39 1 8 
+6 41 54 10 49 50 
+7 52 13 4 11 17 
+8 12 38 59 56 21 
+9 54 20 27 12 42 
+10 48 26 14 20 31 
+11 16 2 49 26 7 
+12 39 43 40 46 43 
+13 33 6 18 15 48 
+14 40 5 36 47 36 
+15 4 55 8 22 4 
+16 27 60 31 28 22 
+17 8 3 3 5 5 
+18 46 58 19 57 13 
+19 11 4 55 42 44 
+20 19 52 48 36 32 
+21 30 24 24 34 24 
+22 59 30 17 25 27 
+23 43 47 46 3 46 
+24 31 7 29 55 59 
+25 55 19 52 48 39 
+26 22 56 2 19 30 
+27 21 36 58 37 16 
+28 58 10 54 53 19 
+29 45 17 30 4 2 
+30 3 37 32 41 14 
+31 34 57 21 6 57 
+32 7 50 7 18 6 
+33 18 18 28 43 29 
+34 1 59 23 23 23 
+35 50 23 57 32 54 
+36 28 33 42 44 53 
+37 24 27 33 35 33 
+38 60 12 56 45 18 
+39 32 22 22 14 28 
+40 42 42 20 2 41 
+41 38 53 25 9 11 
+42 5 28 60 59 38 
+43 37 8 26 58 52 
+44 25 49 35 21 1 
+45 26 48 43 8 35 
+46 2 39 16 24 26 
+47 57 11 38 50 20 
+48 17 32 47 16 47 
+49 47 21 45 33 45 
+50 20 25 12 51 25 
+51 15 44 44 38 58 
+52 6 45 41 29 10 
+53 36 9 15 40 37 
+54 9 41 11 52 56 
+55 29 40 5 27 49 
+56 23 29 53 13 3 
+57 56 34 51 54 34 
+58 10 35 13 17 40 
+59 53 46 34 10 55 
+60 35 51 9 60 60 

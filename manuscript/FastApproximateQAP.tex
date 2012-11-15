@@ -1,14 +1,48 @@
 \documentclass[11pt]{article}
-\input{/Users/jovo/Research/other/latex/latex_document}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{algorithm,algorithmic}
+\usepackage{times}
+\usepackage{fancyhdr}
+\usepackage[small]{titlesec}
+\usepackage{color}
+\usepackage{enumerate}
 
-\title{\vspace{-75pt}(Brain) Graph Matching via \\ Fast Approximate Quadratic Programming}
-\author{JoVo, cep}
+\pagestyle{fancy}
+
+\oddsidemargin=0.0in %%this makes the odd side margin go to the default of 1inch
+\evensidemargin=0.0in
+\textwidth=6.5in
+\headwidth=6.5in
+\textheight=9in %%sets the textwidth to 6.5, which leaves 1 for the remaining right margin with 8 1/2X11inch paper
+\headheight=12pt
+\topmargin=-0.25in
+
+
+\usepackage{hyperref}
+\hypersetup{
+    linkcolor=red,          % color of internal links
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+
+
+\input{/Users/jovo/Research/other/latex/latex_commands.tex}
+% \usepackage{longtable}
+
+\title{\vspace{-75pt}Large (Brain) Graph Matching via \\ Fast Approximate Quadratic Programming}
+\author{Joshua T.~Vogelstein, John M.~Conroy, Louis J.~Podrazik, Steven G.~Kratzer, Eric T.~Harley, \\
+        Donniell E.~Fishkind, 
+		R.~Jacob~Vogelstein,
+        and~Carey~E.~Priebe}
 
 \begin{document}
 \maketitle
 
 
-% \author{Joshua T.~Vogelstein, John M.~Conroy, Louis J.~Podrazik, Steven G.~Kratzer, Eric T.~Harley,
+% \author{Joshua T.~Vogelstein, John M.~Conroy, Louis J.~Podrazik, S/teven G.~Kratzer, Eric T.~Harley,
 %         Donniell E.~Fishkind, 
 % 		R.~Jacob~Vogelstein,
 %         and~Carey~E.~Priebe% <-this % stops a space
@@ -24,7 +58,12 @@
  
 \begin{abstract}
 	
-Graph matching (GM)---the process of finding an optimal permutation of the vertices of one graph to minimize adjacency disagreements with the vertices of another---is rapidly becoming an increasingly important computational problem, arising in fields ranging from machine vision to chemical engineering to neuroscience. Because GM is NP-hard, exact algorithms are unsuitable for today's massive graphs; yet, scalable GM algorithms have received short shrift.  GM can be formulated as a quadratic program with linear and binary constraints.  We develop a fast approximate quadratic (\FAQ) assignment algorithm to approximately solve a relaxed quadratic program with only linear constraints.  \FAQ scales cubicly with the number of vertices, and demonstrates marked improvements over previous state-of-the-art on nearly all benchmarks. Moreover, our non-convex formulation facilitates multiple restarts; $2-3$ wisely chosen initial conditions yield the best objective function on \emph{all} benchmarks. We find qualitatively similar results for our motivating application: brain-graph matching.  Unfortunately, the computational complexity of \FAQ scales too poorly to use it for mammalian brain-graphs, with millions or billions of vertices.  To inspire further development of approximate solutions to these problems, this work is available from on the first author's website, \url{http://jovo.me}.
+Graph matching (GM)---the process of finding an optimal permutation of the vertices of one graph to minimize adjacency disagreements with the vertices of another---is rapidly becoming an increasingly important computational problem, arising in fields ranging from machine vision to neuroscience. Because GM is $\mc{NP}$-hard, exact algorithms are unsuitable for today's large graphs (with $\ge 1000$ vertices). 
+Approximate algorithms necessarily employ a accuracy/efficiency trade-off.
+We developed a fast approximate quadratic assignment algorithm (\texttt{FAQ}). 
+\FAQ scales cubicly with the number of vertices, similar to other approximate GM algorithms.  Our formulation, however, achieves a lower objective function value than all previously proposed algorithms on over $93\%$ of the QAPLIB benchmark problems.  Moreover, our algorithm runs faster than the second best algorithm on over $80\%$ of the benchmarks.  
+We therefore implement our algorithm on a dataset of increasing interest to the neurobiology community: the brain-graph (connectome) of the C. elegans. \FAQ solves this problem perfectly, and no other algorithm we tried was successful.  
+Future work will hopefully improve upon the cubic complexity of \FAQ to be able to match mammalian brain-graphs, with millions or billions of vertices.  
 \end{abstract}
 
 
@@ -32,19 +71,25 @@ Graph matching (GM)---the process of finding an optimal permutation of the verti
 
 \section{Introduction}
 
-Graph matching---the process of finding an optimal permutation of the vertices of one graph to minimize adjacency disagreements with the vertices of another---is a famously computationally daunting problem (see, for example, ``Thirty Years of Graph Matching in Pattern Recognition''  \cite{Conte2004}). Specifically, graph matching is an $\mc{NP}$-hard problem, in particular, we do not know whether a polynomial time algorithm can solve it \cite{Papadimitriou1998}.  Perhaps the most prominent special case of graph matching is the traveling salesman problem \cite{Burkard2009}. As such, performance of graph matching algorithms are usually evaluated on graphs with $\dot{\approx} 10$ vertices, or at maximum $\dot{\approx} 100$ (see \cite{Burkard1997} for a description of the standard set of benchmarks).  Yet, it is increasingly popular to represent large data sets by a graph, and thus increasingly desirable to consider matching large graphs.  
+Graph matching---the process of finding an optimal permutation of the vertices of one graph to minimize adjacency disagreements with the vertices of another---is a famously computationally daunting problem (see, for example, ``Thirty Years of Graph Matching in Pattern Recognition''  \cite{Conte2004}). Specifically, graph matching is an $\mc{NP}$-hard problem, in particular, we do not know whether a polynomial time algorithm can solve it in worst case scenarios \cite{Papadimitriou1998}.  
+% Perhaps the most prominent special case of graph matching is the traveling salesman problem \cite{Burkard2009}. 
+As such, performance of graph matching algorithms are usually evaluated on graphs with $\dot{\approx} 10$ vertices, or at maximum $\dot{\approx} 100$ (see \cite{Burkard1997} for a description of the standard set of benchmarks).  Yet, it is increasingly popular to represent large data sets by a graph, and thus increasingly desirable to consider matching large graphs.  
 
 The motivating application for this work is \emph{brain-graph matching}.  A brain-graph (aka, a connectome) is a graph for which vertices represent (collections of) neurons and edges represent connections between them \cite{SpornsKotter05, Hagmann05}. Via  Magnetic resonance (MR) imaging, one can image the whole brain and estimate connectivity across voxels, yielding a voxelwise connectome with up to $\dot{\approx} 10^6$ vertices and $\dot{\approx} 10^9$ edges \cite{Zuo2011}.  Comparing brains is an important step for many neurobiological inference tasks.  For example, it is becoming increasingly popular to diagnose neurological diseases via comparing brain images \cite{Csernansky2004}.  To date, however, these comparisons have largely rested on anatomical (e.g., shape) comparisons, not graph comparisons.  This is despite the widely held doctrine that many
 % Yet almost immediately after the ``neuron doctrine'' was conjectured (the idea that networks of neurons comprise brains), Wernicke and others began postulating that 
 psychiatric disorders are fundamentally ``connectopathies'', that is, disorders of the connections of the brain \cite{Kubicki2007,Calhoun2011,Fornito2012,Fornito2012a}. Currently available tests for connectopic explanation of psychiatric disorders  hedge upon first choosing some number of graph invariants to compare across populations. The graph invariant approach to classifying is both theoretically and practically inferior to comparing whole graphs via matching \cite{VP11_unlabeled}.  
 
-More generally, state-of-the-art inference procedures for essentially any decision-theoretic or inference task follow from constructing interpoint dissimilarity matrices \cite{Duin2011}.  Thus, we believe that graph matching of large graphs will become a fundamental subroutine of many statistical inference pipelines operating on graphs. Because the number of vertices of these graphs is so large, exact matching is intractable.   Instead, we require inexact matching algorithms (also called ``heuristics'') that will scale polynomially or even linear \cite{Conte2004}.  We develop an approach to graph matching based on a relaxation of the quadratic programming problem (QAP).  Our approach is only cubic in the number of vertices, and outperforms previously proposed approximate graph matching heuristics on a wide range of benchmark datasets as well as our motivating application.  
+More generally, state-of-the-art inference procedures for essentially any decision-theoretic or inference task follow from constructing interpoint dissimilarity matrices, or graphs \cite{Duin2011}.  Thus, we believe that graph matching of large graphs will become a fundamental subroutine of many statistical inference pipelines operating on graphs. Because the number of vertices of these graphs is so large, exact matching is intractable.   Instead, we require inexact matching algorithms (also called ``heuristics'') that will scale polynomially or even linear \cite{Conte2004}.  In developing such algorithms, there is an inherent accuracy/efficiency trade-off.  If an algorithm outperforms another on both dimensions, it is clearly preferential.  
+
+The remainder of this paper is organized as follows.  Section \ref{sec:GM} formally defines the ``graph matching'' problem, and Section \ref{sec:QAP} makes the connection between graph matching and quadratic assignment problems (QAPs).  Section \ref{sec:FAQ} describes our algorithm, a Fast Approximate QAP (\texttt{FAQ}).  Section \ref{sec:results} provides a number of theoretical and empirical results, comparing our algorithm to previous state-of-the-art algorithms in terms of both computational efficiency and objective function value.  We conclude with a discussion in Section \ref{sec:discussion}.
+% In the sequel, we describe our fast approximate quadratic assignment algorithm called \texttt{FAQ} and demonstrate its superior performance relative to its predecessors.  
+% We develop an approach to graph matching based on a relaxation of the quadratic programming problem (QAP), which is cubic in the number of vertices, and outperforms previously proposed approximate graph matching heuristics on a wide range of benchmark datasets as well as our motivating application.  
 
 
 
 
 \section{Graph Matching} % (fold)
-\label{sec:graph_matching}
+\label{sec:GM}
 
 
 A labeled graph $G=(\mc{V},\mc{E})$ consists of a vertex set $\mc{V}$, where $|\mc{V}|=n$ is number of vertices, and an edge set $\mc{E}$. %, where $|\mc{E}| \leq n^2$. 
@@ -67,7 +112,7 @@ Now consider the following two closely related problems:
 
 Both GI and GM are computationally difficult. GM is at least as hard as GI, since solving GM also solves GI, but not vice versa. It is not known whether GI is in complexity class $\mc{P}$ \cite{Fortin1996}.  In fact, GI is one of the few problems for which, if $\mc{P} \neq \mc{NP}$, then GI might reside in an intermediate complexity class called $\mc{GI}$-complete.  GM, however, is known to be $\mc{NP}$-hard.    
  % There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be $\mc{NP}$-hard, it remains unclear whether GI is in $\mc{P}$, $\mc{NP}$, or its own intermediate complexity class, $\mc{NP}$-isomorphism (or isomorphism-complete).  
-Yet, for large classes of GI and GM problems, linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(\exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GI or GM algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all vertices have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ (yes, that is a factorial!) \cite{Chen1994}.  
+Yet, for large classes of GI and GM problems, linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(\exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GI or GM algorithms are available for special cases of graphs, the constants are often unbearably large.  For example, if all vertices have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ (yes, that is a factorial!) \cite{Chen1994}.  
 
 Because we are interested in solving GM for graphs with $\dot{\approx} 10^6$ or more vertices, exact GM solutions will be computationally intractable. As such, we develop a fast approximate graph matching algorithm.   Our approach is based on formulating GM as a quadratic assignment problem (QAP).  %Below, we introduce assignment problems, and reiterate their close relationship to GI and GM \cite{Burkard2009}.
 
@@ -75,7 +120,7 @@ Because we are interested in solving GM for graphs with $\dot{\approx} 10^6$ or 
 
 
 \section{Graph  Matching as a QAP} % (fold)
-\label{sub:preliminaries}
+\label{sec:QAP}
 
 % Our interests here lie in a particular instantiation of QAPs, the weighted graph matching problem \cite{Umeyama1988}.  A \emph{graph} is the mathematical abstraction of a network, consisting of a collection of vertices (or nodes)  and edges (or links, arcs) between them  \cite{Bollobas1998}.  A \emph{weighted graph},  is a kind of \emph{attributed graph}, where each edge has associated with it a weight.  The (weighted) graph matching problem (WGMP) is the problem of ``aligning'' the vertices of a pair of (weighted) graphs such that each vertex in one graph can be assigned to its corresponding vertex in the other graph.
 % 
@@ -118,8 +163,8 @@ Thus, the feasible region expands to the convex hull of the permutation matrices
 % the feasible space becomes the doubly stochastic matrices; that is, all matrices whose rows and columns both sum to unity, and whose elements are all non-negative, $\mc{D}=\{P : P\T \mb{1} =  P \mb{1} = \mb{1}, P \succeq 0\}$, where $\succeq$ indicates an element-wise inequality. Because the equalities in Eq. \eqref{eq:GM} follow from $P$ being a permutation matrix, relaxing the constraints for different formulations yields different optimization problems.  We relax the binary constraints in the trace formulation, yielding:
 \begin{subequations} \label{eq:FAQ}
 \begin{align}
-		\text{(rQAP) } \quad &\underset{P}{\text{minimize}}  && - tr(B P\T AP) \label{eq:FAQ1}  \\
-		&\text{subject to } && P \in \mc{D}.
+		\text{(rQAP) } \quad &\underset{P}{\text{minimize}}   - tr(B P\T AP) \label{eq:FAQ1}  \\
+		&\text{subject to }  P \in \mc{D}.
 \end{align}
 \end{subequations}
 % FAQ---the above Fast Approximate Quadratic problem---is therefore a quadratic program with linear constraints, meaning that relatively standard solvers may be employed to search for approximately optimal solutions to an $\mc{NP}$-hard problem.
@@ -143,7 +188,7 @@ where $\otimes$ indicates the Kronecker product. This means that the solution sp
 
 
 \section{Fast Approximate Quadratic Assignment Problem Algorithm} % (fold)
-\label{sec:faq}
+\label{sec:FAQ}
 
 
 Our algorithm, called \texttt{FAQ}, has three components:
@@ -196,7 +241,7 @@ Thus, Step 2 of \texttt{FW} is
 	 % \\ &=\argmin_{P \in \mc{D}}  \langle \nabla f(P^{(i)}), P \rangle, 
 \end{align}
 \end{subequations}
-As it turns out, Eq. \eqref{eq:dotFW1} can be solved as a \emph{Linear Assignment Problem} (LAP).  The details of LAPs are well known \cite{Burkard2009}, so we relegate them to the appendix.  Suffice it to say here, LAPs can be solved via  the ``Hungarian Algorithm'', named after three Hungarian mathematicians \cite{Kuhn1955, Konig1931, Egevary1931}.  Modern variants of the Hungarian algorithm are cubic in $n$, that is, $\mc{O}(n^3)$, or even faster in the case of sparse or otherwise structured graphs \cite{Jonker1987, Burkard2009}.  The $\mc{O}(n^3)$ computational complexity of \texttt{FW} was the primary motivating factor for utilizing \texttt{FW}; generic linear programs can require up to $\mc{O}(n^7)$.
+As it turns out, Eq.  \eqref{eq:dotFW1} can be solved as a \emph{Linear Assignment Problem} (LAP).  The details of LAPs are well known \cite{Burkard2009}, so we relegate them to the appendix.  Suffice it to say here, LAPs can be solved via  the ``Hungarian Algorithm'', named after three Hungarian mathematicians \cite{Kuhn1955, Konig1931, Egevary1931}.  Modern variants of the Hungarian algorithm are cubic in $n$, that is, $\mc{O}(n^3)$, or even faster in the case of sparse or otherwise structured graphs \cite{Jonker1987, Burkard2009}.  The $\mc{O}(n^3)$ computational complexity of \texttt{FW} was the primary motivating factor for utilizing \texttt{FW}; generic linear programs can require up to $\mc{O}(n^7)$.
 
 % Thus, we can solve the first step of FW upon computing 
 
@@ -236,17 +281,17 @@ is the usual Euclidean inner product, i.e., $\langle X,Y\rangle \defn tr(X\T Y)=
 
 
 \section{Results} % (fold)
-\label{sec:theoretical_results}
+\label{sec:results}
 
 
 
 
 
 \subsection{Algorithm Complexity and leading constants} % (fold)
-\label{sub:algorithm_complexity_and_leading_constants}
+\label{sub:const}
 
 % Both GM and its closely related counterpart, graph isomorphism (GI), are computationally difficult.  There exist no known algorithms for which worst case behavior is polynomial \cite{Fortin1996}.  While GM is known to be $\mc{NP}$-hard, it remains unclear whether GI is in $\mc{P}$, $\mc{NP}$, or its own intermediate complexity class, $\mc{NP}$-isomorphism (or isomorphism-complete).  Yet, for large classes of GI and GM problems, linear or polynomial time algorithms are available \cite{Babai1980}.  Moreover, at worst, it is clear that GI is only ``moderately exponential,'' for example, $\mc{O}(\exp\{n^{1/2 + o(1)}\})$ \cite{Babai1981}.  Unfortunately, even when linear or polynomial time GM or GI algorithms are available for special cases of graphs, the constants are typically unbearably large.  For example, if all graphs have degree less than $k$, there is a linear time algorithm for GI.  However, the hidden constant in this algorithm is $512k^3!$ \cite{Chen1994}.  
-As mentioned above, GM is computationally difficult; even those special cases for which polynomial time algorithms are available, the leading constants are intractably large for all but the simplest cases. We therefore determined the average complexity of our algorithm and the leading constants.  Figure \ref{fig:scaling} suggests that our algorithm is not just cubic in time, but also has very small leading constants ($\dot{\approx} 10^{-9}$ seconds), making using this algorithm feasible for even reasonably large graphs.
+As mentioned above, GM is computationally difficult; even those special cases for which polynomial time algorithms are available, the leading constants are intractably large for all but the simplest cases. We therefore determined the average complexity of our algorithm and the leading constants.  The primary computational bottleneck of \FAQ is solving the LAP as a subroutine.  We use the Jonker and Volgenant version of the Hungarian algorithm \cite{Jonker1987, Burkard2009}, which is known to scale cubically in the number of vertices.  Figure \ref{fig:scaling} suggests that \FAQ is not just cubic in time, but also has very small leading constants ($\dot{\approx} 10^{-9}$ seconds), making using this algorithm feasible for even reasonably large graphs.  Note that the other state-of-the-art approximate graph matching algorithms also have cubic or worse time complexity in the number of vertices.  We will describe these other algorithms and their time complexity in greater detail below.
 
 
 
@@ -259,59 +304,113 @@ As mentioned above, GM is computationally difficult; even those special cases fo
 
 % subsection algorithm_complexity_and_leading_constants (end)
 
+\subsection{QAP Benchmark Accuracy} % (fold)
+\label{sub:qap_benchmarks}
 
-\subsection{QAP Undirected Benchmarks}
-\label{sub:undirected}
-
-We next assess the computational properties of \FAQ in comparison with other the previous state-of-the-art algorithms.  We therefore compare \FAQ to other approaches using a selection of the QAP benchmark library, QAPLIB \cite{Burkard1997}.  Specifically, \cite{Zaslavskiy2009} created a path following algorithm (\texttt{PATH}) based on a convex and concave relaxation of QAP.  In that manuscript, the authors considered 16 datasets from the QAPLIB benchmark, the same 16 datasets as were used in \cite{Schellewald2001}, which are known to be ``particularly difficult''.  \texttt{PATH} was shown to outperform other state-of-the-art algorithms on 14 of 16 tests.  Specifically, \texttt{PATH} was compared to the Quadratic Programming Bound approach (\texttt{QGP}) of \cite{Anstreicher2001}, the graduated assignment algorithm (\texttt{GRAD}) of \cite{Gold1996}, and Umeyama's algorithm (\texttt{U}) \cite{Umeyama1988}.  Because either \texttt{PATH} or \texttt{QBP} outperformed \texttt{GRAD} and \texttt{U} on every dataset, Table \ref{tab:1} shows the performance of \FAQ versus \texttt{PATH} and \texttt{QBP}.  \FAQ outperforms both of the previous state-of-the-art cubic algorithms on 13 out of 16 benchmarks.  Figure \ref{fig:path16} presents the same data graphically. The top panel compares both \FAQ and \texttt{PSOA}---which is the minimum of the previous state-of-the-art (either \texttt{PATH} or \texttt{QBP} here)---to the absolute minimum; \FAQ get closer than \texttt{PSOA} to the minimum on 13 of 16. The bottom panel shows the ratio of \FAQ to \texttt{PSOA}. 
-
-
-\begin{table}[h!]
-\caption{Comparison of \FAQ with the optimal objective function value and previous state-of-the-art on a set of 16 standard benchmarks from QAPLIB.  The best (lowest) value is in \textbf{bold}. The number of vertices for each problem is the number in its name (second column).}
-\begin{center}
-\begin{tabular}{|r|r|r||l|l|l|l|l|}
-\hline
-\# & Problem  &   Optimal   & \FAQ & \texttt{PATH} & \texttt{QBP} \\
-\hline
-1&    chr12c &   11156 &    \textbf{13072} &   18048 	& 20306\\
-2&    chr15a &    9896 &    27584 &   \textbf{19086} 	& 26132\\
-3&    chr15c &    9504 &    \textbf{11936}  &   16206 	& 29862\\
-4&   chr20b &    2298 & \textbf{3068} &    5560 		& 6674\\
-5&    chr22b &    6194 &    \textbf{8482} &    8500 		& 9942\\
-6&    esc16b & 292 &    320 & 300 		& \textbf{296}\\
-7& rou12 &  235528 &    \textbf{253684} &  256320 	& 278834\\
-8& rou15 &  354210 &    \textbf{371458} &  391270 	& 381016\\
-9& rou20 &  725522 &    \textbf{743884} &  778284 	& 804676\\
-10&    tai10a &  135028 &   157954 &  \textbf{152534} 	& 165364\\
-11&    tai15a &  388214 &   \textbf{397376} &  419224 	& 455778\\
-12&    tai17a &  491812 &   \textbf{529134} &  530978 	& 550862\\
-13&    tai20a &  703482 &   \textbf{734276} &  753712 	& 799790\\
-14&    tai30a & 1818146 &  	\textbf{1894640} & 1903872 	& 1996442\\
-15&    tai35a & 2422002 & 	\textbf{2460940} & 2555110 	& 2720986\\
-16&    tai40a & 3139370 &  	\textbf{3227612} & 3281830 	& 3529402\\
-    \hline
-\end{tabular}
-\end{center}
-\label{tab:1}
-\end{table}%
-
+Having demonstrated empirically \texttt{FAQ} has cubic time complexity, we next decided to evaluate its accuracy on a suite of standard benchmarks.  More specifically, QAPLIB is a library of 137 quadratic assignment problems, ranging in size from 10 to 256 vertices \cite{Burkard1997}.  Recent graph matching papers typically evaluate the performance of their algorithm on 16 of the benchmarks that are known to be ``particularly difficult'' \cite{Zaslavskiy2009,Schellewald2001}.  We compare the results of \FAQ to the results of four other state-of-the-art graph matching algorithms: (1) the \texttt{PATH} algorithm, which solves a path between a convex and concave relaxation of QAP \cite{Zaslavskiy2009}, (2) \texttt{QCV} which is the convex relaxation used to initialize the \texttt{PATH} algorithm, (3) the \texttt{RANK} algorithm \cite{Singh2007}, which uses a spectral decomposition, and (4)  the Umeyama algorithm (denoted by \texttt{U} henceforth), which also uses a spectral decomposition \cite{Umeyama1988}.  We chose these four algorithms to compare because the code is freely available from the \texttt{graphm} package \cite{Zaslavskiy2009}.  
+% Table \ref{tab:1} shows the results of these 5 algorithms on all 137 benchmarks, along with the optimal values (when they are available).  
+Figure \ref{fig:allRelAccuracy} plots the logarithm (base 10, here and elsewhere) of the relative accuracy, that is, $\log_{10}(\mh{f}_{FAQ}/\mh{f}_X)$, for $X \in \{$\texttt{PATH, QCV, RANK, U, all}$\}$, where \texttt{all} is just the best performer of all the non \FAQ algorithms.  Clearly, \FAQ does significantly better than all the other algorithms, outperforming all of them on $\approx 94\%$ of the problems, often by nearly an order of magnitude in terms of relative error.
+% Table \ref{tab:1} in the appendix shows the actual objective function values for all the algorithms on each problem.
 
 \begin{figure}[htbp]
 	\centering
-		\includegraphics[width=0.5\linewidth]{../figs/path16.pdf}
-	\caption{Performance of \FAQ relative to the previous state-of-the-art (\texttt{PSOA}) algorithms on the undirected QABLIB benchmarks.  Top: The optimal error ratio is defined: $(\mh{f} - f^*)/f^*$, for $\mh{f}$ being the minimum function value found by each algorithm, and $f^*$ is the optimal (minimum) value.  Bottom: Ratio of \FAQ minimum to \texttt{PSOA} minimum.  Note that both panels indicate that \FAQ gets closer to the minimum on 13 of 16 benchmarks.}
-	\label{fig:path16}
+		\includegraphics[width=1.0\linewidth]{../figs/allRelAccuracy.pdf}
+	\caption{Relative accuracy---defined to be $\log_{10}(\mh{f}_{FAQ}/\mh{f}_X)$---of all the four algorithms compared with \texttt{FAQ}.  Note that \FAQ is better than all the other algorithms on $\approx 94\%$ of the benchmarks. The abscissa is the log number of vertices.  The gray dot indicates the mean improvement of \FAQ over the other algorithms.}
+	\label{fig:allRelAccuracy}
 \end{figure}
+
+
+% subsection qap_benchmarks (end)
+
+\subsection{QAP Benchmark Efficiency} % (fold)
+\label{sub:subsection_name}
+
+As we mentioned in the introduction, the quality of an \emph{approximate} algorithm depends not just on its accuracy, but also its efficiency.  Therefore, we compare the wall time of each of the five algorithms on all 137 benchmarks in Figure \ref{fig:allEfficiency}.  We fit an iteratively weighted least squares linear regression function (Matlab's \texttt{robustfit}) to regress the logarithm of time (in seconds) onto the logarithm of the number of vertices.  The numbers beside the lines indicate the slopes of the regression functions.  The \texttt{PATH} algorithm has the worst slope.  \texttt{QCV} and \FAQ have nearly identical slopes, which makes sense, given that the are solving very similar objective functions.  Similarly, \texttt{RANK} and \texttt{U} have very similar slopes; they are both using spectral approaches.  Note, however, that although the slope of \texttt{RANk} and \texttt{U} are smaller than that of \texttt{FAQ}, they both seem to be super linear on this log-log plot, suggesting that as the number of vertices increases, their compute time might exceed that of the other algorithms.  
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[height=3in]{../figs/allEfficiency.pdf}
+	\caption{Absolute wall time for running each of the five algorithms on all 137 benchmarks. We fit a line on this log-log plot for each algorithm; the slope is displayed beside each line. The \FAQ slope is much better than the \texttt{PATH} slope, and worse than the others.  Note, however, the time for \texttt{RANK} and \texttt{U} appears to be superlinear on this log-log plot, suggesting that perhaps as the number of vertices increases, \texttt{PATH} might be faster. }
+	\label{fig:allEfficiency}
+\end{figure}
+
+
+% subsection subsection_name (end)
+
+\subsection{QAP Benchmark Accuracy/Efficiency Trade-off} % (fold)
+\label{sub:qap_benchmark_accuracy_efficiency_trade_off}
+
+In the \texttt{PATH}, the authors demonstrated that \texttt{PATH} outperformed \texttt{QCV} and \texttt{U} on a variety of simulated and real examples in terms of objective function \cite{Zaslavskiy2009}.  If \FAQ yields a lower objective function value than \texttt{FAQ}, and is faster, then it clearly is superior to \texttt{PATH}.  Figure \ref{fig:tradeoff} compares the performance of \FAQ with \texttt{PATH} along both dimensions of performance---accuracy and efficiency---for all 137 benchmarks in the QAPLIB library.  The right panel indicates that \FAQ is both more accurate and more efficient on $80\%$ of the problems.
+
+\begin{figure}[htbp]
+	\centering
+		\includegraphics[height=3in]{../figs/allPathCompare.pdf}
+	\caption{Comparison of \FAQ with \texttt{PATH} in terms of both accuracy and efficiency.  The left panel is the same as the left panel of Figure \ref{fig:allRelAccuracy}.  The middle plots the relative wall time of \FAQ to \texttt{PATH} as a function of the number of vertices, also on a log-log scale.  The gray line is the best fit slope on this plot, suggesting that \FAQ is getting exponentially faster than \texttt{PATH} as the number of vertices gets larger.  Finally, the right panel plots log relative time versus log relative objective function value, demonstrating that \FAQ outperforms \texttt{PATH} on both dimensions on $80\%$ of the benchmarks.}
+	\label{fig:tradeoff}
+\end{figure}
+
+
+
+% subsection qap_benchmark_accuracy_efficiency_trade_off (end)
+
+
+% 
+% \subsection{QAP Undirected Benchmarks}
+% \label{sub:undirected}
+% 
+% We next assess the computational properties of \FAQ in comparison with other the previous state-of-the-art algorithms.  We therefore compare \FAQ to other approaches using a selection of the QAP benchmark library, QAPLIB \cite{Burkard1997}.  Specifically, \cite{Zaslavskiy2009} created a path following algorithm (\texttt{PATH}) based on a convex and concave relaxation of QAP.  In that manuscript, the authors considered 16 datasets from the QAPLIB benchmark, the same 16 datasets as were used in \cite{Schellewald2001}, which are known to be ``particularly difficult''.  \texttt{PATH} was shown to outperform other state-of-the-art algorithms on 14 of 16 tests.  Specifically, \texttt{PATH} was compared to the Quadratic Programming Bound approach (\texttt{QGP}) of \cite{Anstreicher2001}, the graduated assignment algorithm (\texttt{GRAD}) of \cite{Gold1996}, and Umeyama's algorithm (\texttt{U}) \cite{Umeyama1988}.  Because either \texttt{PATH} or \texttt{QBP} outperformed \texttt{GRAD} and \texttt{U} on every dataset, Table \ref{tab:1} shows the performance of \FAQ versus \texttt{PATH} and \texttt{QBP}.  \FAQ outperforms both of the previous state-of-the-art cubic algorithms on 13 out of 16 benchmarks.  Figure \ref{fig:path16} presents the same data graphically. The top panel compares both \FAQ and \texttt{PSOA}---which is the minimum of the previous state-of-the-art (either \texttt{PATH} or \texttt{QBP} here)---to the absolute minimum; \FAQ get closer than \texttt{PSOA} to the minimum on 13 of 16. The bottom panel shows the ratio of \FAQ to \texttt{PSOA}. 
+% 
+% 
+% \begin{table}[h!]
+% \caption{Comparison of \FAQ with the optimal objective function value and previous state-of-the-art on a set of 16 standard benchmarks from QAPLIB.  The best (lowest) value is in \textbf{bold}. The number of vertices for each problem is the number in its name (second column).}
+% \begin{center}
+% \begin{tabular}{|r|r|r||l|l|l|l|l|}
+% \hline
+% \# & Problem  &   Optimal   & \FAQ & \texttt{PATH} & \texttt{QBP} \\
+% \hline
+% 1&    chr12c &   11156 &    \textbf{13072} &   18048 	& 20306\\
+% 2&    chr15a &    9896 &    27584 &   \textbf{19086} 	& 26132\\
+% 3&    chr15c &    9504 &    \textbf{11936}  &   16206 	& 29862\\
+% 4&   chr20b &    2298 & \textbf{3068} &    5560 		& 6674\\
+% 5&    chr22b &    6194 &    \textbf{8482} &    8500 		& 9942\\
+% 6&    esc16b & 292 &    320 & 300 		& \textbf{296}\\
+% 7& rou12 &  235528 &    \textbf{253684} &  256320 	& 278834\\
+% 8& rou15 &  354210 &    \textbf{371458} &  391270 	& 381016\\
+% 9& rou20 &  725522 &    \textbf{743884} &  778284 	& 804676\\
+% 10&    tai10a &  135028 &   157954 &  \textbf{152534} 	& 165364\\
+% 11&    tai15a &  388214 &   \textbf{397376} &  419224 	& 455778\\
+% 12&    tai17a &  491812 &   \textbf{529134} &  530978 	& 550862\\
+% 13&    tai20a &  703482 &   \textbf{734276} &  753712 	& 799790\\
+% 14&    tai30a & 1818146 &  	\textbf{1894640} & 1903872 	& 1996442\\
+% 15&    tai35a & 2422002 & 	\textbf{2460940} & 2555110 	& 2720986\\
+% 16&    tai40a & 3139370 &  	\textbf{3227612} & 3281830 	& 3529402\\
+% \hline
+% \end{tabular}
+% \end{center}
+% \label{tab:undirected}
+% \end{table}%
+% 
+% 
+% \begin{figure}[htbp]
+% 	\centering
+% 		\includegraphics[width=0.5\linewidth]{../figs/path16.pdf}
+% 	\caption{Performance of \FAQ relative to the previous state-of-the-art (\texttt{PSOA}) algorithms on the undirected QABLIB benchmarks.  Top: The optimal error ratio is defined: $(\mh{f} - f^*)/f^*$, for $\mh{f}$ being the minimum function value found by each algorithm, and $f^*$ is the optimal (minimum) value.  Bottom: Ratio of \FAQ minimum to \texttt{PSOA} minimum.  Note that both panels indicate that \FAQ gets closer to the minimum on 13 of 16 benchmarks.}
+% 	\label{fig:path16}
+% \end{figure}
 
 
 \subsection{QAP Directed Benchmarks}
 \label{sub:directed}
 
-Nothing in the development of our algorithm depends on the graphs being simple; indeed, \FAQ applies equally well to directed graphs.  To assess the performance of \FAQ on directed graphs, we compare the performance of our algorithm to the previous state-of-the-art. Liu et al.  recently developed an extended path following algorithm for directed graphs \cite{Liu2012}. They compare the performance of their algorithm (\texttt{EPATH}) with several other algorithms on a set of 16 benchmarks from QAPLIB.  In particular, they consider \texttt{U} and \texttt{GRAD}, as well as an algorithm called \texttt{QCV}, which solves a convex relaxation similar to our approach.  The \texttt{EPATH} algorithm achieves at least as low objective value as the other algorithms on 15 of 16 benchmarks.  Our algorithm, \texttt{FAQ}, always gets the best of the five algorithms.  Table \ref{tab:directed} shows the numerical results comparing \FAQ to \texttt{EPATH} and \texttt{GRAD}, which sometimes did better than \texttt{EPATH}.  Note that some of the algorithms achieve the absolute minimum on some benchmarks.  Figure \ref{fig:lipa16} compares \FAQ to whichever other algorithm did best, clearly indicating that \FAQ is the best on these benchmarks.
+While this manuscript was under review, Liu et al. \cite{Liu2012} proposed a modification of the \texttt{PATH} algorithm that adjusted \texttt{PATH} to be more appropriate for directed graphs, as the theory motivating the development of \texttt{PATH} relied upon the graphs being undirected.  \texttt{FAQ}, on the other hand, does not depend on the graphs being simple; rather, directed or weighted graphs are both unproblematic. 
+% a modification of the \texttt{PATH} algorithm arose that  Nothing in the development of our algorithm depends on the graphs being simple; indeed, \FAQ applies equally well to directed graphs.  To assess the performance of \FAQ on directed graphs, we compare the performance of our algorithm to the previous state-of-the-art. Liu et al.  recently developed an extended path following algorithm for directed graphs \cite{Liu2012}.
+Liu et al. compare the performance of their algorithm (\texttt{EPATH}) with \texttt{U}, \texttt{QCV}, and \texttt{GRAD}
+on the set of 16 particularly difficult directed benchmarks from QAPLIB.  The \texttt{EPATH} algorithm achieves at least as low objective value as the other algorithms on 15 of 16 benchmarks.  Our algorithm, \texttt{FAQ}, always gets the best of the five algorithms.  Table \ref{tab:directed} shows the numerical results comparing \FAQ to \texttt{EPATH} and \texttt{GRAD}, which sometimes did better than \texttt{EPATH}.  Note that some of the algorithms achieve the absolute minimum on some benchmarks.  
+% Figure \ref{fig:lipa16} compares \FAQ to whichever other algorithm did best, clearly indicating that \FAQ is the best on these benchmarks.
 
 
 \begin{table}[h!]
-\caption{Comparison of \FAQ with optimal objective function value and previous state-of-the-art for undirected graphs.  The best (lowest) value is in \textbf{bold}. Asterisks indicate achievement of the global minimum.  The number of vertices for each problem is the number in its name (second column).}
+\caption{Comparison of \FAQ with optimal objective function value and previous state-of-the-art for directed graphs.  The best (lowest) value is in \textbf{bold}. Asterisks indicate achievement of the global minimum.  The number of vertices for each problem is the number in its name (second column).}
 \begin{center}
 \begin{tabular}{|r|r|r||l|l|l|l|l|}
 	\hline 
@@ -340,20 +439,37 @@ Nothing in the development of our algorithm depends on the graphs being simple; 
 \end{table}%
 
 
-\begin{figure}[htbp]
-	\centering
-		\includegraphics[width=0.5\linewidth]{../figs/lipa16.pdf}
-	\caption{Performance of \FAQ relative to the previous state-of-the-art (\texttt{PSOA}) algorithms on the undirected QABLIB benchmarks. Top and Bottom panels as in Figure \ref{fig:path16}.  Note that \FAQ gets closer to the minimum on all 8 benchmarks for which the \FAQ and \texttt{PSOA} answer differ.}
-	\label{fig:lipa16}
-\end{figure}
+% \begin{figure}[htbp]
+% 	\centering
+% 		\includegraphics[width=0.5\linewidth]{../figs/lipa16.pdf}
+% 	\caption{Performance of \FAQ relative to the previous state-of-the-art (\texttt{PSOA}) algorithms on the undirected QABLIB benchmarks. Top and Bottom panels as in Figure \ref{fig:path16}.  Note that \FAQ gets closer to the minimum on all 8 benchmarks for which the \FAQ and \texttt{PSOA} answer differ.}
+% 	\label{fig:lipa16}
+% \end{figure}
+% 
 
 
-
-\subsection{rQAP solves QAP in certain special cases} % (fold)
+\subsection{Theoretical properties of \FAQ} % (fold)
 \label{sub:rqap_solves_qap_}
 
-The above numerical results can be strengthened by the below theoretical results.  
-Note that rQAP relaxes the constraints of Eq. \eqref{eq:trQAP}, which suggests that in certain important special cases, the minimum of rQAP will be identical to the minimum of QAP. On the other hand, the equality between Eq. \eqref{eq:trQAP2} and Eq. \eqref{eq:trQAP} follows from dropping cross-terms that fall out of the optimization because $P$ is constrained to be a permutation matrix.  If we had relaxed the constraints prior to canceling those terms, this equality would not follow.  This leads us to wonder in which circumstances are the objective functions of QAP and rQAP equal.  The following lemma clarifies:
+Although we have no theorems proving error bounds on \texttt{FAQ} relative to the optimal solution, we do have a number of theoretical results to buttress the numerical ones.  As mentioned above in \S \ref{sub:const}, \FAQ is a cubic-time algorithm, as its computational bottleneck is solving the LAPs, which are solved in $\mc{O}(n^3)$ by various algorithms collectively referred to as the ``Hungarian algorithm'' \cite{Jonker1987, Burkard2009}.   
+
+In addition to guarantees on computational time, we have several guarantees on performance.  Consider Eq. \eqref{eq:GM}, and note that Eq. \eqref{eq:trQAP} follows from \eqref{eq:trQAP2} by 
+% For example, 
+% % Note that rQAP relaxes the constraints of Eq. \eqref{eq:trQAP}, which suggests that 
+% in certain important special cases, the minimum of rQAP will be identical to the minimum of QAP. 
+% 
+%  On the other hand, the equality between Eq. \eqref{eq:trQAP2} and Eq. \eqref{eq:trQAP} follows from 
+% 
+dropping cross-terms that fall out of the optimization because $P$ is constrained to be a permutation matrix.  \FAQ tries to solve a relaxation of Eq. \eqref{eq:trQAP}, specifically relaxing the permutation matrix constraints to their convex hull.  The resulting objective function, Eq. \eqref{eq:FAQ}, however, is quadratic but not convex.  A different formulation and relaxation of QAP yields a convex objective function. Specifically,
+\begin{subequations} \label{eq:rQAP2}
+\begin{align} 
+		&\underset{P}{\text{minimize}} 		\norm{AP - PB}_F   \label{eq:rQAP2a}\\
+		&\text{subject to } 	 P \in \mc{P}, \label{eq:rQAP2b}
+\end{align}
+\end{subequations}
+is also $\mc{NP}$-hard, but upon relaxing \eqref{eq:rQAP2b} to the doubly stochastic matrices, the result is convex \cite{Almohamad1993}.  Thus, a linear programming algorithm is guaranteed to find the optimal solution to Eq. \eqref{eq:rQAP2}.  This relaxation is in fact the objective function that \texttt{QCV} is solving.  
+
+If we had relaxed the constraints prior to canceling those terms, this equality would not follow.  This leads us to wonder in which circumstances are the objective functions of QAP and rQAP equal.  The following lemma clarifies:
  % This insight leads to the following theorem:
 % Although, rLAP and LAP are always equivalent, in general, it is not the case that FAQ and QAP are equivalent.  However, in a certain important special case, FAQ and QAP are equivalent.
 \begin{lem}
@@ -379,24 +495,26 @@ $\norm{Dx}_\infty \leq \norm{D}_{\infty,\infty} \norm{x}_\infty$.  Applying this
 \subsection{Multiple Restarts} % (fold)
 \label{sub:multiple_restarts}
 
-Although \FAQ outperformed \texttt{PSOA} on 13 of 16 undirected benchmarks, and always did the best amongst 16 of 16 directed benchmarks, it was annoying to us that we did not do best on all 32 benchmarks.  
+Although \FAQ outperformed all other algorithms on nearly every benchmark, that \FAQ was not always the best was annoying to us.
+% . \texttt{PSOA} on 13 of 16 undirected benchmarks, and always did the best amongst 16 of 16 directed benchmarks, it was annoying to us that we did not do best on all 32 benchmarks.  
 % Note that the computational bottleneck of both \FAQ and \texttt{PATH} is the Hungarian algorithm which solves a LAP. 
 % \FAQ strives to solve a non-convex problem.
 % In \texttt{PATH}, the algorithm finds the minimum of a convex path between two extremes, $F_0$ and $F_1$.  Similarly, \texttt{QBP} finds the minimum of a convex program.  Our approach, on the other hand, does not construct a convex problem to solve, rather, it chooses an initial starting point and then finds a local optimum (note that the initial position of the \texttt{PATH} algorithm could also be variable, because $F_0$ is not convex as they assert, so their starting point depends on their initialization). 
 % 
-We utilize the non-convexity of rQAP is as a feature, although it can equally well be regarded as a bug  (because rQAP is non-convex so the solution found by \FAQ depends on the initial condition).  It is a feature, however, if (i) we have some reason to believe that better solutions exist (many algorithms efficiently compute relatively tight lower bounds \cite{Anstreicher2009}), and (ii) we can efficiently search the space of initial conditions.  Although we  lack any supporting theory of optimality, we do know how to sample feasible starting points.  Specifically, we desire that our starting points are ``near'' the flat matrix, and satisfy the conditions.  Therefore, we  sample $K \in \mc{D}$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let our initial guess be $P^{(0)}=(J+K)/2$, where $J$ is the doubly flat matrix.  We can therefore use any number of restarts with this approach.  
+We therefore utilized the non-convexity of rQAP is as a feature, although it can equally well be regarded as a bug  (because rQAP is non-convex so the solution found by \FAQ depends on the initial condition).  We can utilize the non-convexity as a feature, however, whenever (i) we have some reason to believe that better solutions exist (many algorithms efficiently compute relatively tight lower bounds \cite{Anstreicher2009}), and (ii) we can efficiently search the space of initial conditions.  Although we lack any supporting theory of optimality, we do know how to sample feasible starting points.  Specifically, we desire that our starting points are ``near'' the flat matrix, and satisfy the conditions.  Therefore, we  sample $K \in \mc{D}$, a random doubly stochastic matrix using 10 iterations of Sinkhorn balancing \cite{Sinkhorn1964}, and let our initial guess be $P^{(0)}=(J+K)/2$, where $J$ is the doubly flat matrix.  We can therefore use any number of restarts with this approach.  Fixing the number of restarts, we still have a cubic time algorithm, although the constants change.  
 
-Table \ref{tab:2} shows the performance of running \FAQ 3 and 100 times, reporting only the best result (indicated by \texttt{FAQ}$_3$ and \texttt{FAQ}$_{100}$, respectively), and comparing it to the best performing result from Table \ref{tab:1}.  It only required three restarts to outperform all other cubic algorithms on all 16 of 16 benchmarks.  Moreover, after 100 restarts, \FAQ finds the absolute minimum on 3 of the 16 benchmarks. Figure \ref{fig:restarts} graphically demonstrates these results. 
- Note that restarting \FAQ a fixed number of multiple times is still cubic.  Future work could investigate performance as a function of the number of restarts. %, although with an arbitrary number of random restarts, stating that it is cubic is somewhat meaningless.  
+Table \ref{tab:restarts} shows the performance of running \FAQ 3 and 100 times, reporting only the best result (indicated by \texttt{FAQ}$_3$ and \texttt{FAQ}$_{100}$, respectively), and comparing it to the best performing result of the five algorithms (running only \FAQ once). Note that we only consider the 16 particularly difficult benchmarks for this evaluation. \FAQ only required three restarts to outperform all other approximate algorithms on all 16 of 16 difficult benchmarks.  Moreover, after 100 restarts, \FAQ finds the absolute minimum on 3 of the 16 benchmarks; none of the other algorithms ever achieved the absolute minimum on any of these benchmarks. 
+% Figure \ref{fig:restarts} graphically demonstrates these results. 
+ % Note that restarting \FAQ a fixed number of multiple times is still cubic.  Future work could investigate performance as a function of the number of restarts. %, although with an arbitrary number of random restarts, stating that it is cubic is somewhat meaningless.  
 
 
 
 \begin{table}[h!]
-\caption{Comparison of \FAQ with optimal objective function value and the best result from Table \ref{tab:1} on undirected benchmarks.  Note that \FAQ restarted 100 times finds the optimal objective function value in 3 of 16 benchmarks, and that \FAQ restarted 3 times finds a minimum better than the PSOA on all 16 benchmarks.}
+\caption{Comparison of \FAQ with optimal objective function value and the best result  on the undirected benchmarks.  Note that \FAQ restarted 100 times finds the optimal objective function value in 3 of 16 benchmarks, and that \FAQ restarted 3 times finds a minimum better than the previous state-of-the-art on all 16 particularly difficult benchmarks.}
 \begin{center}
 \begin{tabular}{|r|r|r||l|l|l|l|l|}
 \hline
-\# & Problem  &   Optimal    & \texttt{FAQ}$_{100}$ & \texttt{FAQ}$_{3}$ & min(\FAQ,\texttt{PSOA}) \\
+\# & Problem  &   Optimal    & \texttt{FAQ}$_{100}$ & \texttt{FAQ}$_{3}$ & previous min \\
 \hline
 1&    chr12c &   11156 &    \textbf{12176} &   13072 & 13072 \\
 2&    chr15a &    9896 &    \textbf{9896}$^*$ &   17272 &  19086 \\
@@ -417,15 +535,15 @@ Table \ref{tab:2} shows the performance of running \FAQ 3 and 100 times, reporti
     \hline
 \end{tabular}
 \end{center}
-\label{tab:2}
+\label{tab:restarts}
 \end{table}%
 
-\begin{figure}[htbp]
-	\centering
-		\includegraphics[width=0.5\linewidth]{../figs/path16_restarts.pdf}
-	\caption{Performance of \FAQ with multiple restarts on the undirected benchmarks. \texttt{FAQ}$_3$ yields a lower objective function value than the best result from Figure \ref{fig:path16}, and \texttt{FAQ}$_{100}$ finds the absolute optimal permutation on 3 of the 16 benchmarks.  Note that no other algorithm compared ever found the optimal for any of the benchmarks.}
-	\label{fig:restarts}
-\end{figure}
+% \begin{figure}[htbp]
+% 	\centering
+% 		\includegraphics[width=0.5\linewidth]{../figs/path16_restarts.pdf}
+% 	\caption{Performance of \FAQ with multiple restarts on the undirected benchmarks. \texttt{FAQ}$_3$ yields a lower objective function value than the best result from Figure \ref{fig:path16}, and \texttt{FAQ}$_{100}$ finds the absolute optimal permutation on 3 of the 16 benchmarks.  Note that no other algorithm compared ever found the optimal for any of the benchmarks.}
+% 	\label{fig:restarts}
+% \end{figure}
 
 
 % subsection multiple_restarts (end)
@@ -443,33 +561,30 @@ Table \ref{tab:2} shows the performance of running \FAQ 3 and 100 times, reporti
 \subsection{Brain-Graph Matching} % (fold)
 \label{sub:connectome_classification}
 
-A ``connectome'' is a brain-graph in which vertices correspond to (collections of) neurons, and edges correspond to connections between them. The \emph{Caenorhabditis elegans} (\emph{C. elegans}) is a small worm (nematode) with $302$ labeled vertices.  We consider the subgraph with $279$ somatic neurons that form edges with other neurons \cite{WhiteBrenner86, Varshney2011}.  Two distinct kinds of edges exist between vertices: chemical and electrical ``synapses'' (edges). Any pair of vertices may have several edges of each type. Moreover, some of the synapses are hyper-edges amongst more than two vertices.   Thus, the connectome of a \emph{C. elegans} may be thought of as a weighted multi-hypergraph, where the weights are the number of edges of each type.  \FAQ natively operates on weighted or unweighted graphs.  We therefore conducted the following synthetic experiments.  
+A ``chemical connectome'' is a brain-graph in which vertices correspond to (collections of) neurons, and edges correspond to chemical synapses between them. The \emph{Caenorhabditis elegans} (\emph{C. elegans}) is a small worm (nematode) with $302$ labeled vertices.  We consider the subgraph with $279$ somatic neurons that form edges with other neurons \cite{WhiteBrenner86, Varshney2011}.  
+% Though vertices in brain-graphs can connect via either chemical or electrical synapses, the chemical connectome is the connectome of primary interest
 
-Let $A_{ij;z} \in \{0,1,2,\ldots\}$ be the number of synapses from neuron $i$ to neuron $j$ of type $z$ (either chemical $c$ or electrical $e$), and let $A_z=\{A_{ij;z}\}_{i,j \in [279]}$ for $z \in \{e,c\}$ correspond to the electrical or chemical connectome.  To generate synthetic data, we let $B_z^{(k)}=Q_z^{(k)} A_z {Q_z^{(k)}}\T$, for some $Q_z^{(k)}$ chosen uniformly at random from $\mc{P}$, effectively shuffling the vertex labels of the connectome.  Then, we try to graph match $A_z$ to $B_z^{(k)}$, for $z \in \{e,c\}$ and for $k =1,2,\ldots, 1000$, that is, we repeat the experiment $1000$ times.  We define accuracy as the fraction of vertices correctly assigned. We always start with the doubly flat matrix.
-% by the value of our objective function, $f(P_z^{(k)})$.  
-% To evaluate the impact of multiple restarts, for both connectomes, we restarted \FAQ up to 30 times.   Specifically, our stopping criteria on the number of restarts was either (i) perfect assignment or (ii) 30 restarts.
-
-% Table \ref{tab:1} shows the mean (standard deviation) of accuracy and solution time for both connectomes.  For the chemical connectome, \FAQ always found the optimal solution, but not so for the electrical connectome.  
+% Two distinct kinds of edges exist between vertices: chemical and electrical ``synapses'' (edges). Any pair of vertices may have several edges of each type. Moreover, some of the synapses are hyper-edges amongst more than two vertices.  
+Because pairs of neurons sometimes have multiple synapses between them, and they are directed, the chemical connectome of \emph{C. elegans} may be thought of as a weighted directed graph.
+ % Thus, the connectome of a \emph{C. elegans} may be thought of as a weighted multi-hypergraph, where the weights are the number of edges of each type.  \FAQ natively operates on weighted or unweighted graphs.  
+We therefore conducted the following synthetic experiments.  
+Let $A_{ij} \in \{0,1,2,\ldots\}$ be the number of synapses from neuron $i$ to neuron $j$, and let $A=\{A_{ij}\}_{i,j \in [279]}$.  To generate synthetic data, we let $B^{(k)}=Q^{(k)} A {Q^{(k)}}\T$, for some $Q^{(k)}$ chosen uniformly at random from $\mc{P}$, effectively shuffling the vertex labels of the connectome.  Then, we try to graph match $A$ to $B^{(k)}$, for  $k =1,2,\ldots, 1000$, that is, we repeat the experiment $1000$ times.  We define accuracy as the fraction of vertices correctly assigned. We always start with the doubly flat matrix.
 
 
 \begin{figure}[htbp]
 	\centering
-		\includegraphics[width=1.0\linewidth]{../figs/connectomes.pdf}
-	\caption{Performance of \texttt{U}, \texttt{QCV}, \texttt{PATH}, and \FAQ on synthetic C.~elegans connectome data, that is, graph matching the true connectomes with permuted versions of themselves.  Error is the fraction of vertices correctly matched.  Circle indicates the median, thick black bars indicate the quartiles, thin black lines indicate extreme but non-outlier points, and plus signs are outliers. The top panels indicate error (fraction of misassigned vertices), and the bottom panels indicate wall time on a 2.2 GHz Apple MacBook.  The left panels show the chemical connectome results, and the right panels show the electrical connectome results. For the chemical connectome, \FAQ always obtained the optimal solution, whereas none of the other algorithms ever found the optimal.  On the other hand, for the electrical connectome, none of the algorithms ever found the optimal.  \FAQ also ran very quickly, nearly as quickly as \texttt{U} and \texttt{QCV}, and much faster than \texttt{PATH}, even though our \FAQ implementation is in Matlab, and the others are in C.}
+		\includegraphics[width=0.5\linewidth]{../figs/chemicalConnectome.pdf}
+	\caption{Performance of \texttt{U}, \texttt{QCV}, \texttt{PATH}, and \FAQ on synthetic C.~elegans connectome data, that is, graph matching the true connectomes with permuted versions of themselves.  Error is the fraction of vertices correctly matched.  Circle indicates the median, thick black bars indicate the quartiles, thin black lines indicate extreme but non-outlier points, and plus signs are outliers. The left panel indicate error (fraction of misassigned vertices), and the right panel indicates wall time on a 2.2 GHz Apple MacBook.   \FAQ always obtained the optimal solution, whereas none of the other algorithms ever found the optimal.    \FAQ also ran very quickly, nearly as quickly as \texttt{U} and \texttt{QCV}, and much faster than \texttt{PATH}, even though the \FAQ implementation is in Matlab, and the others are in C.}
 	\label{fig:connectomes}
 \end{figure}
 
 
-Figure \ref{fig:connectomes} displays the results of \FAQ along with three previous state-of-the-art algorithms on the two connectomes: (i) Umeyama's algorithm\texttt{U}, (ii) a quadratic convex relaxation \texttt{QCV} (which follows from relaxing the permutation matrix constraint to the doubly stochastic constraint in Eq. \eqref{eq:trQAP2}), and (iii) \texttt{PATH}.  The top left panel indicates that \FAQ \emph{always} found the optimal solution for the chemical connectome, whereas none of the other algorithms \emph{ever} found the optimal solution.  On the other hand, the top right panel shows that for the electrical connectome, none of the four algorithms ever found the optimal. One hundred restarts of \FAQ failed to significantly improve the results. 
+Figure \ref{fig:connectomes} displays the results of \FAQ along with \texttt{U}, \texttt{QCV},  and \texttt{PATH}.  The left panel indicates that \FAQ \emph{always} found the optimal solution for the chemical connectome, whereas none of the other algorithms \emph{ever} found the optimal solution.  The right panel compares the wall time of the various algorithms, running on an 2.2 GHz Apple MacBook. Note that we have only a Matlab implementation of \texttt{FAQ}, whereas the other algorithms are implemented in C.  Nonetheless, \FAQ runs nearly as quickly as both \texttt{U} and \texttt{QCV}, and significantly faster than \texttt{PATH}.  %This suggests that lower level language implementation of \FAQ might be 
 
-The bottom panels compare the wall time of the various algorithms, running on an 2.2 GHz Apple MacBook. Note that we have only a Matlab implementation of \texttt{FAQ}, whereas the other algorithms are implemented in C.  Nonetheless, \FAQ runs nearly as quickly as both \texttt{U} and \texttt{QCV}, and significantly faster than \texttt{PATH}, for both connectomes.  %This suggests that lower level language implementation of \FAQ might be 
-
- % \FAQ ran very quickly, finding the optimal solution for the chemical connectome and converging for the electrical connectome, in only a few seconds.  Although computer times are not directly comparable, as our \FAQ implementation is in Matlab, and the other algorithms are coded in C, consider \FAQ versus \texttt{PATH}.  The bottleneck in both is \texttt{FW}.  In \texttt{PATH}, the number of \texttt{FW}s depends on a parameter, $d\lambda$, which sets the step size along the path. The \texttt{PATH} paper, \cite{Zaslavskiy2009}, describes an adaptive scheme for updating $d\lambda$, with a lower bound of $10^{-5}$, clearly indicating that sometimes, \texttt{FW} is run many times.  On the other hand, in \texttt{FAQ}, \texttt{FW} is always run only once.  
-
-The properties of these connectomes are analyzed in \cite{Varshney2011}; a cursory evaluation of the properties of these graphs does not suggest to us why the chemical connectome was so much easier to graph match than the electrical one. 
+% The properties of this connectomes are analyzed in \cite{Varshney2011}; a cursory evaluation of the properties of these graphs does not suggest to us why the chemical connectome was so much easier to graph match than the electrical one. 
 
 
-To investigate the performance of \FAQ on undirected graphs, we ran \FAQ on binarized symmeterized versions of the graphs ($A_{ij;z}=1$ if and only if $A_{ij;z}\geq 1$ or $A_{ji;z} \geq 1$).  The resulting errors are nearly identical to those presented in Figure \ref{fig:connectomes}, although speed increased by greater than a factor of two. Note that the number of vertices in this brain-graph matching problem---279---is several times larger than the largest of the 32 benchmarks used above. 
+To investigate the performance of \FAQ on undirected graphs, we ran \FAQ on binarized symmeterized versions of the graphs ($A_{ij}=1$ if and only if $A_{ij}\geq 1$ or $A_{ji} \geq 1$).  The resulting errors are nearly identical to those presented in Figure \ref{fig:connectomes}, although speed increased by greater than a factor of two. Note that the number of vertices in this brain-graph matching problem---279---is larger than the largest of the 137 benchmarks used above. 
 
 
 
@@ -478,23 +593,15 @@ To investigate the performance of \FAQ on undirected graphs, we ran \FAQ on bina
 \label{sec:discussion}
 
 This work presents a fast approximate quadratic assignment problem algorithm called \FAQ for approximately solving large graph matching problems, motivated by brain-graphs.  Our key insight was to relax the binary constraint of QAP to its continuous and non-negative counterpart---the doubly stochastic matrix---which is the convex hull of the original feasible region.  
-Numerically, we demonstrated that not only is \FAQ cubic in time, but also its leading constants are quite small---$10^{-9}$---suggesting that it can be used for graphs with hundreds or thousands of vertices.  Moreover, it achieves better performance than previous state-of-the-art cubic-time algorithms on 29 of the 32 standard QAP benchmarks, including both directed and undirected graph matching problems.  Because rQAP is non-convex, we also consider multiple restarts, and achieve improved performance for the remaining three benchmarks using only two or three restarts.  We then demonstrate that the solution to our relaxed optimization problem, rQAP, is identical to that for QAP whenever the two graphs are simple and isomorphic to one another.  Finally, we used it to match C.~elegans connectomes to permuted versions of themselves. For the chemical connectome, of the four state-of-the-art algorithms considered, \FAQ achieved perfect performance $100\%$ of the time, whereas none of the other three algorithms ever achieved perfect performance. On the other hand, all the algorithms struggled with the electrical connectome.   Moreover, \FAQ ran about as fast as two of them, and significantly faster than \texttt{PATH}, even though \FAQ is implemented in Matlab, and the others are implemented in C.  Note that these connectomes have 302 vertices, several-fold more than even the largest benchmarks. 
+Numerically, we demonstrated that not only is \FAQ cubic in time, but also its leading constants are quite small---$10^{-9}$---suggesting that it can be used for graphs with hundreds or thousands of vertices.  
+Moreover, it achieves better accuracy than previous state-of-the-art approximate algorithms on on over $93\%$ of the 137 QAPLIB benchmarks, including both directed and undirected graph matching problems.  Because rQAP is non-convex, we also consider multiple restarts, and achieve improved performance for the particularly difficult benchmarks using only two or three restarts.  We then demonstrate that the solution to our relaxed optimization problem, rQAP, is identical to that for QAP whenever the two graphs are simple and isomorphic to one another.  Finally, we used it to match C.~elegans connectomes to permuted versions of themselves. Of the four state-of-the-art algorithms considered, \FAQ achieved perfect performance $100\%$ of the time, whereas none of the other three algorithms ever achieved perfect performance.  Moreover, \FAQ ran about as fast as two of them, and significantly faster than \texttt{PATH}, even though \FAQ is implemented in Matlab, and the others are implemented in C.  Note that these connectomes have 279 vertices, more vertices than even the largest benchmarks. 
 
-% our motivating application: brain-graph matching.  \FAQ solved a brain-graph matching problem, which has an order of magnitude more vertices than any of the 16 QAP benchmarks.
 
-% These insights led to an approximate QAP solver with a few distinct features. %While others have incorporated the FW algorithm as a subroutine of a graph matching strategy \cite{Zaslavskiy2009}, we modified the FW algorithm for GM in a few ways.  
+Fortunately, our work is not done. Even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve of Figure \ref{fig:scaling}, this algorithm would take about 20 years to finish (on a standard laptop from 2011) when $n=100,000$.  We hope to be able to approximately solve rQAP on graphs much larger than that, given that the number of neurons even in a fly brain, for example, is $\approx 250,000$.  More efficient algorithms and/or implementations are required for such massive graph matching. Although a few other state-of-the-art algorithms were more efficient than \texttt{FAQ}, their accuracy was significantly worse.  So the search continues to find approximate graph matching algorithms with scaling rules like \texttt{QCV}, \texttt{U} or \texttt{RANK}, but performance like \texttt{FAQ}.
 
-% First, after finding a local solution to the relaxed problem, we project the resulting doubly stochastic matrix onto the set of permutation matrices.  Second, we initialize the algorithm using either the identity matrix or the doubly flat matrix (the matrix where all elements are $1/n$).  These choices seem to us to be the most obvious places to start if one must choose.  Third, if one of those choices does not work, we restart FW with other ``nearby'' initial points.  These modifications facilitate improved performance on \emph{all} the benchmarks we considered.  Moreover, although the algorithm scales cubically with the number of vertices, the leading constants are very small ($\mc{O}(10^{-9})$ seconds), so the algorithm runs quite fast on reasonably sized networks (e.g., $n \dot{\approx} 100$).  Indeed, on a biologically inspired GM problem, \emph{C. elegans} connectome mapping, this approach was both fast and effective.  
 
-Fortunately, our work is not done. Even with very small leading constants for this algorithm, as $n$ increases, the computational burden gets quite high.  For example, extrapolating the curve of Figure \ref{fig:scaling}, this algorithm would take about 20 years to finish (on a standard laptop from 2011) when $n=100,000$.  We hope to be able to approximately solve rQAP on graphs much larger than that, given that the number of neurons even in a fly brain, for example, is $\approx 250,000$.  More efficient algorithms and/or implementations are required for such massive graph matching. 
-
-% more efficient algorithms and/or implementations are essential.
-
-% Although \FAQm consistently found the optimal solution for the \emph{C. elegans} chemical connectome, connectomes for different organisms even within a species are unlikely to be identical. Even if all connectomes of a particular species were identical, measurement error will likely persist \cite{Helmstaedter2011}. Therefore, \texttt{FAQ}$_m$'s scientific utility will largely rest on its performance under noisy conditions, which we aim to explore in future work.  
-
-Additional future work might generalize \FAQ in a number of ways.  First, many (brain-) graphs of interest will be errorfully observed \cite{Priebe2011}, that is, vertices might be missing and putative edges might exhibit both false positives and false negatives.  Explicitly dealing with this error source is both theoretically and practically of interest \cite{VP11_unlabeled}.  
-% that QAP and LAP are so similar suggests that perhaps one could simply implement a single iteration of QAP starting from the identity.  While not changing the order of complexity, it could reduce computational time by at least an order of magnitude, without drastically changing performance properties (because convergence typically requires around $5-15$ iterations for the graphs we tested).  The relative performance/computational cost trade-off merits further theoretical investigations.  
-Second, for many brain-graph matching problems, the number of vertices will not be the same across the brains.  Recent work from \cite{Zaslavskiy2009, Zaslavskiy2010} and \cite{Escolano2011} suggest that extensions in this direction would be both relatively straightforward and effective. Third, the most ``costly'' subroutine is LAP.  Fortunately, LAP is a quadratic optimization problem with linear constraints.  A number of parallelized optimization strategies could therefore potentially be brought to bear on this problem \cite{Boyd2011}.  Fourth, our matrices have certain special properties, namely sparsity, which makes more efficient algorithms (such as ``active set'' algorithms) readily available for further speed increases.  Fourth, for brain-graphs, we have some prior information that could easily be incorporated in the form of vertex attributes.  For example, position in the brain, cell type, etc., could be used to measure ``dissimilarity'' between vertices.  %The WGMP could easily incorporate these dissimilarities, in fact, the original QAP formulation already encodes them via the matrix $C$; that matrix was simply dropped when WGMP was originally proposed.  
+Additional future work might generalize \FAQ in a number of ways.  First, many (brain-) graphs of interest will be errorfully observed \cite{Priebe2011}, that is, vertices might be missing and putative edges might exhibit both false positives and negatives.  Explicitly dealing with this error source is both theoretically and practically of interest \cite{VP11_unlabeled}.  
+Second, for many brain-graph matching problems, the number of vertices will not be the same across the brains.  Recent work from \cite{Zaslavskiy2009, Zaslavskiy2010} and \cite{Escolano2011} suggest that extensions in this direction would be both relatively straightforward and effective. Third, the most ``costly'' subroutine is LAP.  Fortunately, LAP is a quadratic optimization problem with linear constraints.  A number of parallelized optimization strategies could therefore potentially be brought to bear on this problem \cite{Boyd2011}.  Fourth, our matrices have certain special properties, namely sparsity, which makes more efficient algorithms (such as ``active set'' algorithms) readily available for further speed increases.  Fifth, for brain-graphs, we have some prior information that could easily be incorporated in the form of vertex attributes.  For example, position in the brain, cell type, etc., could be used to measure ``dissimilarity'' between vertices.  %The WGMP could easily incorporate these dissimilarities, in fact, the original QAP formulation already encodes them via the matrix $C$; that matrix was simply dropped when WGMP was originally proposed.  
 % The objective function could then be modified to give
 % \begin{align} \label{eq:Jqap}
 % 	\mt{Q}_{AB}= \argmin_{Q \in \mc{D}} \norm{Q A Q\T - B}^2_F + \lambda J(Q),
@@ -516,8 +623,201 @@ In conclusion, this manuscript has presented an algorithm for approximately solv
 
 
 \appendix
-
+\newpage
 % \textbf{APPENDIX}
+
+% \section{QAPLIB Benchmark Results} % (fold)
+% \label{sec:qaplib_benchmark_results}
+% 
+% 
+% 
+% \begin{table}[h!]
+% \caption{Comparison of \FAQ with the optimal objective function value and previous state-of-the-art on the entire set of 137 benchmarks from QAPLIB.  The best (lowest) value is in \textbf{bold}. The number of vertices for each problem is the number in its name (second column).  When the optimal objective function is unknown, we write ``NaN''.}
+% \begin{center}
+% \begin{tabular}{|r|r|r||l|l|l|l|l|l|}
+% \hline
+% \# & Problem  &   Optimal   & \FAQ & \texttt{PATH} & \texttt{QCV} & \texttt{RANK} & \texttt{U} \\
+% \hline
+% 1 & bur26a & 5.43e+06 & \textbf{5.43e+06} & 5.85e+06 & 6.56e+06 & 6.67e+06 & 6.41e+06 \\ 
+% 2 & bur26b & 3.82e+06 & \textbf{3.83e+06} & 4.24e+06 & 4.7e+06 & 4.74e+06 & 4.15e+06 \\ 
+% 3 & bur26c & 5.43e+06 & \textbf{5.44e+06} & 6.27e+06 & 6.17e+06 & 6.58e+06 & 5.86e+06 \\ 
+% 4 & bur26d & 3.82e+06 & \textbf{3.83e+06} & 4.2e+06 & 4.61e+06 & 4.68e+06 & 4.19e+06 \\ 
+% 5 & bur26e & 5.39e+06 & \textbf{5.4e+06} & 5.86e+06 & 6.67e+06 & 6.71e+06 & 6.11e+06 \\ 
+% 6 & bur26f & 3.78e+06 & \textbf{3.78e+06} & 4.42e+06 & 4.77e+06 & 4.71e+06 & 4.35e+06 \\ 
+% 7 & bur26g & 1.01e+07 & \textbf{1.01e+07} & 1.12e+07 & 1.21e+07 & 1.21e+07 & 1.14e+07 \\ 
+% 8 & bur26h & 7.1e+06 & \textbf{7.12e+06} & 8.06e+06 & 8.68e+06 & 8.73e+06 & 7.64e+06 \\ 
+% 9 & chr12a & 9.55e+03 & \textbf{3.3e+04} & 7.38e+04 & 5.72e+04 & 5.23e+04 & 3.34e+04 \\ 
+% 10 & chr12b & 9.74e+03 & \textbf{1.05e+04} & 7.66e+04 & 6.98e+04 & 5.9e+04 & 4.38e+04 \\ 
+% 11 & chr12c & 1.12e+04 & \textbf{1.31e+04} & 7.5e+04 & 5.4e+04 & 4.61e+04 & 4.55e+04 \\ 
+% 12 & chr15a & 9.9e+03 & \textbf{2.65e+04} & 1.09e+05 & 9.17e+04 & 8.38e+04 & 6.88e+04 \\ 
+% 13 & chr15b & 7.99e+03 & \textbf{9.11e+03} & 1.06e+05 & 9.21e+04 & 8.64e+04 & 8.97e+04 \\ 
+% 14 & chr15c & 9.5e+03 & \textbf{1.19e+04} & 1.1e+05 & 9.18e+04 & 7.25e+04 & 8.72e+04 \\ 
+% 15 & chr18a & 1.11e+04 & \textbf{1.54e+04} & 1.35e+05 & 8.66e+04 & 8.87e+04 & 8.54e+04 \\ 
+% 16 & chr18b & 1.53e+03 & \textbf{1.66e+03} & 5.79e+03 & 4.67e+03 & 5.31e+03 & 4.85e+03 \\ 
+% 17 & chr20a & 2.19e+03 & \textbf{2.53e+03} & 1.64e+04 & 1.4e+04 & 1.17e+04 & 1.07e+04 \\ 
+% 18 & chr20b & 2.3e+03 & \textbf{4.06e+03} & 1.72e+04 & 1.11e+04 & 1.11e+04 & 1.2e+04 \\ 
+% 19 & chr20c & 1.41e+04 & \textbf{1.98e+04} & 1.9e+05 & 1.6e+05 & 1.18e+05 & 1.03e+05 \\ 
+% 20 & chr22a & 6.16e+03 & \textbf{8.29e+03} & 3.23e+04 & 2.42e+04 & 2.03e+04 & 2.19e+04 \\ 
+% 21 & chr22b & 6.19e+03 & \textbf{8.42e+03} & 3.15e+04 & 2.21e+04 & 2.14e+04 & 2.31e+04 \\ 
+% 22 & chr25a & 3.8e+03 & \textbf{6.28e+03} & 2.93e+04 & 2.9e+04 & 2.32e+04 & 1.99e+04 \\ 
+% 23 & els19 & 1.72e+07 & \textbf{2.13e+07} & 5.76e+07 & 4.6e+07 & 4.74e+07 & 8.03e+07 \\ 
+% 24 & esc128 & 64 & \textbf{68} & 214 & 202 & 202 & 286 \\ 
+% 26 & esc16b & 292 & 320 & 326 & 320 & 320 & \textbf{314} \\ 
+% 28 & esc16d & 16 & \textbf{16} & 74 & 62 & 62 & 56 \\ 
+% 29 & esc16e & 28 & \textbf{32} & 78 & 50 & 50 & 56 \\ 
+% 30 & esc16f & 0 & \textbf{0} & 0 & 0 & 0 & 0 \\ 
+% 33 & esc16i & 14 & \textbf{14} & 84 & 40 & 40 & 40 \\ 
+% 34 & esc16j & 8 & 36 & 34 & 22 & 22 & \textbf{16} \\ 
+% 35 & esc32a & NaN & \textbf{150} & 550 & 368 & 368 & 498 \\ 
+% 36 & esc32b & NaN & \textbf{184} & 492 & 320 & 320 & 476 \\ 
+% 38 & esc32d & NaN & \textbf{322} & 404 & 340 & 340 & 362 \\ 
+% 39 & esc32e & 2 & \textbf{2} & 30 & 30 & 30 & 40 \\ 
+% 40 & esc32f & 2 & \textbf{2} & 30 & 30 & 30 & 40 \\ 
+% 41 & esc32g & 6 & \textbf{6} & 32 & 28 & 28 & 28 \\ 
+% 42 & esc32h & NaN & \textbf{472} & 726 & 630 & 630 & 686 \\ 
+% \hline
+% \end{tabular}
+% \end{center}
+% \label{tab:1}
+% \end{table}%
+% 
+% \begin{table}[h!]
+% % \caption{Comparison of \FAQ with the optimal objective function value and previous state-of-the-art on the entire set of 137 benchmarks from QAPLIB.  The best (lowest) value is in \textbf{bold}. The number of vertices for each problem is the number in its name (second column).}
+% \begin{center}
+% \begin{tabular}{|r|r|r||l|l|l|l|l|l|}
+% \hline
+% \# & Problem  &   Optimal   & \FAQ & \texttt{PATH} & \texttt{QCV} & \texttt{RANK} & \texttt{U} \\
+% \hline
+% 43 & esc64a & NaN & \textbf{116} & 280 & 254 & 254 & 280 \\ 
+% 44 & had12 & 1.65e+03 & \textbf{1.68e+03} & 2.05e+03 & 2e+03 & 1.9e+03 & 1.89e+03 \\ 
+% 45 & had14 & 2.72e+03 & \textbf{2.72e+03} & 3.42e+03 & 3.39e+03 & 3.4e+03 & 3.17e+03 \\ 
+% 46 & had16 & 3.72e+03 & \textbf{3.73e+03} & 4.62e+03 & 4.3e+03 & 4.41e+03 & 4.29e+03 \\ 
+% 47 & had18 & 5.36e+03 & \textbf{5.43e+03} & 6.51e+03 & 6.42e+03 & 6.21e+03 & 5.94e+03 \\ 
+% 48 & had20 & 6.92e+03 & \textbf{6.98e+03} & 8.45e+03 & 8.17e+03 & 8.01e+03 & 7.7e+03 \\ 
+% 49 & kra30a & 8.89e+04 & \textbf{9.47e+04} & 1.25e+05 & 1.43e+05 & 1.47e+05 & 1.33e+05 \\ 
+% 50 & kra30b & 9.14e+04 & \textbf{9.7e+04} & 1.31e+05 & 1.51e+05 & 1.46e+05 & 1.38e+05 \\ 
+% 51 & kra32 & 8.89e+04 & \textbf{9.57e+04} & 1.33e+05 & 1.48e+05 & 1.41e+05 & 1.39e+05 \\ 
+% 52 & lipa20a & 3.68e+03 & \textbf{3.79e+03} & 3.98e+03 & 3.96e+03 & 3.96e+03 & 3.93e+03 \\ 
+% 53 & lipa20b & 2.71e+04 & \textbf{2.71e+04} & 3.93e+04 & 3.8e+04 & 3.68e+04 & 3.5e+04 \\ 
+% 54 & lipa30a & 1.32e+04 & \textbf{1.36e+04} & 1.4e+04 & 1.39e+04 & 1.38e+04 & 1.38e+04 \\ 
+% 55 & lipa30b & 1.51e+05 & \textbf{1.51e+05} & 2.16e+05 & 2.05e+05 & 1.96e+05 & 1.98e+05 \\ 
+% 56 & lipa40a & 3.15e+04 & \textbf{3.21e+04} & 3.29e+04 & 3.28e+04 & 3.28e+04 & 3.27e+04 \\ 
+% 57 & lipa40b & 4.77e+05 & \textbf{4.77e+05} & 6.87e+05 & 6.45e+05 & 6.29e+05 & 6.18e+05 \\ 
+% 58 & lipa50a & 6.21e+04 & \textbf{6.3e+04} & 6.44e+04 & 6.41e+04 & 6.4e+04 & 6.4e+04 \\ 
+% 59 & lipa50b & 1.21e+06 & \textbf{1.21e+06} & 1.7e+06 & 1.6e+06 & 1.59e+06 & 1.57e+06 \\ 
+% 60 & lipa60a & 1.07e+05 & \textbf{1.08e+05} & 1.1e+05 & 1.1e+05 & 1.1e+05 & 1.1e+05 \\ 
+% 61 & lipa60b & 2.52e+06 & \textbf{2.52e+06} & 3.55e+06 & 3.36e+06 & 3.3e+06 & 3.27e+06 \\ 
+% 62 & lipa70a & 1.7e+05 & \textbf{1.72e+05} & 1.74e+05 & 1.74e+05 & 1.74e+05 & 1.74e+05 \\ 
+% 63 & lipa70b & 4.6e+06 & \textbf{4.6e+06} & 6.45e+06 & 6.16e+06 & 6.05e+06 & 6.06e+06 \\ 
+% 64 & lipa80a & 2.53e+05 & \textbf{2.56e+05} & 2.59e+05 & 2.59e+05 & 2.59e+05 & 2.58e+05 \\ 
+% 65 & lipa80b & 7.76e+06 & \textbf{7.76e+06} & 1.1e+07 & 1.03e+07 & 1.02e+07 & 1.02e+07 \\ 
+% 66 & lipa90a & 3.61e+05 & \textbf{3.64e+05} & 3.68e+05 & 3.67e+05 & 3.67e+05 & 3.68e+05 \\ 
+% 67 & lipa90b & 1.25e+07 & \textbf{1.25e+07} & 1.75e+07 & 1.66e+07 & 1.64e+07 & 1.64e+07 \\ 
+% 68 & nug12 & 578 & \textbf{598} & 1.03e+03 & 838 & 850 & 902 \\ 
+% 69 & nug14 & 1.01e+03 & \textbf{1.07e+03} & 1.74e+03 & 1.51e+03 & 1.45e+03 & 1.43e+03 \\ 
+% 70 & nug15 & 1.15e+03 & \textbf{1.18e+03} & 2.01e+03 & 1.73e+03 & 1.66e+03 & 1.63e+03 \\ 
+% 71 & nug16a & 1.61e+03 & \textbf{1.65e+03} & 2.66e+03 & 2.27e+03 & 2.11e+03 & 2.29e+03 \\ 
+% 72 & nug16b & 1.24e+03 & \textbf{1.32e+03} & 2.1e+03 & 1.86e+03 & 1.86e+03 & 1.75e+03 \\ 
+% 73 & nug17 & 1.73e+03 & \textbf{1.76e+03} & 2.84e+03 & 2.43e+03 & 2.41e+03 & 2.38e+03 \\ 
+% 74 & nug18 & 1.93e+03 & \textbf{1.99e+03} & 3.13e+03 & 2.74e+03 & 2.65e+03 & 2.6e+03 \\ 
+% 75 & nug20 & 2.57e+03 & \textbf{2.63e+03} & 4.14e+03 & 3.65e+03 & 3.63e+03 & 3.2e+03 \\ 
+% 76 & nug21 & 2.44e+03 & \textbf{2.44e+03} & 4.29e+03 & 3.69e+03 & 3.69e+03 & 3.62e+03 \\ 
+% 77 & nug22 & 3.6e+03 & \textbf{3.63e+03} & 6.51e+03 & 6e+03 & 5.59e+03 & 4.77e+03 \\ 
+% 78 & nug24 & 3.49e+03 & \textbf{3.55e+03} & 5.89e+03 & 4.79e+03 & 5.13e+03 & 4.97e+03 \\ 
+% 79 & nug25 & 3.74e+03 & \textbf{3.75e+03} & 6.17e+03 & 5.37e+03 & 5.37e+03 & 5.21e+03 \\ 
+% 80 & nug27 & 5.23e+03 & \textbf{5.35e+03} & 8.64e+03 & 7.8e+03 & 7.78e+03 & 6.75e+03 \\ 
+% 81 & nug28 & 5.17e+03 & \textbf{5.22e+03} & 8.28e+03 & 7.2e+03 & 7.4e+03 & 7.02e+03 \\ 
+% 82 & nug30 & 6.12e+03 & \textbf{6.18e+03} & 9.85e+03 & 8.83e+03 & 8.59e+03 & 7.79e+03 \\ 
+% 83 & rou12 & 2.36e+05 & \textbf{2.53e+05} & 3.76e+05 & 3.68e+05 & 3.33e+05 & 2.98e+05 \\ 
+% 84 & rou15 & 3.54e+05 & \textbf{3.71e+05} & 5.61e+05 & 5.33e+05 & 4.89e+05 & 4.87e+05 \\ 
+% 85 & rou20 & 7.26e+05 & \textbf{7.44e+05} & 1.09e+06 & 1.04e+06 & 9.62e+05 & 9.34e+05 \\ 
+% 86 & scr12 & 3.14e+04 & \textbf{3.36e+04} & 7.09e+04 & 6.65e+04 & 6.72e+04 & 6.12e+04 \\ 
+% 87 & scr15 & 5.11e+04 & \textbf{6.21e+04} & 1.01e+05 & 1.22e+05 & 1.22e+05 & 1.4e+05 \\ 
+% 88 & scr20 & 1.1e+05 & \textbf{1.17e+05} & 2.24e+05 & 1.9e+05 & 2.09e+05 & 2.74e+05 \\ 
+% \hline
+% \end{tabular}
+% \end{center}
+% \label{tab:2}
+% \end{table}%
+% 
+% 
+% \begin{table}[h!]
+% % \caption{Comparison of \FAQ with the optimal objective function value and previous state-of-the-art on the entire set of 137 benchmarks from QAPLIB.  The best (lowest) value is in \textbf{bold}. The number of vertices for each problem is the number in its name (second column).}
+% \begin{center}
+% \begin{tabular}{|r|r|r||l|l|l|l|l|l|}
+% \hline
+% \# & Problem  &   Optimal   & \FAQ & \texttt{PATH} & \texttt{QCV} & \texttt{RANK} & \texttt{U} \\
+% \hline
+% 89 & sko100a & 1.52e+05 & \textbf{1.54e+05} & 1.92e+05 & 1.82e+05 & 1.87e+05 & 1.79e+05 \\ 
+% 90 & sko100b & 1.54e+05 & \textbf{1.56e+05} & 1.97e+05 & 1.86e+05 & 1.88e+05 & 1.8e+05 \\ 
+% 91 & sko100c & 1.48e+05 & \textbf{1.49e+05} & 1.88e+05 & 1.78e+05 & 1.82e+05 & 1.74e+05 \\ 
+% 92 & sko100d & 1.5e+05 & \textbf{1.52e+05} & 1.91e+05 & 1.78e+05 & 1.81e+05 & 1.75e+05 \\ 
+% 93 & sko100e & 1.49e+05 & \textbf{1.51e+05} & 1.9e+05 & 1.8e+05 & 1.83e+05 & 1.78e+05 \\ 
+% 94 & sko100f & 1.49e+05 & \textbf{1.51e+05} & 1.9e+05 & 1.78e+05 & 1.79e+05 & 1.75e+05 \\ 
+% 95 & sko42 & NaN & \textbf{1.62e+04} & 2.33e+04 & 2.08e+04 & 2.12e+04 & 2.02e+04 \\ 
+% 96 & sko49 & NaN & \textbf{2.37e+04} & 3.36e+04 & 3e+04 & 3.05e+04 & 2.92e+04 \\ 
+% 97 & sko56 & NaN & \textbf{3.46e+04} & 4.87e+04 & 4.47e+04 & 4.36e+04 & 4.2e+04 \\ 
+% 98 & sko64 & NaN & \textbf{4.9e+04} & 6.57e+04 & 6.11e+04 & 6.18e+04 & 5.86e+04 \\ 
+% 99 & sko72 & NaN & \textbf{6.69e+04} & 8.8e+04 & 8.37e+04 & 8.22e+04 & 8.14e+04 \\ 
+% 100 & sko81 & 9.1e+04 & \textbf{9.19e+04} & 1.18e+05 & 1.13e+05 & 1.12e+05 & 1.1e+05 \\ 
+% 101 & sko90 & 1.16e+05 & \textbf{1.16e+05} & 1.49e+05 & 1.39e+05 & 1.42e+05 & 1.4e+05 \\ 
+% 102 & ste36a & 9.53e+03 & \textbf{1.05e+04} & 2.44e+04 & 2.91e+04 & 2.89e+04 & 2.41e+04 \\ 
+% 103 & ste36b & 1.59e+04 & \textbf{1.71e+04} & 1.42e+05 & 1.6e+05 & 1.52e+05 & 1.39e+05 \\ 
+% 104 & ste36c & 8.24e+06 & \textbf{8.79e+06} & 1.3e+07 & 2.43e+07 & 2.49e+07 & 2.14e+07 \\ 
+% 105 & tai100a & 2.11e+07 & \textbf{2.17e+07} & 2.66e+07 & 2.48e+07 & 2.41e+07 & 2.42e+07 \\ 
+% 106 & tai100b & 1.19e+09 & \textbf{1.25e+09} & 2.09e+09 & 1.96e+09 & 1.99e+09 & 1.71e+09 \\ 
+% 107 & tai10a & NaN & \textbf{1.58e+05} & 2.34e+05 & 2.34e+05 & 2.06e+05 & 1.78e+05 \\ 
+% 108 & tai10b & NaN & \textbf{1.39e+06} & 1.96e+06 & 2.38e+06 & 2.9e+06 & 2.3e+06 \\ 
+% 109 & tai12a & 2.24e+05 & \textbf{2.45e+05} & 3.78e+05 & 3.78e+05 & 3.19e+05 & 2.98e+05 \\ 
+% 110 & tai12b & 3.95e+07 & \textbf{4.99e+07} & 7.92e+07 & 9.13e+07 & 6.29e+07 & 9.25e+07 \\ 
+% 111 & tai150b & 4.99e+08 & \textbf{5.14e+08} & 6.76e+08 & 6.59e+08 & 6.59e+08 & 6.43e+08 \\ 
+% 112 & tai15a & 3.88e+05 & \textbf{3.97e+05} & 5.97e+05 & 5.24e+05 & 5.12e+05 & 4.68e+05 \\ 
+% 113 & tai15b & 5.18e+07 & \textbf{5.2e+07} & 6.15e+08 & 6.15e+08 & 7.02e+08 & 7.02e+08 \\ 
+% 114 & tai17a & 4.92e+05 & \textbf{5.29e+05} & 7.38e+05 & 7.13e+05 & 6.44e+05 & 6.62e+05 \\ 
+% 115 & tai20a & 7.03e+05 & \textbf{7.36e+05} & 1.07e+06 & 9.95e+05 & 9.76e+05 & 8.96e+05 \\ 
+% 116 & tai20b & 1.22e+08 & \textbf{1.39e+08} & 4.6e+08 & 4.35e+08 & 4.8e+08 & 3.08e+08 \\ 
+% 118 & tai25a & 1.17e+06 & \textbf{1.22e+06} & 1.7e+06 & 1.59e+06 & 1.46e+06 & 1.41e+06 \\ 
+% 119 & tai25b & 3.44e+08 & \textbf{3.69e+08} & 9.11e+08 & 1.02e+09 & 8.06e+08 & 8.96e+08 \\ 
+% 120 & tai30a & NaN & \textbf{1.89e+06} & 2.51e+06 & 2.37e+06 & 2.18e+06 & 2.22e+06 \\ 
+% 121 & tai30b & 6.37e+08 & \textbf{7.15e+08} & 1.38e+09 & 1.35e+09 & 1.22e+09 & 1.13e+09 \\ 
+% 122 & tai35a & NaN & \textbf{2.46e+06} & 3.36e+06 & 3.11e+06 & 2.97e+06 & 2.93e+06 \\ 
+% 123 & tai35b & 2.83e+08 & \textbf{3.06e+08} & 6.39e+08 & 6.08e+08 & 4.44e+08 & 4.62e+08 \\ 
+% 124 & tai40a & NaN & \textbf{3.23e+06} & 4.32e+06 & 3.97e+06 & 3.89e+06 & 3.74e+06 \\ 
+% 125 & tai40b & 6.37e+08 & \textbf{6.68e+08} & 1.1e+09 & 1.2e+09 & 1.22e+09 & 1.03e+09 \\ 
+% 126 & tai50a & 4.94e+06 & \textbf{5.13e+06} & 6.73e+06 & 6.22e+06 & 5.96e+06 & 5.9e+06 \\ 
+% 127 & tai50b & 4.59e+08 & \textbf{4.77e+08} & 9.54e+08 & 8.03e+08 & 7.71e+08 & 7.39e+08 \\ 
+% 128 & tai60a & 7.21e+06 & \textbf{7.44e+06} & 9.67e+06 & 8.97e+06 & 8.48e+06 & 8.63e+06 \\ 
+% 129 & tai60b & 6.08e+08 & \textbf{6.47e+08} & 1.23e+09 & 1.04e+09 & 1.02e+09 & 9.45e+08 \\ 
+% 130 & tai64c & 1.86e+06 & 5.7e+06 & 5.89e+06 & 5.89e+06 & 5.89e+06 & \textbf{2.96e+06} \\ 
+% \hline
+% \end{tabular}
+% \end{center}
+% \label{tab:3}
+% \end{table}%
+% 
+% \begin{table}[h!]
+% % \caption{Comparison of \FAQ with the optimal objective function value and previous state-of-the-art on the entire set of 137 benchmarks from QAPLIB.  The best (lowest) value is in \textbf{bold}. The number of vertices for each problem is the number in its name (second column).}
+% \begin{center}
+% \begin{tabular}{|r|r|r||l|l|l|l|l|l|}
+% \hline
+% \# & Problem  &   Optimal   & \FAQ & \texttt{PATH} & \texttt{QCV} & \texttt{RANK} & \texttt{U} \\
+% \hline
+% 131 & tai80a & 1.35e+07 & \textbf{1.39e+07} & 1.74e+07 & 1.61e+07 & 1.57e+07 & 1.57e+07 \\ 
+% 132 & tai80b & 8.18e+08 & \textbf{8.5e+08} & 1.45e+09 & 1.37e+09 & 1.29e+09 & 1.19e+09 \\ 
+% 133 & tho150 & 8.13e+06 & \textbf{8.22e+06} & 1.02e+07 & 1.02e+07 & 1.01e+07 & 9.93e+06 \\ 
+% 134 & tho30 & 1.5e+05 & \textbf{1.53e+05} & 2.28e+05 & 2.31e+05 & 2.25e+05 & 2.09e+05 \\ 
+% 135 & tho40 & 2.41e+05 & \textbf{2.5e+05} & 3.5e+05 & 3.89e+05 & 3.73e+05 & 3.38e+05 \\ 
+% 136 & wil100 & 2.73e+05 & \textbf{2.75e+05} & 3.16e+05 & 3.05e+05 & 3.07e+05 & 3e+05 \\ 
+% 137 & wil50 & NaN & \textbf{4.93e+04} & 5.98e+04 & 5.66e+04 & 5.74e+04 & 5.55e+04 \\ 
+% \hline
+% \end{tabular}
+% \end{center}
+% \label{tab:4}
+% \end{table}%
+% 
+% % section qaplib_benchmark_results (end)
+
+\clearpage
 \section{Linear Assignment Problems} % (fold)
 % \label{ssub:linear_assignment_problems}
 
@@ -602,8 +902,8 @@ This relaxation motivates our approach to approximating QAP.
 The authors would like to acknowledge two helpful reviewers as well as Lav Varshney for providing the data. This work was partially supported by the Research Program in Applied Neuroscience. 
 
 
-\bibliography{/Users/jovo/Research/other/latex/library}
-\bibliographystyle{IEEEtran}
+\bibliography{../../../../other/latex/library}
+\bibliographystyle{unsrt}
 
 
 
