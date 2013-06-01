@@ -60,7 +60,7 @@ else
     times=zeros(size(data));
     errors=times;
     iters=errors;
-    parfor i=1:length(data)
+    for i=1:length(data)
         
         display(['numher of vectices = ', num2str(i)]) 
         % Generate a random digraph is Pr(i,j)=log(n)/n;
