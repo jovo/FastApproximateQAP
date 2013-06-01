@@ -1,0 +1,985 @@
+
+.drag
+{
+   position:relative;cursor:hand
+}
+
+#scontentmain
+{
+   position:absolute;
+   width:150px;
+}
+
+#scontentbar
+{
+   cursor:hand;
+   position:absolute;
+   background-color:green;
+   height:15;
+   width:100%;
+   top:0;
+}
+
+#scontentsub
+{
+   position:absolute;
+   width:100%;
+   top:15;
+   background-color:lightyellow;
+   border:2px solid green;
+   padding:1.5px;
+}
+
+#style203
+{
+  // position:absolute;
+  // height:300px;
+  // width:300px;
+   background-color:#F4F4F4;
+   border:1px solid #333;
+}
+
+.commentstoeditor
+{
+   color: #000000;
+   background-image: url(/images/en_US/layout/editor_watermark.gif);
+}
+
+.commentstoauthor
+{
+   color: #000000;
+   background-image: url(/images/en_US/layout/author_watermark.gif);
+}
+
+.commentstoeditor2
+{
+   color: #000000;
+   background: #CFE3EB;
+}
+
+.commentstoauthor2
+{
+   color: #000000;
+   background: #C1E7BD;
+}
+
+A:link
+{
+   color: #666666;
+}
+
+A:active
+{
+   color: #666666;
+}
+
+A:visited
+{
+   color: #666666;
+}
+
+A:hover
+{
+   color: #1F5D9C;
+}
+
+.pagecontents
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+}
+
+.pagecontentsgray
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: gray;
+}
+
+.pagecontentsblue
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: blue;
+}
+
+.pagecontentsred
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: red;
+}
+
+A.pagecontentsred:link
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: red;
+}
+
+A.pagecontentsred:active
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: red;
+}
+
+A.pagecontentsred:visited
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: red;
+}
+
+A.pagecontentsred:hover
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: red;
+}
+
+.nocontents
+{
+   font-size: 0px;
+   color: #F7F7EE;
+}
+
+.textareacontents
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+   width: 500px;
+}
+
+A.primaryon:link
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+A.primaryon:active
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+A.primaryon:visited
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+A.primaryon:hover
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+A.primaryoff:link
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+   text-decoration: none;
+}
+
+A.primaryoff:active
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+   text-decoration: none;
+}
+
+A.primaryoff:visited
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+   text-decoration: none;
+}
+
+A.primaryoff:hover
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #1F5D9C;
+   text-decoration: none;
+}
+
+A.overdueperson:link
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: red;
+}
+
+A.overdueperson:active
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: red;
+}
+
+A.overdueperson:visited
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: red;
+}
+
+A.overdueperson:hover
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: red;
+}
+
+.search
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #666666;
+}
+
+.editing
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #999999;
+}
+
+.pagecontentsemphasis
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+   font-weight: bold;
+}
+
+.detailsontab
+{
+   font-family: Verdana;
+   color: #42CBC0;
+   font-size: 11px;
+   font-weight: bold;
+}
+
+.supportdetailsontab
+{
+   font-family: Verdana;
+   color: #CC0000;
+   font-size: 11px;
+   font-weight: bold;
+}
+
+.error
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: black;
+   background-color: #FFFFCC;
+   border-style: double;
+   border-color: red;
+   padding: 10px;
+}
+
+.error2
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: black;
+   background-color: #FFFFCC;
+   border-style: double;
+   border-color: red;
+   padding: 4px;
+}
+
+.smallerror
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #CE0000;
+   font-weight: bold;
+}
+
+.pagecontentslarge
+{
+   font-family: Verdana;
+   font-size: 12px;
+   color: #2B2B2B;
+}
+
+.footer
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: #333333;
+}
+
+.footergrey
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: #666666;
+}
+
+.conflict
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: blue;
+}
+
+.conflictgreen
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: green;
+}
+
+.conflictbad
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: orange;
+}
+
+.secondarymenu:link
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+.secondarymenu:active
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+.secondarymenu:visited
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+.secondarymenu:hover
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: #FFFFFF;
+   text-decoration: none;
+}
+
+.steps
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: #333333;
+   text-decoration: none;
+}
+
+TD.tablelines
+{
+   background-color: #999999;
+}
+
+TD.tablelineslight
+{
+   background-color: #999999;
+}
+
+TD.headercells
+{
+   background-color: #BCBCB3;
+}
+
+TD.secondaryheader
+{
+   background-color: #D7DDE2;
+}
+
+TD.alternatetablecolor
+{
+   background-color: #EEEEEE;
+}
+
+TD.tablelightcolor
+{
+   background-color: #FFFFFF;
+}
+
+TD.dataentry
+{
+   background-color: #F7F7EE;
+}
+
+TD.dataentryFL
+{
+   background-color: #F7F7EE;
+   word-break:break-all;
+}
+
+TD.calendartoday
+{
+   background-color: #66CCFF;
+}
+
+TD.menubg
+{
+   background-color: #545556;
+}
+
+TD.menuonbg
+{
+   background-color: #757575;
+}
+
+TD.secondarymenubg
+{
+   background-color: #3F9CD3;
+}
+
+TD.completestep
+{
+   background-image: url(/images/en_US/layout/steps/complete_bg.gif);
+   background-repeat: repeat-y;
+}
+
+TD.incompletestep
+{
+   background-image: url(/images/en_US/layout/steps/incomplete_bg.gif);
+   background-repeat: repeat-y;
+}
+
+TD.prooflogobg
+{
+   background-image: url(/images/common/layout/proof_logo_bg.gif);
+   background-repeat: repeat-x;
+}
+
+TD.detailtab
+{
+   background-image: url(/images/common/details/bg_off.gif);
+   background-repeat: repeat-x;
+}
+
+TD.detailtabon
+{
+   background-image: url(/images/common/details/bg_on.gif);
+   background-repeat: repeat-x;
+}
+
+TD.supportdetailtab
+{
+   background-image: url(/images/common/details/support_bg_off.gif);
+   background-repeat: repeat-x;
+}
+
+TD.supportdetailtabon
+{
+   background-image: url(/images/common/details/support_bg_on.gif);
+   background-repeat: repeat-x;
+}
+
+TD.errorcell
+{
+   background-color: red;
+}
+
+TD.onthispage
+{
+   background-color: #BAE2FA;
+}
+
+TD.versionribbon
+{
+   background-image: url(/images/common/details/r1_ribbon.gif);
+   background-repeat: repeat-y;
+}
+
+TD.headerbg
+{
+   background-image: url(/images/en_US/layout/header_bg.gif);
+   background-repeat: repeat-x;
+}
+
+IMG.cursor
+{
+   cursor:hand;
+}
+
+TD.redesigntablelines
+{
+   background-color: #636363;
+}
+
+TD.detailsheaderbg
+{
+   background-image: url(/images/common/layout/details_header_bg.gif);
+   background-repeat: repeat-x;
+   background-color: #93B6C2;
+}
+
+TD.detailsheaderbg2
+{
+   background-image: url(/images/common/layout/details_header_bg_2.gif);
+   background-repeat: repeat-x;
+}
+
+TD.detailsbg
+{
+   background-image: url(/images/common/layout/details_bg.gif);
+   background-repeat: repeat-x;
+   background-color: #D1D5D7;
+}
+
+TD.societylogobg
+{
+   background-color: #DEDEDE;
+}
+
+TD.headerbreadcrumbsbg
+{
+   background-image: url(/images/common/breadcrumbs/breadcrumbs_bg.gif);
+   background-repeat: repeat-x;
+   background-color: #93B6C2;
+}
+
+TD.breadcrumbsdev
+{
+   background-color: #CC6666;   
+}
+
+TD.headerbg2
+{
+   background-color: #D1D5D7;
+}
+
+TD.searchbg
+{
+   background-color: #AAAAAA;
+}
+
+TD.newsecondary
+{
+   background-color: #E6E6D2;
+}
+
+TD.secondaryheader2
+{
+   background-color: #CCD9E2;
+}
+
+TD.redesigndetailtab
+{
+   background-image: url(/images/common/details/redesign_bg_off.gif);
+   background-repeat: repeat-x;
+}
+
+TD.redesignbodybg
+{
+   background-image: url(/images/en_US/layout/redesign_body_bg.gif);
+   background-repeat: repeat-y;
+}
+
+TD.redesigndetailtabon
+{
+   background-image: url(/images/common/details/redesign_bg_on.gif);
+   background-repeat: repeat-x;
+}
+
+TD.redesigndetailtabon2
+{
+   background-color: #D1D5D7;
+   background-image: url(/images/common/details/redesign_bg_on2.gif);
+   background-repeat: repeat-x;
+}
+
+TD.redesigndetailtab2
+{
+   background-color: #FFFFFF;
+   background-image: url(/images/common/details/redesign_bg_off2.gif);
+   background-repeat: repeat-x;
+}
+
+TD.redesigndetaillast2
+{
+   background-image: url(/images/common/details/redesign_last3.gif);
+   background-repeat: repeat-y;
+}
+
+TD.redesignlefton2
+{
+   background-image: url(/images/common/details/redesign_left_on2.gif);
+   background-repeat: repeat-y;
+}
+
+TD.redesignleftoff2
+{
+   background-image: url(/images/common/details/redesign_left_off2.gif);
+   background-repeat: repeat-y;
+}
+
+.redesigndetailsontext
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+   padding-right: 4px;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+
+A.redesigndetailsofftext
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #666666;
+   text-decoration: none;
+   padding-right: 4px;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+
+TD.resourcesbg
+{
+   background-color: #EEEEEE;
+}
+
+.listcontents
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+   padding: 5px;
+}
+
+.searchcriteria
+{
+   font-family: Verdana;
+   font-size: 10px;
+   color: #333333;
+   padding: 5px;
+   font-style: italic;
+}
+
+A.breadcrumblink
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+}
+
+A.breadcrumblink:active
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+}
+
+A.breadcrumblink:visited
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+}
+
+A.breadcrumblink:hover
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: #000000;
+}
+
+TD.test123top
+{
+   background-color: white;
+   border-top: 1px solid #999999;
+}
+
+TD.test123bottom
+{
+   background-color: white;
+   border-bottom: 1px solid #999999;
+}
+
+TD.test123both
+{
+   background-color: white;
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+}
+
+TD.test444top
+{
+   background-color: #E6E6D2;
+   border-top: 1px solid #999999;
+}
+
+TD.test444bottom
+{
+   background-color: #E6E6D2;
+   border-bottom: 1px solid #999999;
+}
+
+TD.test444both
+{
+   background-color: #E6E6D2;
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+}
+
+TD.test444bothFL
+{
+   background-color: #F7F7EE;
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+   border-right: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+
+TD.alternatetablecolortop
+{
+   background-color: #EEEEEE;
+   border-top: 1px solid #999999;
+}
+
+A.conflictbad:link
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: orange;
+}
+
+A.conflictbad:active
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: orange;
+}
+
+A.conflictbad:visited
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: orange;
+}
+
+A.conflictbad:hover
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: orange;
+}
+
+.style1 {color: #FF0000}
+ 
+
+.patsearchcriteria
+{
+  font-family: Verdana;
+  font-size: 10px;
+  background-color: #F2F2F2;
+  padding: 5px;
+  font-style: italic;
+  font-weight: bold;
+  color: orange;
+}
+
+TD.test123topleft
+{
+   background-color: white;
+   border-top: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+
+TD.test123topright
+{
+   background-color: white;
+   border-top: 1px solid #999999;
+   border-right: 1px solid #999999;
+}
+
+TD.test444topright
+{
+   background-color: #E6E6D2;
+   border-top: 1px solid #999999;
+   border-right: 1px solid #999999;
+}
+
+TD.test444topleft
+{
+   background-color: #E6E6D2;
+   border-top: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+
+TD.test123bothleft
+{
+   background-color: white;
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+
+TD.test123toprightleft
+{
+   background-color: white;
+   border-top: 1px solid #999999;
+   border-right: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+
+TD.test123bottom
+{
+   background-color: white;
+   border-bottom: 1px solid #999999;
+}
+
+TD.test123bottomleft
+{
+   background-color: white;
+   border-bottom: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+
+
+
+TD.test123bottomright
+{
+   background-color: white;
+   border-bottom: 1px solid #999999;
+   border-right: 1px solid #999999;
+}
+
+TD.test444both
+{
+   background-color: #E6E6D2;
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+}
+
+TD.test444bothleft
+{
+   background-color: #E6E6D2;
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+
+TD.test444bothright
+{
+   background-color: #E6E6D2;
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+   border-right: 1px solid #999999;
+}
+
+TD.test123bothboth
+{
+   background-color: white;
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+   border-right: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+TD.test123bottomleftright
+{
+   background-color: white;
+   border-bottom: 1px solid #999999;
+   border-right: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+
+TD.test444left
+{
+   border-left: 1px solid #999999;
+   background-color: #E6E6D2;
+}
+
+TD.test444right
+{
+   border-right: 1px solid #999999;
+   background-color: #E6E6D2;
+}
+
+TD.test123bothboth
+{
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+   border-right: 1px solid #999999;
+   border-left: 1px solid #999999;
+   background-color: white;
+}
+
+.pagecontentsgreen
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: green;
+}
+
+.pagecontentsred
+{
+   font-family: Verdana;
+   font-size: 11px;
+   color: red;
+}
+
+TD.headercellswithborder
+{
+   background-color: #BCBCB3;
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+   border-right: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+
+.dropdownyesaccess
+{
+   background-color: #BCDABE;
+}
+
+.dropdownnoaccess
+{
+   background-color: #CCCCCC;
+}
+
+TD.test444bothboth
+{
+   background-color: #E6E6D2;
+   border-top: 1px solid #999999;
+   border-bottom: 1px solid #999999;
+   border-left: 1px solid #999999;
+   border-right: 1px solid #999999;
+}
+
+TD.test444topboth
+{
+   background-color: #E6E6D2;
+   border-top: 1px solid #999999;
+   border-right: 1px solid #999999;
+   border-left: 1px solid #999999;
+}
+
+TD.test123topboth
+{
+   background-color: white;
+}

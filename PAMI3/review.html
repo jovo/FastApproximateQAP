@@ -1,0 +1,903 @@
+
+<!-- saved from url=(0304)https://mc.manuscriptcentral.com/tpami-cs?NEXT_PAGE=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP&CURRENT_PAGE=AUTHOR_VIEW_MANUSCRIPTS&EMAIL_ID=215008760&READ_EMAIL_ID=215008760&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=AUTHOR_VIEW_MANUSCRIPTS -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ScholarOne Manuscripts</title>
+
+
+<link rel="STYLESHEET" type="text/css" href="./review_files/scholarone.css">
+
+<script language="JavaScript" type="text/javascript">
+var ALERT_WAIT_FOR_SUBMIT = 'The form has been submitted, please wait until it has completed before pressing any more buttons.';
+var ALERT_TEXT_LIMIT = 'The text limit for this field has been reached. No more text may be added.';
+var ALERT_NO_SEARCH = 'Starting over will mean that the system will not perform this search. Are you sure?';
+var ALERT_TEXT_OVERFLOW = 'Text overflow';
+var PREFER_24HOUR = '0';
+var GMT_STR = 'GMT';
+var AM_STR = 'AM';
+var PM_STR = 'PM';
+</script>
+<script language="JavaScript" type="text/javascript">
+var ALERT_WAIT_FOR_SUBMIT = 'The form has been submitted, please wait until it has completed before pressing any more buttons.';
+var ALERT_TEXT_LIMIT = 'The text limit for this field has been reached. No more text may be added.';
+var ALERT_NO_SEARCH = 'Starting over will mean that the system will not perform this search. Are you sure?';
+var ALERT_TEXT_OVERFLOW = 'Text overflow';
+var PREFER_24HOUR = '0';
+var GMT_STR = 'GMT';
+var AM_STR = 'AM';
+var PM_STR = 'PM';
+</script>
+<script language="JavaScript" src="./review_files/scholarone.js"></script>
+<link type="text/css" rel="StyleSheet" href="./review_files/helptip.css">
+<script language="JavaScript" src="./review_files/helptip.js"></script>
+<script language="JavaScript" type="text/javascript">
+function isPageCompletelyLoaded()
+{
+  if (document.forms[0].PAGE_LOADED_FLAG.value != 'Y') {alert('The form has been submitted, please wait until it has completed before pressing any more buttons.'); return false;}
+       return true;
+}
+function getSiteURL()
+{
+   return 'tpami-cs';
+}
+function getLongRequestSiteURL()
+{
+   return '/LongRequest/tpami-cs';
+}
+var gSessionWarningTimer = window.setInterval('SessionWarningTimer()', 60000);
+var gTimerCount = 0;var canTimeout = true;var isSubmissionPage = false;
+function getCurrentPage(){return 'ADMIN_EMAIL_PREVIEW_EMAIL_POPUP';}
+
+function stopTimeout()
+{
+	canTimeout = false;
+}
+function restartTimer()
+{
+   window.clearInterval(gSessionWarningTimer);
+   gSessionWarningTimer = window.setInterval('SessionWarningTimer()', 60000);
+}
+function SessionWarningTimer()
+{
+   gTimerCount++;
+   if ( gTimerCount == 168)
+      if (canTimeout)
+{ 
+	showSessionWarning(true); 
+}
+}
+var gSessionSaveTimer = window.setTimeout('SessionSave()', 10620000);
+function SessionSave()
+{
+ if(canTimeout) { 
+   if(false) { 
+      var errorUrl = '';       if(window.parent != null && window.parent.frames != null && window.parent.frames.length > 0) {          window.parent.top.location = errorUrl;      } else {          window.location = errorUrl;      }          window.close();   } else { 
+    setField('EMAIL_POPUP_CLOSE_WIN_FL','Y');
+    setField('CLOSE_WINDOW_FL','Y');
+    setDataAndNextPage('NATURAL_TIMEOUT', 'true', 'ADMIN_EMAIL_PREVIEW_EMAIL_POPUP');
+      if(window.parent != null && window.parent.frames != null && window.parent.frames.length > 0) {         window.parent.top.setDataAndNextPage('NATURAL_TIMEOUT', 'true', 'LOGIN');
+      } else {         setDataAndNextPage('NATURAL_TIMEOUT', 'true', 'LOGIN');
+      }     } 
+  }}
+function getPostParams(){}
+
+function popWindow(url,winname,width,height)
+{
+  winX=Math.round(screen.width/2)-(width/2);
+  winY=Math.round(screen.height/2)-(height/2);
+  winStats='toolbar=no,location=no,directories=no,menubar=no,resizable=yes,'
+  winStats+='scrollbars=yes,width='+width+',height='+height
+  if (navigator.appName.indexOf('Microsoft')>=0) {
+    winStats+=',left='+winX+',top='+winY+''
+  }else{ 
+    winStats+=',screenX='+winX+',screenY='+winY+''
+  }
+  restartTimer();
+  handle = window.open(encodeURI(url),winname,winStats) 
+  if(handle != null)
+  {
+   if (winname != 'add_person_to_pick_pop' && winname != 'mssearch_issue_popup' && winname != 'progress_pop_report' && winname != 'progress_pop_large' && winname != 'progress_pop_large2' && winname != 'transfer_pop' && winname != 'email_popup_stay' && winname != 'forms_instructions_popup') 
+   {
+     addHandleToArray(handle);  
+   }
+   handle.focus();  
+  }
+  if (winname == 'progress_pop_delayed' || winname == 'author_affil_details' || winname == 'sp_char_palette') 
+    return handle;  
+}
+function popWindowSecure(url,winname,width,height)
+{
+  winX=Math.round(screen.width/2)-(width/2);
+  winY=Math.round(screen.height/2)-(height/2);
+  winStats='toolbar=no,location=no,directories=no,menubar=no,status=yes,resizable=yes,'
+  winStats+='scrollbars=yes,width='+width+',height='+height
+  if (navigator.appName.indexOf('Microsoft')>=0) {
+    winStats+=',left='+winX+',top='+winY+''
+  }else{ 
+    winStats+=',screenX='+winX+',screenY='+winY+''
+  }
+  restartTimer();
+  handle = window.open(url,winname,winStats) 
+  if (winname != 'add_person_to_pick_pop' && winname != 'mssearch_issue_popup' && winname != 'progress_pop_report' && winname != 'progress_pop_large' && winname != 'progress_pop_large2' && winname != 'transfer_pop' && winname != 'email_popup_stay') 
+    addHandleToArray(handle);  
+  handle.focus();  
+}
+function popWindowSecureForPortal(url,winname,width,height)
+{
+  winX=Math.round(screen.width/2)-(width/2);
+  winY=Math.round(screen.height/2)-(height/2);
+  winStats='toolbar=yes,location=yes,directories=yes,menubar=yes,status=yes,resizable=yes,'
+  winStats+='scrollbars=yes,width='+width+',height='+height
+  if (navigator.appName.indexOf('Microsoft')>=0) {
+    winStats+=',left='+winX+',top='+winY+''
+  }else{ 
+    winStats+=',screenX='+winX+',screenY='+winY+''
+  }
+  restartTimer();
+  handle = window.open(url,winname,winStats) 
+  if (winname != 'add_person_to_pick_pop' && winname != 'mssearch_issue_popup' && winname != 'progress_pop_report' && winname != 'progress_pop_large' && winname != 'progress_pop_large2' && winname != 'transfer_pop' && winname != 'email_popup_stay') 
+    addHandleToArray(handle);  
+  handle.focus();  
+}
+function showProgressWindow() { 
+  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SHOW_UPLOADING_FL=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop', 400, 300); 
+}function showProgressWindowLarge(vPageName) { 
+ showProgressWindowLarge(vPageName, 'progress_pop_large'); 
+} 
+function showProgressWindowLarge(vPageName, vPopupWindowName) { 
+ if (vPopupWindowName == null) { vPopupWindowName = 'progress_pop_large'; } 
+  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SHOW_UPLOADING_FL=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP&PAGE_NAME=' + vPageName + '', vPopupWindowName, 800, 600); 
+}function showGenericProgressWindowLarge() { 
+  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SHOW_UPLOADING_FL=N&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_large_generic', 800, 600); 
+}function showProgressWindowForReport() {  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SHOW_CREATING_REPORT_FL=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 600, 500); 
+} 
+function showProgressWindowForReportSwitchConfig(configId) {  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SHOW_CREATING_REPORT_FL=Y&FIRST_TIME_FL=Y&SWITCH_CONFIG_ID_UNDER_POPUP='+configId+'&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 600, 500); 
+} 
+function showProgressWindowRoleChange() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP&SHOW_ROLE_CHANGE_TASK=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 800, 600); 
+} 
+function showProgressWindowMSListExport() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SPAWN_EXPORT_MS_LIST_THREAD=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+function showProgressWindowStubsListExport() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP&SPAWN_EXPORT_STUBS_LIST_THREAD=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+function showProgressWindowMSListExportHistoryExport() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP&SPAWN_EXPORT_MS_LIST_THREAD=Y&FIRST_TIME_FL=Y&CSV_FOR_EXPORT_HISTORY=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+function showProgressWindowSimpleExportHistory() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SPAWN_EXPORT_SIMPLE_EXPORT_HISTORY_THREAD=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+function showProgressAsyncSearchResultsExport() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP&SPAWN_DOWNLOAD_ASYNC_SEARCH_RESULTS_THREAD=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 600, 500); 
+} 
+function showProgressWindowMSAddTasks() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SPAWN_MS_ADD_TASK=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+function showProgressWindowForIssueLineup(vRadioGroupName, vIssueId) {selVal = GetRadioValue(vRadioGroupName);if(selVal == '3') {javascript:setField('TAG_ACTION', 'EXPORT_ISSUE');  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&EDIT_ISSUE_ID='+vIssueId+'&EXPORT_ISSUE_LINEUP_SELECTED=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} else {  javascript: showProgressWindowForReport();}} 
+function showProgressWindowGeneric(vProgressTypeId) {  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&PROGRESS_TYPE_ID='+vProgressTypeId+'&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+function showProgressWindowForTransfer() {  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SHOW_TRANSFERING_TEXT=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','transfer_pop', 400, 300); 
+} 
+function showProgressWindowForIssueTransfer() {  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&POPUP_RELOAD_PARENT_PAGE=PRODUCTION_ISSUE_MANAGEMENT&CURRENT_PAGE_NO=null&SHOW_ISSUE_TRANSFERING_TEXT=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','transfer_pop', 400, 300); 
+} 
+function showProgressWindowForImport() {  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SHOW_CREATING_IMPORT_FL=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 600, 500); 
+} 
+function showProgressWindowArXiv() { 
+  javascript: popWindow('tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&UPLOAD_FILES_FROM_ARXIV_FL=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_large', 800, 600); 
+}function checkForSomethingToUpload()
+{ 
+  var i=0; 
+  var existsFl = 0; 
+  for (i=0;i<20;i++) { 
+    var metaArray = document.getElementsByName('FILE_TO_UPLOAD'+i); 
+    if (metaArray.length == 1) { 
+     var filename = document.forms[0]['FILE_TO_UPLOAD'+i].value; 
+     if (filename.length > 0) 
+       existsFl = 1; 
+   } 
+  } 
+  for (i=0;i<20;i++) { 
+    var metaArray = document.getElementsByName('ZIP_FILE_TO_UPLOAD'+i); 
+    if (metaArray.length == 1) { 
+     var filename = document.forms[0]['ZIP_FILE_TO_UPLOAD'+i].value; 
+     if (filename.length > 0) 
+       existsFl = 1; 
+   } 
+  } 
+  if (existsFl == 1) { return true; }  
+  return false; 
+}
+function checkForDuplicateFiles()
+{ 
+  var i=0; 
+  var j=0; 
+  var existsFileFl = 0; 
+  var filename1 = '';
+  var filename2 = '';
+  var noOfFiles = 0;
+  noOfFiles =  document.getElementById('HIDDEN_VALUE_FOR_FILENO').value; 
+  for (i=0;i<noOfFiles && existsFileFl != 1;i++){
+     filename1 = document.forms[0]['FILE_TO_UPLOAD'+i].value; 
+     filename1 = trimAll(filename1.substring(filename1.lastIndexOf('\\')+1));     for(j=i+1; j<noOfFiles && existsFileFl != 1;j++){ 
+       filename2 = document.forms[0]['FILE_TO_UPLOAD'+j].value; 
+       filename2 = trimAll(filename2.substring(filename2.lastIndexOf('\\')+1));       if(filename1!='' && filename1==filename2) existsFileFl = 1; } } 
+  if (existsFileFl == 1) { alert ('A file named ' + filename1 + ' is already present for uploading for this manuscript. If you want to upload this file (e.g. this is a replacement for an existing file) you must rename the new file and then upload it.'); resetIsOk(); return false; }  
+  return true; 
+}
+function checkUploadFields()
+{ 
+   if(window.parent != null && window.parent.frames != null && window.parent.frames.length > 0) { 
+		return checkUploadFieldsLocal(); 
+   }   
+  return true; 
+}
+function checkUploadFieldsLocal()
+{ 
+  return true; 
+}
+function showProgressWindowUserListExport() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SPAWN_EXPORT_USER_LIST_THREAD=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+function showProgressWindowUPlagiarismDocExport() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SPAWN_EXPORT_PLAG_DOC_LIST_THREAD=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+function showProgressWindowRevExport() {  var assigneeRoleId = document.forms[0].ASSIGNEE_ROLE_ID.value;  var docTaskId = document.forms[0].DOCUMENT_TASK_ID.value;  popWindow("/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP&SPAWN_EXPORT_REV_THREAD=Y&FIRST_TIME_FL=Y&ASSIGNEE_ROLE_ID=" + assigneeRoleId + "&DOCUMENT_TASK_ID=" + docTaskId + "&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP","progress_pop_report", 480, 400); 
+} 
+function showProgressWindowEmailTagsListExport() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP&SPAWN_EXPORT_EMAIL_TAG_LIST_THREAD=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+
+var emailWindows = new Array();
+var emailWindowNames = new Array();
+var checkEmailWindowsCalled = false;
+function registerEmailWindow(emailWindow)
+{ 
+   emailWindows[emailWindows.length] = emailWindow;
+   if(emailWindowNames.toString().indexOf(emailWindow.name)==-1)
+   { 
+       emailWindowNames[emailWindowNames.length] = emailWindow.name;
+   }
+   if(document.forms[0].OPEN_EMAIL_WINDOWS!=null)
+   { 
+       document.forms[0].OPEN_EMAIL_WINDOWS.value = emailWindowNames.toString();
+   }
+} 
+
+function checkEmailWindows()
+{
+if(!checkEmailWindowsCalled)
+{
+   var blPopupsOpen=false;
+   if(false)
+   { 
+     if(document.forms[0].NEXT_PAGE.value.indexOf("MANUSCRIPT_DETAILS")==-1 || (document.forms[0].NEXT_PAGE.value.indexOf("MANUSCRIPT_DETAILS")!=-1 && document.forms[0].NEXT_PREV_DOCUMENT_ID!=null && document.forms[0].NEXT_PREV_DOCUMENT_ID.value!="" && document.forms[0].DOCUMENT_ID.value != document.forms[0].NEXT_PREV_DOCUMENT_ID.value) || (document.forms[0].NEXT_PAGE.value.indexOf("MANUSCRIPT_DETAILS")!=-1 && document.forms[0].PRE_ACTION != null && document.forms[0].PRE_ACTION.value=="PERFORM_HEADER_QUICK_SEARCH" )|| (document.forms[0].NEXT_PAGE.value.indexOf("MANUSCRIPT_DETAILS")!=-1 && document.forms[0].PROXY_TO_ROLE_ID != null && document.forms[0].PROXY_TO_ROLE_ID.value != '' ))
+     { 
+       emailWindows.length=0;
+       for(var i = 0; i<emailWindowNames.length; i++)
+       {
+           emailWindowName = emailWindowNames[i];
+           if (typeof emailWindowName != 'undefined' && emailWindowName != '')
+           { 
+               var winHandle=window.open('',emailWindowName);
+               if(typeof winHandle.frames['mainemailwindow'] != 'undefined' && winHandle.frames['mainemailwindow'] != null)
+               {
+                   registerEmailWindow(winHandle);
+               }
+               else
+               {
+                   winHandle.close();
+               }
+           }
+       }
+       if(emailWindows.length > 0)
+       { 
+           for(var i = 0; i<emailWindows.length; i++)
+           {
+               if(!emailWindows[i].closed)
+               {
+                   blPopupsOpen=true;
+                   break;
+               }
+           }
+           if(!blPopupsOpen)
+           { 
+               checkEmailWindowsCalled=true;
+               return true;
+           }
+           if(confirm ('We have detected that there is at least one e-mail window open - these windows will be closed when you move from the details of one manuscript to another. If you would like to retain this text for use later,  please either save the e-mails as drafts or copy them to your hard drive for future reference.\nContinue?'))
+           { 
+               for(var i = 0; i<emailWindows.length; i++)
+               {
+                   if(!emailWindows[i].closed)
+                   {
+                       unRegisterWindow(emailWindows[i].name);
+                       emailWindows[i].close();
+                   }
+               }
+               checkEmailWindowsCalled=true;
+               return true;
+           }
+           else
+           { 
+               if(document.forms[0].NEXT_PREV_DOCUMENT_ID!=null){document.forms[0].NEXT_PREV_DOCUMENT_ID.value='';}
+               if(document.forms[0].PRE_ACTION!=null){document.forms[0].PRE_ACTION.value='';}
+               if(document.forms[0].PROXY_TO_ROLE_ID!=null){document.forms[0].PROXY_TO_ROLE_ID.value='';}
+               if(document.forms[0].CLEAR_SEARCH!=null){document.forms[0].CLEAR_SEARCH.value='';}
+               return false;
+           }
+       }
+       else
+       { 
+           checkEmailWindowsCalled=true;
+           return true;
+       }
+     }
+     else
+     { 
+       checkEmailWindowsCalled=true;
+       return true;
+     }
+   }
+   else
+   {
+       checkEmailWindowsCalled=true;
+       return true;
+   }
+}
+else
+{ 
+   checkEmailWindowsCalled=true;
+   return true;
+}
+}
+
+function getOpenEmailWindows()
+{ 
+   if(document.forms[0].OPEN_EMAIL_WINDOWS!=null)
+   { 
+       return document.forms[0].OPEN_EMAIL_WINDOWS.value;
+   }
+   else
+   { 
+       return '';
+   }
+} 
+
+function registerEmailWindowByName(emailWindowName)
+{ 
+ if (typeof emailWindowName != 'undefined')
+ { 
+   if(emailWindowNames.toString().indexOf(emailWindowName)==-1)
+   { 
+       emailWindowNames[emailWindowNames.length] = emailWindowName;
+   }
+   if(document.forms[0].OPEN_EMAIL_WINDOWS!=null)
+   { 
+       document.forms[0].OPEN_EMAIL_WINDOWS.value = emailWindowNames.toString(); 
+   }
+ } 
+} 
+
+function unRegisterWindow(emailWindowName)
+{ 
+  var newEmailWinNames = new Array(); 
+  for(var i = 0, j=0; i<emailWindowNames.length; i++)
+  {
+   if(emailWindowNames[i]!=emailWindowName)
+   { 
+      if(typeof emailWindowNames[i] != 'undefined' && emailWindowNames[i]!='')
+      { 
+         newEmailWinNames[j] = emailWindowNames[i];
+         j++;
+      }
+   }
+  }
+  emailWindowNames.length=0;
+  emailWindowNames=newEmailWinNames;
+  if(document.forms[0].OPEN_EMAIL_WINDOWS!=null)
+  { 
+      document.forms[0].OPEN_EMAIL_WINDOWS.value = emailWindowNames.toString();
+  }
+} 
+
+function showProgressWindowPermissionAuditTrailExport() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP&SPAWN_EXPORT_PERMISSION_AUDIT_TRAIL_THREAD=Y&FIRST_TIME_FL=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+function showProgressWindowSubmissionStatisticsExportCSV() {  javascript: popWindow('/LongRequest/tpami-cs?NEXT_PAGE=UPLOAD_PROGRESS_POPUP&SPAWN_EXPORT_SUBMISSION_STATISTICS_THREAD=Y&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP','progress_pop_report', 400, 300); 
+} 
+</script>
+
+<style type="text/css"></style></head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+<body bgcolor="#D1D5D7"> 
+<form style="margin:0px;" id="default_form" name="default_form" method="post" target="" action="https://mc.manuscriptcentral.com/tpami-cs">
+<input type="hidden" name="PORTAL" value="null">
+<input type="hidden" name="S1LOGIN" value="null">
+<input type="hidden" name="NEXT_PAGE" value="">
+<input type="hidden" name="NEXT_PAGE_FOR_REDIRECT" value="">
+<input type="hidden" name="CURRENT_PAGE" value="ADMIN_EMAIL_PREVIEW_EMAIL_POPUP">
+<input type="hidden" name="PRE_ACTION" value="">
+<input type="hidden" name="POST_ACTION" value="">
+<input type="hidden" name="CURRENT_ROLE_ID" value="21231">
+<input type="hidden" name="SWITCH_CONFIG_ID" value="">
+<input type="hidden" name="CHANGE_PORTAL_CONFIG_ID_FOR_LOGIN_PAGE" value="">
+<input type="hidden" name="SWITCH_CONFIG_ID_PREV" value="">
+<input type="hidden" name="NEW_USER_CONFIG_ID" value="">
+<input type="hidden" name="PROXY_TO_PAGE_NAME" value="">
+<input type="hidden" name="PROXY_TO_ROLE_ID" value="">
+<input type="hidden" name="PROXY_TO_DOCUMENT_ID" value="">
+<input type="hidden" name="PROXY_TO_DOCUMENT_TASK_ID" value="">
+<input type="hidden" name="PAGE_DIRTY_FL" value="">
+<input type="hidden" name="PAGE_LOADED_FLAG" value="Y">
+<input type="hidden" name="DISPLAY" value="">
+<input type="hidden" name="SANITY_CHECK_DOCUMENT_ID" value="">
+<input type="hidden" name="DOCUMENT_HASHCODE" value="">
+<input type="hidden" name="CONFIG_ID" value="3573">
+<input type="hidden" name="SAVE_MS_DETAILS_FL" value=""><input type="hidden" name="SAVE_MS_DETAILS_VALIDATE_FL" value=""><input type="hidden" name="CURRENT_USER_ID" value="24155020">
+<input type="hidden" name="NATURAL_TIMEOUT" value="false">
+<input type="hidden" name="CURRENT_USER_ID" value="24155020">
+<input type="hidden" name="LOGIN_SITE_SHORT_NAME" value="null">
+<input type="hidden" name="EXTERNAL_HTTP_REFERRER" value="https://mc.manuscriptcentral.com/tpami-cs">
+
+
+<table align="center" cellpadding="0" cellspacing="0" border="0" width="100%">
+	<tbody><tr>
+		<td colspan="2">
+			
+<div id="warning" name="warning" style="position:absolute;visibility:hidden" width="20%">    
+
+<table border="0" cellpadding="0" cellspacing="0" width="350">
+   <tbody><tr>
+       <td><p class="footer">&nbsp;</p></td>
+   </tr>
+   <tr>    
+       <td class="secondarymenubg">
+           <table cellpadding="5" cellspacing="10" border="0" width="100%">
+               <tbody><tr>
+                   <td class="dataentry">
+                       <table border="0" cellpadding="0" cellspacing="0">
+                           <tbody><tr>
+                               <td><p class="pagecontents"><br>For security reasons, your session will time out in 10 minutes (at <span id="tP"><script language="javascript">showTime()</script>4:03 PM, 7:03 PM GMT</span>).  Please save your work to avoid potential loss.  To refresh your session, close this message and save your work or return to your main menu.  You may then continue working as normal.<br>&nbsp;</p></td>
+                           </tr>
+                           <tr>
+                               <td align="center"><a href="https://mc.manuscriptcentral.com/tpami-cs?NEXT_PAGE=ADMIN_EMAIL_PREVIEW_EMAIL_POPUP&CURRENT_PAGE=AUTHOR_VIEW_MANUSCRIPTS&EMAIL_ID=215008760&READ_EMAIL_ID=215008760&CURRENT_ROLE_ID=21231&CURRENT_USER_ID=24155020&DOCUMENT_HASHCODE=&SANITY_CHECK_DOCUMENT_ID=&CONFIG_ID=3573&PAGE_NAME=AUTHOR_VIEW_MANUSCRIPTS#" onclick="showSessionWarning(false)"><img src="./review_files/close_message.gif" border="0"></a></td>
+                           </tr>
+                       </tbody></table>
+                   </td>
+               </tr>
+           </tbody></table>
+       </td>
+   </tr>
+</tbody></table>   
+</div>
+	
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			
+
+
+
+
+
+
+
+
+		
+		</td>
+	</tr>
+	<tr>
+    <td>
+      <table align="center" cellpadding="5" cellspacing="5" border="0" width="100%">
+      <tbody><tr>    
+		    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 						
+  				
+        
+          
+
+
+          
+          
+          
+          
+          
+
+      </tr>
+      </tbody></table>
+    </td>            
+	</tr>
+</tbody></table>
+<br clear="all">
+
+<table align="center" cellpadding="0" cellspacing="0" border="0" width="100%">
+	<tbody><tr>
+		<td colspan="2">
+			<table border="0" cellpadding="0" cellspacing="0" width="100%">
+				<tbody><tr>
+					<td><img src="./review_files/details_header_left.gif" border="0"></td>
+					<td class="detailsheaderbg" width="100%">&nbsp;</td>
+					<td><img src="./review_files/details_header_right.gif" border="0"></td>
+				</tr>
+			</tbody></table>
+		</td>
+	</tr>
+	<tr>
+		<td class="tablelines" colspan="2">
+			<table cellpadding="5" cellspacing="1" border="0" width="100%">
+				<tbody><tr>	
+					<td colspan="2" class="dataentry">
+					
+	        			
+
+<!-- Tag: com.scholarone.tags.adminEmailPreviewPopupTag -->
+
+<input type="hidden" name="TAG_ACTION" value="">
+<table align="LEFT" cellpadding="0" cellspacing="5" border="0" width="100%"> 
+													<tbody><tr>	 
+														<td class="dataentry" width="1%" colspan="2"> 
+	<table align="LEFT" cellpadding="0" cellspacing="5" border="0" width="100%"> 
+	<tbody><tr> 
+		<td class="tablelines" colspan="2"> 
+			<table cellpadding="5" cellspacing="1" border="0" width="100%"> 
+				<tbody><tr>	 
+					<td class="headercells"><p class="pagecontents"><b>Preview</b></p></td> 
+				</tr> 
+				<tr>	 
+					<td class="tablelightcolor"> 
+						<table border="0" cellpadding="4" cellspacing="0"> 
+							<tbody><tr> 
+								<td nowrap="" align="RIGHT" width="1%"> 
+									<p class="pagecontents"><b>From:</b></p> 
+								</td> 
+								<td> 
+									<p class="pagecontents"><span><a class="smarterwiki-linkify" href="mailto:daf@uiuc.edu">daf@uiuc.edu</a></span></p> 
+								</td> 
+							</tr> 
+							<tr> 
+								<td nowrap="" align="RIGHT" width="1%"> 
+									<p class="pagecontents"><b>To:</b></p> 
+								</td> 
+								<td> 
+									<p class="pagecontents"><span><a class="smarterwiki-linkify" href="mailto:joshuav@jhu.edu,">joshuav@jhu.edu,</a> <a class="smarterwiki-linkify" href="mailto:joshuav@jhu.edu,">joshuav@jhu.edu,</a> <a class="smarterwiki-linkify" href="mailto:conroyjohnm@gmail.com,">conroyjohnm@gmail.com,</a> <a class="smarterwiki-linkify" href="mailto:ljpodra@gmail.com,">ljpodra@gmail.com,</a> <a class="smarterwiki-linkify" href="mailto:sgkratz@gmail.com,">sgkratz@gmail.com,</a> <a class="smarterwiki-linkify" href="mailto:eric.harley@jhu.edu,">eric.harley@jhu.edu,</a> <a class="smarterwiki-linkify" href="mailto:def@jhu.edu,">def@jhu.edu,</a> <a class="smarterwiki-linkify" href="mailto:Jacob.Vogelstein@jhuapl.edu,">Jacob.Vogelstein@jhuapl.edu,</a> <a class="smarterwiki-linkify" href="mailto:cep@jhu.edu">cep@jhu.edu</a></span></p> 
+								</td> 
+							</tr> 
+							<tr> 
+								<td nowrap="" align="RIGHT" width="1%"> 
+									<p class="pagecontents"><b>CC:</b></p> 
+								</td> 
+								<td> 
+									<p class="pagecontents"><span><a class="smarterwiki-linkify" href="mailto:tpami@computer.org,sclaroff@bu.edu,SingBing.Kang@microsoft.com,welling@ics.uci.edu,">tpami@computer.org,sclaroff@bu.edu,SingBing.Kang@microsoft.com,welling@ics.uci.edu,</a> <a class="smarterwiki-linkify" href="mailto:daf@uiuc.edu,">daf@uiuc.edu,</a> <a class="smarterwiki-linkify" href="mailto:lawrennd@gmail.com,">lawrennd@gmail.com,</a> <a class="smarterwiki-linkify" href="mailto:daf@illinois.edu">daf@illinois.edu</a></span></p> 
+								</td> 
+							</tr> 
+							<tr> 
+								<td nowrap="" align="RIGHT" width="1%"> 
+									<p class="pagecontents"><b>Subject:</b></p> 
+								</td> 
+								<td> 
+									<p class="pagecontents">Decision Re: TPAMI-2012-12-0973</p> 
+								</td> 
+							</tr> 
+							<tr> 
+								<td nowrap="" align="RIGHT" width="1%" valign="TOP"> 
+									<p class="pagecontents"><b>Body:</b></p> 
+								</td> 
+								<td colspan="2"> 
+									<p class="pagecontents"> 
+									RE: TPAMI-2012-12-0973, "Large (Brain) Graph Matching via Fast Approximate Quadratic Programming"
+<br>Manuscript Type: Regular
+<br>
+<br>Dear Dr. Joshua Vogelstein,
+<br>
+<br>We have completed the review process of the above referenced paper that was submitted to the IEEE Transactions on Pattern Analysis and Machine Intelligence.  Enclosed are your reviews. We hope that you will find the editor's and reviewers’ comments and suggestions helpful.
+<br>
+<br>I regret to inform you that based on the reviewer feedback, we could not recommend publishing your paper. Final decisions on acceptance are based on the referees' reviews and such factors as restriction of space, topic, and the overall balance of articles.
+<br>
+<br>We hope that this decision does not deter you from submitting to us again. Thank you for your interest in the IEEE Transactions on Pattern Analysis and Machine Intelligence.
+<br>
+<br>Sincerely,
+<br>
+<br>Dr. David Forsyth,
+<br>EIC
+<br>IEEE Transactions on Pattern Analysis and Machine Intelligence
+<br>
+<br>
+<br>***********
+<br>Editor Comments
+<br>
+<br>Editor
+<br>Comments to the Author:
+<br>The reviewers criticize that related work is not adequately covered. They also point out a lack of care in the experiments (e.g. missing baselines), and a lack of quality in writing and presentation. The lack of care in the experiments is decisive, as the method is a heuristics and not theoretically justified.
+<br>
+<br>In its current state and with its limited degree of novelty, this article does not provide a substantial enough contribution to the field to warrant publication in TPAMI.
+<br>
+<br>***********************
+<br>
+<br>Reviewer Comments
+<br>
+<br>
+<br>Reviewer: 1
+<br>
+<br>Recommendation: Author Should Prepare A Major Revision For A Second Review
+<br>
+<br>Comments:
+<br>Strong points:
+<br>-- Good empirical evaluation
+<br>
+<br>Weak points:
+<br>-- Not clear exactly what the novelty is compared to similar approaches
+<br>-- Overly informal writing style and presentation
+<br>
+<br>Detailed comments:
+<br>
+<br>I find the writing of the paper could be substantially improved. The style is way too conversational and familiar. e.g. "that FAQ was not always the best was annoying to us." Try to write the paper using standard academic voice. I'd also like to see more focus on the introduction and technical content, rather than focusing the paper so strongly on experimental results as you do now.
+<br>
+<br>I'm not really sure why the authors chose to focus so much on brain graphs, even to the point of promoting it to the title. It seems like this is really a paper about proposing a novel approach to quadratic assignment algorithms, and brain graphs is simply one possible domain. Therefore I'd change the title be more general.
+<br>
+<br>I'd also change the abstract: it tells me you have good results, but does little to say why your method is novel or important. The fact that you have good results should be mentioned, but should hardly be the main focus of your abstract in my opinion.
+<br>
+<br>Section 5.1 doesn't add much. The complexity of Linear Assignment has been studied elsewhere, and Erdos Renyi graphs may not have representative performance of the models typical complexity.
+<br>
+<br>In short, while the results of this paper seem to be good, I don't know that this algorithm warrants full publication in a journal. I'd think it'd be better suited to a shorter format -- unless more technical details, or a better explanation of its novelty are given.
+<br>
+<br>
+<br>Additional Questions:
+<br>1. Which category describes this manuscript?: Research/Technology
+<br>
+<br>2. How relevant is this manuscript to the readers of this periodical? If you answer Not very relevant or Irrelevant please explain your rating under Public Comments below.: Relevant
+<br>
+<br>1. Please evaluate the significance of the manuscript’s research contribution.: Fair  - Even with the recommended changes, the contribution of this paper is unlikely be significant enough for publication in TPAMI.
+<br>
+<br>2.  Please explain how this manuscript advances this field of research and/or contributes something new to the literature. : The paper proposes a novel solution to the problem of graph matching, via a reduction to quadratic assignment. However, the paper doesn't do a great job of explaining exactly what the novelty is. Briefly the approach in this paper is to:
+<br>1) Phrase graph matching as a QAP (which is standard)
+<br>2) Relax the binary constraints of the resulting QAP (also standard)
+<br>3) Solve the relaxed QP using standard approaches
+<br>4) Project on to the feasible region
+<br>
+<br>To me, there seem to be several similar works. Consider for example the seminar work by Rangarajan et al. (softassign). It follows essentially the same programme, which many others have built upon. Although the authors give good evidence that their algorithm works well in practice on standard benchmark datasets, it's not really clear to me exactly what the novelty is compared to myriad other approaches.
+<br>
+<br>3. Is the manuscript technically sound? In the Public Comments section, please provide detailed explanations to support your assessment: Yes
+<br>
+<br>4. How thorough is the experimental validation (where appropriate)? Please discuss any shortcomings in the Public Comments section.: Compelling experiments; clearly state of the art
+<br>
+<br>1. Are the title, abstract, and keywords appropriate? If not, please comment in the Public Comments section.: No
+<br>
+<br>2.  Does the manuscript contain sufficient and appropriate references?  Please comment and include additional suggested references in the Public Comments section.: References are sufficient and appropriate
+<br>
+<br>3.  Does the introduction state the objectives of the manuscript in terms that encourage the reader to read on? If not, please explain your answer in the Public Comments section.: Could be improved
+<br>
+<br>4.  How would you rate the organization of the manuscript? Is it focused? Please elaborate with suggestions for reorganization in the Public Comments section.: Could be improved
+<br>
+<br>5. Please rate the readability of the manuscript. Explain your rating under Public Comments below. : Easy to read
+<br>
+<br>6. How is the length of the manuscript?  If changes are suggested, please make explicit recommendations in the Public Comments section.: Too long – the manuscript should be shortened significantly (e.g., if a regular paper, should be reduced to a short paper).
+<br>
+<br>7. Should the supplemental material be included? (Click on the Supplementary Files icon to view files): Does not apply, no supplementary files included
+<br>
+<br>8. If yes to 7, should it be accepted: As is
+<br>
+<br>Please rate the manuscript overall. Explain your choice.: Fair
+<br>
+<br>
+<br>Reviewer: 2
+<br>
+<br>Recommendation: Revise and resubmit as “new”
+<br>
+<br>Comments:
+<br>The key insight behind the approach is to allow the assignment matrix
+<br>to be continuous during optimization. During the optimization, the
+<br>objective is linearized (akin to convex concave procedure) and then
+<br>solved by the Hungarian method.
+<br>
+<br>I am surprised that this technique is new given that the Lagrangian
+<br>relaxation technique has been used quite extensively for integer
+<br>programs. A google search leads me to the following link:
+<br>
+<br><span><a class="smarterwiki-linkify" href="http://www.opt.math.tu-graz.ac.at/~cela/papers/qap_bericht.pdf">http://www.opt.math.tu-graz.ac.at/~cela/papers/qap_bericht.pdf</a>
+</span><br>
+<br>And there are a few linearization techniques described there. It'd be
+<br>great for the readers to know how is this technique compared to those
+<br>techniques.
+<br>
+<br>The paper claims that the method is a "fast approximation" but the
+<br>results seem to be quite speculative. In particular, the speed
+<br>comparison in Figure 3 does not look impressive at all. Results in 5.8
+<br>need a baseline. Without any improvement in speed nor theoretical
+<br>guarantees, it's quite hard to acknowledge the contributions of this
+<br>work.
+<br>
+<br>
+<br>Additional Questions:
+<br>1. Which category describes this manuscript?: Research/Technology
+<br>
+<br>2. How relevant is this manuscript to the readers of this periodical? If you answer Not very relevant or Irrelevant please explain your rating under Public Comments below.: Relevant
+<br>
+<br>1. Please evaluate the significance of the manuscript’s research contribution.: Fair  - Even with the recommended changes, the contribution of this paper is unlikely be significant enough for publication in TPAMI.
+<br>
+<br>2.  Please explain how this manuscript advances this field of research and/or contributes something new to the literature. : This paper proposes an approximation solver for the Quadratic Assignment Problem. Quadratic Assignment Problem is an NP-hard problem that has several interesting applications in computer vision (such as
+<br>3D point correspondence, or Brain graph matching).
+<br>
+<br>3. Is the manuscript technically sound? In the Public Comments section, please provide detailed explanations to support your assessment: Appears to be - but didn't check completely
+<br>
+<br>4. How thorough is the experimental validation (where appropriate)? Please discuss any shortcomings in the Public Comments section.: Insufficient; clearly inferior to state of the art, or necessary tests are absent
+<br>
+<br>1. Are the title, abstract, and keywords appropriate? If not, please comment in the Public Comments section.: Yes
+<br>
+<br>2.  Does the manuscript contain sufficient and appropriate references?  Please comment and include additional suggested references in the Public Comments section.: Important references are missing; more references are needed
+<br>
+<br>3.  Does the introduction state the objectives of the manuscript in terms that encourage the reader to read on? If not, please explain your answer in the Public Comments section.: Yes
+<br>
+<br>4.  How would you rate the organization of the manuscript? Is it focused? Please elaborate with suggestions for reorganization in the Public Comments section.: Satisfactory
+<br>
+<br>5. Please rate the readability of the manuscript. Explain your rating under Public Comments below. : Readable - but requires some effort to understand
+<br>
+<br>6. How is the length of the manuscript?  If changes are suggested, please make explicit recommendations in the Public Comments section.: About right
+<br>
+<br>7. Should the supplemental material be included? (Click on the Supplementary Files icon to view files): Yes, as part of the digital library for this submission if accepted
+<br>
+<br>8. If yes to 7, should it be accepted: After revisions.  Please include explanation under Public Comments below.
+<br>
+<br>Please rate the manuscript overall. Explain your choice.: Fair
+<br>
+<br>
+<br>Reviewer: 3
+<br>
+<br>Recommendation: Revise and resubmit as “new”
+<br>
+<br>Comments:
+<br>Graph matching is a famously computational difficult problem. It’s clearly meaningful to design a fast algorithm for it. The manuscript proposed a fast approximate quadratic assignment problem algorithm (FAQ) for graph matching problem. The method showed some interesting results. The manuscript is well written and easy to follow. However, I have some major concerns. 
+<br>
+<br>Major concerns
+<br>
+<br>1.	No theoretical foundation for the algorithm is given in the manuscript. It seems that the manuscript only propose a heuristic algorithm, and does not present why the algorithm can solve the graph matching problem. Can the algorithm guarantee convergence?  If the algorithm converges, is it convergent to the solution of the original problem? What are the error bounds of FAQ? 
+<br>2.	In section 5.1, the manuscript states that the FAQ algorithm is in cubic time based on experiments.  A theoretical explanation should be presented. 
+<br>3.	Some synthetic data can be generated to show the performance of the algorithm, since the 137 benchmarks have limitations in the number of vertices. It might be interesting to see how the methods perform for graphs with specific properties (e.g. scale-free). 
+<br>4.	From Figure 4, although the linear fits showed FAQ is better than PATH, The time spent by FAQ has much larger variance than PATH. This figure shows running time by FAQ is rather unstable and unpredictable. From the figure, it is also unconvincing to say FAQ might be better when the number of vertices increase. The readers might want to see the experimental results which can prove this point even based on synthetic data.  
+<br>5.	In table 1, why not show the results by methods U and QCV?
+<br>6.	In the left panel of figure 5, the algorithm U performs strangely bad (almost 100% error). Some explanation should be provided.      
+<br>
+<br>
+<br>Minors:
+<br>1.	‘Table ??’ in the caption in Table 2. 
+<br>2.	P7,line8, something wrong with this sentence ‘If FAQ ….than FAQ’. 
+<br>3.	Page 11, line 17, ‘error is the fraction of vertices correctly matched’?
+<br>
+<br>
+<br>Additional Questions:
+<br>1. Which category describes this manuscript?: Research/Technology
+<br>
+<br>2. How relevant is this manuscript to the readers of this periodical? If you answer Not very relevant or Irrelevant please explain your rating under Public Comments below.: Relevant
+<br>
+<br>1. Please evaluate the significance of the manuscript’s research contribution.: Fair  - Even with the recommended changes, the contribution of this paper is unlikely be significant enough for publication in TPAMI.
+<br>
+<br>2.  Please explain how this manuscript advances this field of research and/or contributes something new to the literature. : Graph matching is a famously computational difficult problem. It’s clearly meaningful to design a fast algorithm for it. The manuscript proposed a fast approximate quadratic assignment problem algorithm (FAQ) for graph matching problem. The method showed some interesting results. The manuscript is well written and easy to follow. However, I have some major concerns.
+<br>
+<br>3. Is the manuscript technically sound? In the Public Comments section, please provide detailed explanations to support your assessment: Appears to be - but didn't check completely
+<br>
+<br>4. How thorough is the experimental validation (where appropriate)? Please discuss any shortcomings in the Public Comments section.: Lacking in some respects; some cases of interest not tested
+<br>
+<br>1. Are the title, abstract, and keywords appropriate? If not, please comment in the Public Comments section.: Yes
+<br>
+<br>2.  Does the manuscript contain sufficient and appropriate references?  Please comment and include additional suggested references in the Public Comments section.: References are sufficient and appropriate
+<br>
+<br>3.  Does the introduction state the objectives of the manuscript in terms that encourage the reader to read on? If not, please explain your answer in the Public Comments section.: Could be improved
+<br>
+<br>4.  How would you rate the organization of the manuscript? Is it focused? Please elaborate with suggestions for reorganization in the Public Comments section.: Satisfactory
+<br>
+<br>5. Please rate the readability of the manuscript. Explain your rating under Public Comments below. : Easy to read
+<br>
+<br>6. How is the length of the manuscript?  If changes are suggested, please make explicit recommendations in the Public Comments section.: About right
+<br>
+<br>7. Should the supplemental material be included? (Click on the Supplementary Files icon to view files): Does not apply, no supplementary files included
+<br>
+<br>8. If yes to 7, should it be accepted: As is
+<br>
+<br>Please rate the manuscript overall. Explain your choice.: Fair 
+									</p> 
+								</td> 
+							</tr> 
+							<tr> 
+								<td nowrap="" align="RIGHT" width="1%"> 
+									<p class="pagecontents"><b>Date Sent:</b></p> 
+								</td> 
+								<td> 
+									<p class="pagecontents">07-Mar-2013</p> 
+								</td> 
+							</tr> 
+<script language="JavaScript" type="text/javascript">if(document.getElementById('autoattachmsg'))document.getElementById('autoattachmsg').innerHTML=''</script>						</tbody></table> 
+					</td> 
+				</tr> 
+			</tbody></table> 
+		</td> 
+	</tr>   
+	</tbody></table>   
+														</td> 
+													</tr> 
+	<tr> 
+		<td colspan="2">&nbsp;</td> 
+	</tr> 
+	<tr> 
+		<td class="tablelines" colspan="2"> 
+			<table cellpadding="5" cellspacing="1" border="0" width="100%"> 
+				<tbody><tr>	 
+					<td class="tablelightcolor" align="RIGHT"><a href="javascript:window.close();"><img src="./review_files/close_window.gif" border="0"></a></td> 
+				</tr> 
+			</tbody></table> 
+		</td> 
+	</tr> 
+</tbody></table> 
+
+	        		
+					</td>
+					
+				</tr>
+			</tbody></table>
+		</td>
+	</tr>
+</tbody></table>
+
+<script language="JavaScript" type="text/javascript">  setField('SANITY_CHECK_DOCUMENT_ID','');   setField('DOCUMENT_HASHCODE','');   setField('CONFIG_ID','3573');   setField('PAGE_LOADED_FLAG','Y'); </script></form><script language="JavaScript" type="text/javascript"></script>
+<table border="0" cellpadding="10" cellspacing="0" align="center" width="100%">
+<tbody><tr>
+  <td align="center" bgcolor="#FFFFFF">
+    <p class="footer">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		&nbsp; &nbsp;
+
+</p>
+  </td>
+</tr> 
+</tbody></table>
+
+
+
+
+
+</body></html>

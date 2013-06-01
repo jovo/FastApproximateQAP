@@ -1,0 +1,210 @@
+
+
+\begin{lem}
+% \emph{	
+If $A$ and $B$ are the adjacency matrices of simple graphs that are isomorphic to one another, then the minimum of rQAP is equal to the minimum of QAP.
+\end{lem}
+
+\begin{proof}
+Because any feasible solution to GM is also a feasible solution to rQAP, we must only show that the optimal objective function value to rQAP can be no better than the optimal objective function value of QAP.  Let $A=PBP\T$, so that $\langle A, PBP\T\rangle=2m$, where $m$ is the number of edges in $A$.  If rQAP could achieve a lower objective value, then it must be that there exists a $D \in \mc{D}$ such that $\langle A, DBD\T\rangle > \langle A, PBP\T\rangle = 2m$ (remember that we are minimizing the negative Euclidean inner product). For that to be the case, it must be that $(DBD\T)_{uv} \geq 1$ for some $(u,v)$.  That this is not so may be seen by the submultiplicativity of the norm induced by the $\ell_{\infty}$ norm:
+$\norm{Dx}_\infty \leq \norm{D}_{\infty,\infty} \norm{x}_\infty$.  Applying this twice (once for each doubly stochastic matrix multiplication) yields our result.
+% Consider $d_i=\langle D, \text{col}_i(BD\T) \rangle$, where $\text{col}_i(\cdot)$ indicates the $i^{th}$ column of the matrix.  $d_i \leq 1$ for all $i \in [n]$, therefore, our result holds.
+\end{proof}
+
+
+\paragraph{Linear Assignment Problems} % (fold)
+% \label{ssub:linear_assignment_problems}
+
+% subsubsection linear_assignment_problems (end)
+
+The standard way of writing a Linear Assignment Problem (LAP) is
+\begin{equation*}
+% \text{(LAP)} \qquad  
+\begin{array}{cl}
+			\text{minimize}   & \sum_{u,v \in [n]} a_{u \pi(v)} b_{uv} \\
+			\text{subject to}  &P \in \mc{P}.   
+\end{array} %\label{eq:LAP}
+\end{equation*}
+The LAP objective function, like the QAP objective function, enjoys a number of equivalent formulations, including
+% , similar to the QAP objective function (cf Eq. \eqref{eq:equiv})
+% \begin{multline} \label{eq:equiv}
+% (a_{uv}-b_{\pi(u)\pi(v)})^2 = \norm{A - PBP\T}_F^2 \\ = tr \{ (A - PBP\T)\T (A - PBP\T)\}.
+% \end{multline}
+% 
+% 
+% which can be written equivalently in a number of ways using the notion of permutation matrix introduced in the main text, including
+\begin{equation}
+\text{(LAP)} \qquad  
+\begin{array}{cl}
+			\text{minimize}   & \langle P, AB\T \rangle \\
+			\text{subject to}  &P \in \mc{P}.   
+\end{array}\label{eq:LAP}
+\end{equation}
+% 
+% \begin{subequations} \label{eq:LAP2}
+% \begin{align}
+% 	&\argmin_{\PmcP} \norm{PA - B}_F =\\
+% 	&\argmin_{\PmcP} \, tr(PA-B)\T (PA-B)=\\ 
+% 	% &\argmin_{\PmcP} tr (A\T P\T PA) - tr(2PAB\T) + tr(B\T B)=\\ 
+% 	&\argmin_{\PmcP}  -tr (P AB\T) = \argmin_{\PmcP}  -\langle P\T, AB\T \rangle = \label{eq:2c} \\
+% 	% &\argmin_{\PmcP}  -\sum_{u,v \in [n]} p_{ij} a_{ij} b_{ji}
+% 	% =\\% &\argmin_{\PmcP}  - \text{vec}(P)\T \text{vec}(AB\T).=\\
+% 	&\argmin_{\PmcP}  -\langle P, AB\T \rangle, \label{eq:dotLAP}
+% \end{align}
+% \end{subequations}
+% where $\langle \cdot,\cdot \rangle$ %the equality on the second to last line defines is the usual Euclidean inner product, i.e., $\langle X,Y\rangle \defn tr(X\T Y)= \sum_{ij} x_{ij} y_{ij}$.
+% While the objective function and the first two constraints of LAP are linear, t
+The binary constraints of LAP---like those of QAP---make solving even this problem computationally tricky.  Nonetheless, in the last several decades, there has been much progress in accelerating algorithms for solving LAPs, starting with exponential time, all the way down to $\mc{O}(n^3)$ for general LAPs, and even faster for certain special cases (e.g., sparse matrices) \cite{Jonker1987, Burkard2009}.
+
+% That Eq.~\eqref{eq:dir} is a LAP is evident by considering Eq.~\eqref{eq:dotLAP}.  
+To see that Eq.~\eqref{eq:dir} is identical to Eq.~\eqref{eq:LAP}, 
+simply let $A=\nabla_P^{(i)}$ and $B=I$ (the $n\times n$ identity matrix).
+
+
+% The last form indicates that LAP is a linear programming problem (hence the name).  Yet, the constraints, $\mc{P}$, make it a bit trickier.  The feasible region $\mc{P}$ can be written as a set of three constraints: two linear equality constraint sets and a binary constraint.  The LAP objection function with constraints can explicitly be written:
+% \begin{align}
+% 		&\text{minimize}_P  &&\sum_{u \in \mc{V}} -p_{ij} a_{ij} b_{ji} \nonumber \\
+% 		&\text{subject to } && \sum_{u \in \mc{V}} p_{ij} = 1 \, \forall u \in \mc{V} \nonumber \\
+% 		& && \sum_{v \in \mc{V}} p_{ij} = 1 \, \forall v \in \mc{V}, \nonumber \\
+% 		& &&p_{ij} \in \{0,1\} \, \forall u,v. \label{eq:rLAP}	
+% \end{align}
+% Perhaps because LAP comes up in a wide variety of contexts, a large number of algorithms have been developed to solve LAP \cite{Burkard2009}.  These algorithms have become increasing efficient.  
+% One of the most popular algorithms, the so-called ``Hungarian algorithm'' has time complexity $\mc{O}(n^3)$ \cite{Jonker1987}.  Under certain conditions (for example, when $AB\T$ is sparse), faster implementations are also available.  As will be seen below, LAP is a key subroutine to our inexact QAP solution.  
+
+To solve a LAP, consider a continuous relaxation of LAP, specifically, relaxing the permutation matrix constraint to a doubly stochastic matrix constraint:
+% A matrix $P$ is doubly stochastic precisely when $P$ satisfies the following three conditions: 
+% \begin{enumerate}
+% \item	$P\mb{1} = \mb{1}$,
+% \item	$P\T \mb{1}=\mb{1}$, %\\
+% \item 	$P \in  \Real_+^{n \times n}$,
+% \end{enumerate}
+% where the third constraint relaxes the binary constraints of the permutation matrices with a non-negativity constraint.  
+% Let $\mc{D}$ be the set of doubly stochastic matrices.
+% With this, we now state a relaxed LAP problem:
+\begin{equation}
+\text{(rLAP)} \qquad  
+\begin{array}{cl}
+			\text{minimize}   & \langle P, AB\T \rangle \\
+			\text{subject to}  &P \in \mc{D}.   
+\end{array}\label{eq:LAP}
+\end{equation}
+% \begin{subequations} \label{eq:rLAP}
+% \begin{align}
+% 		\text{(rLAP) } \quad &\underset{P}{\text{minimize}}  &&-\langle P, AB\T \rangle \\
+% 		&\text{subject to } && P \in \mc{D}.
+% 		% && \sum_{u \in \mc{V}} p_{ij} = 1 \, \forall u \in \mc{V} \nonumber \\
+% 		% 		& && \sum_{v \in \mc{V}} p_{ij} = 1 \, \forall v \in \mc{V}, \nonumber \\
+% 		% 		& &&p_{ij} \geq 0 \, \forall u,v, \label{eq:ALAP}	
+% \end{align}
+% \end{subequations}
+As it turns out, the minima of LAP and rLAP are equal to one anther \cite{Burkard2009}.
+% solving rLAP is equivalent to solving LAP.
+% \begin{prop}
+% 	LAP and rLAP are equivalent, meaning that they have the same optimal objective function value.
+% \end{prop}
+% \begin{proof}
+% 	Although this proposition is typically proven by invoking total unimodularity, we present a  proof here that we find simpler.	Let $P^L$ be a solution to LAP and let $P^r = \sum_{i\in[k]} \alpha_i P_i$ be a solution to rLAP for some positive integer $k$, permutation matrices $\{P_i\}_{i \in [k]}$, and positive real numbers $\{\alpha_i\}_{i \in[k]}$ such that $\sum_{i \in [k]} \alpha_i=1$.  Note that it must be the case that
+% \begin{align}
+% 	\langle P^L, AB\T \rangle \geq \langle P^r, AB\T \rangle,
+% \end{align}
+% because $P^L$ is also a solution for rLAP. Expanding $P^r$, we have
+% \begin{align}
+% 	\langle P^r, AB\T \rangle = \langle \sum_i \alpha_i P_i, AB\T \rangle = \sum_i \alpha_i \langle  P_i, AB\T \rangle.
+% \end{align}
+% But we know that 
+% \begin{align}
+% 	\langle P^L, AB\T \rangle \leq \langle P, AB\T \rangle
+% \end{align}
+% for any $P \in \mc{P}$ because $P^L$ solves LAP, so  
+% 	% 
+% 	% 
+% 	% \begin{multline}
+% 	% \langle P^L,AB\T \rangle = \langle  \sum_{i\in[k]} \alpha_i P_i^L, AB\T \rangle=  \sum_{i\in[k]} \alpha_i \langle  P_i^L, AB\T \rangle	 \\
+% 	% \leq \sum_{i\in[k]} \alpha_i \langle P^r, AB\T  \rangle = \langle P^r, AB\T \rangle \leq \langle P^L, AB\T \rangle,
+% 	% \end{multline}
+% 	% % then we have a contradiction, 
+% 	% because $P^r$ is feasible in rLAP.
+% 	\end{proof}
+This relaxation motivates our approach to approximating QAP.
+
+
+
+\begin{algorithm}
+	\caption{\FAQ~ for finding a local optimum of rQAP} \label{alg:1}
+\begin{algorithmic}[1]
+	\REQUIRE graphs $A$ and $B$ as well as stopping criteria
+	\ENSURE $\wh{P}$, an estimated permutation matrix
+	\STATE Choose an initialization, $P^{(0)}=\mb{1}\mb{1}\T/n$ \label{step:init} %\COMMENT{although points in $\mc{D}$ would also be feasible}
+	\WHILE{stopping criteria not met} 
+	\STATE Compute the gradient of $f$ at the current point via Eq.~\eqref{eq:grad}	
+	\STATE Compute the direction $Q^{(i)}$ by solving Eq.~\eqref{eq:dir} via the Hungarian algorithm
+	\STATE Compute the step size $\alpha^{(i)}$ by solving Eq.~\eqref{eq:step}
+	\STATE Update $P^{(i)}$ according to Eq.~\eqref{eq:update}  %$P^{(i+1)} \leftarrow P^{(i)} + \alpha^{(i)} Q^{(i)}$
+	\ENDWHILE
+	\STATE Obtain $\wh{P}$ by solving Eq.~\eqref{eq:proj} via the Hungarian algorithm.
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\begin{table}[h!]
+\caption{Comparison of \FAQ~ with optimal objective function value and previous state-of-the-art for directed graphs.  The best (lowest) value is in \textbf{bold}. Asterisks indicate achievement of the global minimum.  The number of vertices for each problem is the number in its name (second column).}
+\begin{center}
+\begin{tabular}{|r|r|r||l|l|l|l|l|}
+	\hline 
+	          \# &  Problem &      Optimal & \FAQ~ & \Epath~& \Grad~ \\
+	\hline 
+	           1 &  lipa20a &     3683 & \textbf{3791} &     3885 &     3909 \\ 
+	           2 &  lipa20b &    27076 & \textbf{27076}$^*$ &    32081 &    \textbf{27076}$^*$ \\ 
+	           3 &  lipa30a &    13178 & \textbf{13571} 	&    13577 &    13668 \\ 
+	           4 &  lipa30b &   151426 & \textbf{151426}$^*$ & \textbf{151426}$^*$ &   \textbf{151426}$^*$ \\ 
+	           5 &  lipa40a &    31538 & \textbf{32109} 	&    32247 &    32590 \\ 
+	           6 &  lipa40b &   476581 & \textbf{476581}$^*$ &   \textbf{476581}$^*$ &   \textbf{476581}$^*$ \\ 
+	           7 &  lipa50a &    62093 & \textbf{62962} &    63339 &    63730 \\ 
+	           8 &  lipa50b &  1210244 & \textbf{1210244}$^*$ &  \textbf{1210244}$^*$ &  \textbf{1210244}$^*$ \\ 
+	           9 &  lipa60a &   107218 & \textbf{108488} &   109168 &   109809 \\ 
+	          10 &  lipa60b &  2520135 & \textbf{2520135}$^*$ &  \textbf{2520135}$^*$ &  \textbf{2520135}$^*$ \\ 
+	          11 &  lipa70a &   169755 & \textbf{171820} &   172200 &   173172 \\ 
+	          12 &  lipa70b &  4603200 & \textbf{4603200}$^*$ &  \textbf{4603200}$^*$ &  \textbf{4603200}$^*$ \\ 
+	          13 &  lipa80a &   253195 & \textbf{256073} &   256601 &   258218 \\ 
+	          14 &  lipa80b &  7763962 & \textbf{7763962}$^*$ &  \textbf{7763962}$^*$ &  \textbf{7763962}$^*$ \\ 
+	          15 &  lipa90a &   360630 & \textbf{363937} &   365233 &   366743 \\ 
+	          16 &  lipa90b & 12490441 & \textbf{12490441}$^*$ & \textbf{12490441}$^*$ & \textbf{12490441}$^*$ \\ 
+	\hline
+	\end{tabular}
+\end{center}
+\label{tab:directed}
+\end{table}%
+
+
+
+
+
+\begin{table}[h!]
+\caption{Comparison of \FAQ~ with optimal objective function value and the best result  on the undirected benchmarks.  Note that \FAQ~ restarted 100 times finds the optimal objective function value in 3 of 16 benchmarks, and that \FAQ~ restarted 3 times finds a minimum better than the previous state-of-the-art on all 16 particularly difficult benchmarks.}
+\begin{center}
+\begin{tabular}{|r|r|r||l|l|l|l|l|}
+\hline
+\# & Problem  &   Optimal    & \FAQ$_{100}$ & \FAQ$_{3}$ & previous min \\
+\hline
+1&    chr12c &   11156 &    \textbf{12176} &   13072 & 13072 \\
+2&    chr15a &    9896 &    \textbf{9896}$^*$ &   17272 &  19086 \\
+3&    chr15c &    9504 &    \textbf{10960} &   14274 &  16206 \\
+4&   chr20b &    2298 &     \textbf{2786} &    3068 &    3068 \\
+5&    chr22b &    6194 &    \textbf{7218} &    7876 &   8482 \\
+6&    esc16b & 	292 & 		\textbf{292}$^*$ & 294 &    296 \\
+7& 	   rou12 &  235528 &  \textbf{235528}$^*$ &  238134 &    253684 \\
+8& 	   rou15 &  354210 &  \textbf{356654} &  371458 &    371458 \\
+9&      rou20 &  725522 &  \textbf{730614} &  743884 &    743884 \\
+10&    tai10a &  135028 &  \textbf{135828} &  148970 &    152534 \\
+11&    tai15a &  388214 &  \textbf{391522} &  397376 &    397376 \\
+12&    tai17a &  491812 &  \textbf{496598} &  511574 &    529134 \\
+13&    tai20a &  703482 &  \textbf{711840} &  721540 &    734276 \\
+14&    tai30a & 1818146 & \textbf{1844636} & 1890738 &  1894640 \\
+15&    tai35a & 2422002 & \textbf{2454292} & 2460940 &  2460940 \\
+16&    tai40a & 3139370 & \textbf{3187738} & 3194826 &  3227612 \\
+    \hline
+\end{tabular}
+\end{center}
+\label{tab:restarts}
+\end{table}%

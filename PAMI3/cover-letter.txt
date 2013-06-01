@@ -1,0 +1,18 @@
+Dear Colleagues:
+
+We are please to submit our novel manuscript entitled, "Large (Brain) Graph Matching via Fast Approximate Quadratic Programming," largely inspired by our previously submitted and rejected manuscript entitled, "Fast Inexact Graph Matching with Applications in Statistical Connectomics."  We are optimistic that this novel manuscript is sufficiently distinct from the previously submitted manuscript to warrant consideration for review as a new manuscript, preferably with the same editors and reviewers.  Below, we highlight several of the key differences.  We let 'FAQ' refer to new manuscript.
+
+(1) In FAQ, we highlight that in approximately solving any computationally challenging problem, we necessarily face an efficiency/efficacy trade-off.  In particular, we can make an algorithm go faster by solving an easier and more approximate problem.  We believe that this is a key aspect to dealing with graph matching problems for big data, which was unmentioned in our original manuscript.  In FAQ, we explicitly compare the performance of our algorithm and several state-of-the-art algorithms in terms of both computational time and objective value function. Our algorithm outperforms the others on both metrics.
+
+(2) In FAQ, we compare the performance of our algorithm to several other state-of-the-art algorithms on all of the benchmarks from the QAPLIB library (as suggested by the reviewers).  This is in contrast to our previous manuscript, as well as the other manuscripts on this problem recently published in TPAMI, all of which used only 16 problems from the >100 total.  Moreover, we have significantly extended the number of competitor algorithms to which we compare (also as suggested by the reviewers). Figure 3 of the submitted manuscript is in color to ease the visual comparisons.
+
+(3) The algorithm proposed in the previous submission utilized any number of restarts. In contrast, in FAQ proposes an algorithm with a deterministic starting point: the barycenter of the feasible region (as suggested by the reviewers).  Even with this deterministic starting point, our algorithm was both faster and better than PATH, the previously best algorithm in the field, published in TPAMI in 2009.
+
+(4) We highlight the performance of our algorithm on both directed and undirected benchmarks, whereas our previous submission only considered the undirected case.  Our algorithm was shown to dominate the previous state-of-the-art algorithms on the directed, as well as the undirected, benchmarks, in terms of both speed and accuracy.
+
+We have attached the related manuscript that was previously reviewed and rejected for comparison purposes. We look forward to reading your reviews. 
+
+All best,
+
+
+Dr. Joshua Vogelstein, on behalf of my fellow co-authors

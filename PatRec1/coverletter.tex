@@ -1,0 +1,33 @@
+\documentclass{letter}
+\signature{Joshua T. Vogelstein, et al.}
+\address{Dept. Statistical Science \\ Duke University \\ Durham, NC 27708\\ USA}
+\begin{document}
+\begin{letter}{Pattern Recognition \\ 
+Elsevier Inc.}
+ % \\ 1600 John F Kennedy Boulevard \\ Suite 1800 \\ Philadelphia PA 19103-2879 \\ USA}
+% Elsevier \\ PO Box 3014 \\ Los Alamitos, CA  90720-1314\\ USA}
+	
+	 
+	
+	  
+	
+\opening{Dear Sir or Madam:}
+
+We are delighted to submit to you our manuscript entitled ``\emph{Fast Approximate Quadratic Programming for Large (Brain) Graph Matching}''.  Quadratic assignment problems have a rich history of theoretic and methodological development.  Yet, the majority of this work has focused on exact algorithms or bounds.  We propose an approach that is quite similar to previous approaches that have been used to obtain exact algorithms or bounds, but we use this approach to obtain an inexact solution. 
+
+Our work was largely inspired by the approximate algorithms 
+from Mikhail Zaslavskiy, Francis Bach, and others,
+that utilize a ``PATH'' following approach. For that reason, we have made extensive comparisons of our algorithms to PATH based approaches on real world data sets.  The empirical results demonstrate both improved speed and accuracy on over $80\%$ of the benchmarks, as well as a novel real world application of interest: matching brain-graphs (connectomes).
+
+In brief, the basic idea of our algorithm is as follows: we relax the feasible region of the \textbf{NP}-hard quadratic assignment problem to its convex hull, yielding a quadratic problem with linear constraints.  We then successively use the Frank-Wolfe algorithm to descend the gradient.  At completion, we project the final doubly-stochastic matrix to its closest permutation matrix.  All iterations and the final step require $\leq n^3$ operations, like many other approximations.  However, our constants are smaller than those for PATH algorithms because we only descend and project once, versus their multiple descents along the path.  
+
+Thank you for considering publication of our manuscript in your prestigious journal.
+
+
+\closing{With best regards,}
+
+% Joshua T. Vogelstein, on behalf of my co-authors
+% \ps{P.S. Here goes your ps.}
+% \encl{Enclosures.}
+\end{letter}
+\end{document}
