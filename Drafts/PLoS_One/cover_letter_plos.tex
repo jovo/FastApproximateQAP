@@ -1,0 +1,52 @@
+\documentclass{letter}
+\usepackage{jhuams-ltr}
+\usepackage{graphicx}
+
+\setlength{\oddsidemargin}{-.2in} \setlength{\topmargin}{-.55in}
+\setlength{\textwidth}{6.9in} \setlength{\textheight}{9.1in}
+
+\signature{Vince Lyzinski \\ Senior Research Scientist\\ Department of Applied Mathematics and Statistics\\ Johns Hopkins University}
+\begin{document}
+\pagenumbering{gobble}% Remove page numbers (and reset to 1)
+\name{Dr.\ Joshua T. Vogelstein}
+\position{Assistant Professor\\Dept. of Biomedical Engineering}
+\address{Johns Hopkins University}
+%\telephone{(410) 516 7195 }
+%\fax{(607) 255 8803}
+\email{vlyzins1@jhu.edu}
+
+\begin{letter}
+{
+Cover letter for the submission of 
+\\
+``Fast Approximate Quadratic Programming for Large (Brain) Graph Matching''
+\\
+to PLOS ONE
+}
+
+\date{\today}
+
+\opening{Dear Sir or Madam:}
+
+\bigskip
+ 
+We are delighted to submit to you our manuscript entitled ``\emph{Fast Approximate Quadratic Programming for Large (Brain) Graph Matching}''.
+We believe this paper to be an important benchmark in both the quadratic assignment problem and graph matching literatures.  Indeed, this paper has already been cited numerous times in the literature and has spawned a bevy of subsequent research papers.  
+
+Quadratic assignment problems have a rich history of theoretic and methodological development.  Yet, the majority of this work has focused on exact algorithms or bounds.  In contrast, we propose an approach  to obtain an inexact solution. 
+Our work is inspired by the approximate algorithms 
+from Mikhail Zaslavskiy, Francis Bach, and others,
+that utilize a ``PATH'' following approach. For that reason, we have made extensive comparisons of our algorithms to PATH based approaches on real world data sets.  The empirical results demonstrate that our approach yields both improved speed and accuracy on over $80\%$ of QAP benchmarks, and best possible performance in a novel real world application of interest: matching brain-graphs (connectomes).
+
+In brief, the basic idea of our algorithm is as follows: we relax the feasible region of the \textbf{NP}-hard quadratic assignment problem to its convex hull, yielding a quadratic problem with linear constraints.  We then successively use the Frank-Wolfe algorithm to descend the gradient.  At completion, we project the final doubly-stochastic matrix to its closest permutation matrix.  All iterations and the final step require $O(n^3)$,  and we empirically demonstrate that our procedure obtains the state-of-the-art trade off between accuracy and efficiency.
+
+Thank you for considering publication of our manuscript in your prestigious journal.
+
+With best regards,\\
+\bigskip 
+
+Joshua T. Vogelstein, et al.
+
+
+\end{letter}
+\end{document}

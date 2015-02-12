@@ -1,0 +1,10 @@
+# Fdb version 3
+["pdflatex"] 1410146685 "coverletter.tex" "coverletter.pdf" "coverletter" 1410148038
+  "/usr/local/texlive/2013/texmf-dist/tex/latex/base/letter.cls" 1254151887 14415 bc7ec0a00ed87d31897c5fe79c8e71a9 ""
+  "/usr/local/texlive/2013/texmf-dist/tex/latex/base/size10.clo" 1254151887 9042 248dfba326a1b8733d6bb8e0a3ac1e49 ""
+  "coverletter.aux" 1410146686 110 3f5010d92b6cfee4f0e4d73b9a90b6d3 ""
+  "coverletter.tex" 1379080966 2295 f80835a9b431aa76ddf1f49048448647 ""
+  (generated)
+  "coverletter.pdf"
+  "coverletter.aux"
+  "coverletter.log"

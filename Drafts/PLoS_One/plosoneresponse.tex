@@ -1,0 +1,46 @@
+\documentclass[10pt]{article}
+
+\usepackage{amsfonts,latexsym,eucal,amsmath,amsthm,amssymb,bm}
+
+\begin{document}
+\date{}
+\title{Response to Reviewers for ``Fast Approximate Quadratic Programming for Large (Brain) Graph Matching'' }
+\maketitle 
+\noindent Dear Dr. Muldoon,\\
+\\
+\noindent We wish to thank you and the anonymous reviewers for
+providing valuable feedback on our paper ``Fast Approximate Quadratic Programming for Large (Brain) Graph Matching."  We found the reviewers comments very helpful in elucidating a number of deficiencies in our manuscript, and our manuscript greatly improved by incorporating their suggestions.  We have included a detailed description of the changes we implemented below.  We are delighted to hear
+that ``after careful consideration, we feel that your manuscript will likely be suitable for publication if it is revised to address the points below,'' and again we thank the editor and the reviewers of
+{\em PLOS ONE} for considering a revision of our manuscript for publication.\\ \\
+Sincerely, \\ 
+Joshua T. Vogelstein, John M. Conroy, Vince Lyzinski,
+, Louis J. Podrazik,  Steven G.~Kratzer, Eric T.~Harley,
+Donniell E.~Fishkind, 
+    R.~Jacob~Vogelstein,
+        and Carey E.~Priebe
+
+
+
+\subsection*{Response to Reviewer 1}
+We agree with your assertion that the inclusion of the phrase ``large (brain)'' in the title of our manuscript ``is a bit of a stretch.''  In light of this, we have modified the title to read ``Fast Approximate Quadratic Programming for Graph Matching,'' which we feel more accurately describes the content of our paper. 
+
+\subsection*{Response to Reviewer 2}
+
+\begin{enumerate}
+    \item The reviewer notes
+    \begin{quote}
+      The proposed algorithm is not new, see for example 'An Integer Projected Fixed Point Method for Graph Matching and MAP Inference' by M. Leordeanu and all. At least this reference should be included in the paper. 
+    \end{quote}
+We have added this reference to the related work section, and have compared our current approach to that of Leordeanu et al. Namely, we pointed out that the approach adopted in Leordeanu et al.\@ is a generalization of our FW approach.  Indeed, our GM formulation and subsequent FW implementation can be realized from Leordeanu et al.\@ by setting $M=-B^T\otimes A^T$, and having the constraint matrix enforce a one--to--one matching of the vertices.  While their paper focuses on FW methodology applied to general quadratic-objective optimizations (indeed their $M$ could be anything), our novel contribution is touting the enhanced efficiency and efficacy of solving our particular indefinite form with FW methodology.  We emphasize several advantages of our approach in Section 5.1 of the revised manuscript.
+\item\begin{quote}
+I think the paper can be improved by dropping off large portions of the text which explains the theoretical aspects of the graph matching problem, and by focusing more on the numerical results (as an options add experiments on synthetic graphs of variable size).
+\end{quote}
+We respectfully disagree with this assertion.  The theoretical results cited in our paper further support the particular indefinite form of the quadratic objective function we adopt.  Indeed, we emphasize that the convex GM relaxation of Eq.\@ (4) is efficiently solvable, but the obtained solution is almost surely incorrect (for a broad class of random graphs)
+ and the correct solution is often not obtained even post projection.  Our indefinite relaxation, however, almost surely yields the correct solution when exactly solved (for a broad class of random graphs) (see ``Graph matching: Relax at your own risk,'' by Lyzinski et al. 2014 for detail).
+ \item\begin{quote}
+The section on `brain-graph matching' is too short given that the title is `for Large (Brain) Matching' and it does not tell us anything interesting about this particular matching application. I would suggest to remove this section completely or add more results, for example, on the comparison of neuron connection maps from different species (and potential insights that such a comparison could provide).
+    \end{quote}
+    We agree that, in light of the inclusion of the phase ``large (brain)'' in the title, our application to brain graph matching is incomplete.  We have modified the title accordingly to ``Fast Approximate Quadratic Programming for Graph Matching,'' which we feel more accurately describes the content of our paper.  The C. elegans matching application then serves to show the applicability of our procedure to biologically inspired graphs.
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,168 @@
+%% cornell-ltr.sty - Cornell University letterhead style
+%% 2009/08/20 Shami Chatterjee 
+%% http://www.astro.cornell.edu/~shami/cornell-letterhead/
+%% Format based on Cornell University Style Guide rev 3.07, March 2007
+%% LaTeX adapted from Stanford's suletter.sty and MIT's mitletter3.cls
+%
+% In the letter preamble (before \begin{document}), 
+% declare \name{} and \address{}
+% and optionally, \telephone{}, \fax{}, \email{}.
+% At the end of the first page, use \closefirstpage to revert
+% to the standard left margin.
+%  
+% Class options:
+% color-logo: print the logo in color [Default]
+% bw-logo: print the logo in black and white, not color
+% no-logo: include no logo, e.g. for printing on letterhead paper?
+% britdate: use dd-mmm-yyyy date format.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{jhuams-ltr}
+\typeout{** JHU AMS Letter Document Style, SC 200908}
+\typeout{** Based on the Cornell University Style Guide rev 3.07, March 2007}
+\RequirePackage{graphicx}
+\RequirePackage{palatino,times}
+
+\def\CULogofile{hltlogo}
+\def\CULogoBWfile{hltlogo}
+\newlength{\defaultmargin}
+\setlength{\defaultmargin}{1.1in}  
+% Extra left margin on first page
+\newlength{\firstpageindent}
+\setlength{\firstpageindent}{0.0in}  
+%\setlength{\firstpageindent}{0.8in}  
+
+% cep
+\RequirePackage[margin=\defaultmargin,top=1.6in,nohead]{geometry}
+
+% Note: Style guide specifies 7/8 inch logo minimum.
+% Use height instead of width, since height is fixed.
+\def\culogo{\includegraphics[height=0.875in]{\CULogofile}}
+
+\DeclareOption{color-logo}{%
+  \def\culogo{\includegraphics[height=0.875in]{\CULogofile}}
+  \typeout{Using logo file \CULogofile}
+}
+\DeclareOption{bw-logo}{%
+  \def\culogo{\includegraphics[height=0.875in]{\CULogoBWfile}}
+  \typeout{Using logo file \CULogoBWfile}
+}
+\DeclareOption{no-logo}{%
+  \def\culogo{\parbox[t]{5in}{\hspace*{4in}}\vspace*{0.4in}}
+  \typeout{Blank logo requested. Hope you had other plans.}
+}
+
+\DeclareOption{britdate}{\renewcommand*{\today}{\number\day\space
+   \ifcase\month\or
+   January\or February\or March\or April\or May\or June\or
+   July\or August\or September\or October\or November\or December\fi
+   \space\number\year}}
+
+\ProcessOptions
+
+%%% letter.cls already defines the following:
+% \newcommand*{\name}[1]{\def\fromname{#1}}
+% \newcommand*{\signature}[1]{\def\fromsig{#1}}
+% \newcommand*{\address}[1]{\def\fromaddress{#1}}
+% \newcommand*{\location}[1]{\def\fromlocation{#1}}
+% \newcommand*{\telephone}[1]{\def\telephonenum{#1}}
+%% Add the following to customize:
+\newcommand*{\position}[1]{\def\mypos{#1}}
+\newcommand*{\fax}[1]{\def\faxnum{#1}}
+\newcommand*{\email}[1]{\def\emailaddr{#1}}
+
+\position{}
+\fax{}
+\email{}
+
+% Define sender's address to conform to Cornell style guide.
+\def\fulladdress{
+    {\bf \fromname \\}%
+    \mypos\\
+    \smallskip
+    \fromaddress\\
+    Baltimore, MD 21211-2840 \\
+    \ifx\telephonenum\@empty \else t.\ \telephonenum\\ \fi %
+    \ifx\faxnum\@empty \else f.\ \faxnum\\ \fi %
+    \ifx\emailaddr\@empty \else email:\ \emailaddr\\ \fi %
+}
+
+% Address goes on the right; 9 pt Palatino with 10 pt leading.
+% cep
+% \def\completeaddress{\hspace*{4in}
+\def\completeaddress{\hspace*{4.7in}
+ \parbox{\indentedwidth}{%
+ {\fontfamily{ppl}\fontsize{9}{10}\selectfont
+  \raggedright \fulladdress
+}}}
+
+%%%% In progress %%%%
+%\newsavebox{\CUheader}
+%\sbox{\CUheader}{%
+%  \parbox[t]{\textwidth}{%
+%  }
+%}
+
+%%% Footer on all pages:
+%\renewcommand{\@oddfoot}{\mbox{\scriptsize%
+%      Johns Hopkins University is an equal opportunity, 
+%      affirmative action educator and employer.}}
+
+%%% First page style definition:
+% Reduce textwidth and increase left margin for this page
+\renewcommand{\ps@firstpage}{%
+  \addtolength{\oddsidemargin}{0in} 
+  % Defining it here fails, but we need the side effects.
+% Could define the letterhead here: \renewcommand{\@oddhead}{}
+}
+
+
+  \addtolength{\oddsidemargin}{\firstpageindent}
+  \addtolength{\textwidth}{-\firstpageindent}  
+  \typeout{** First Oddsidemargin = \the\oddsidemargin}
+  \typeout{** First Textwidth = \the\textwidth} 
+  \onecolumn
+
+\newcommand{\closefirstpage}{%
+  \clearpage
+  \addtolength{\oddsidemargin}{-\firstpageindent}
+  \addtolength{\textwidth}{\firstpageindent}   
+  \typeout{** Next Oddsidemargin = \the\oddsidemargin}
+  \typeout{** Next Textwidth = \the\textwidth}
+  \onecolumn
+} 
+
+% Text is in 11 pt Times with 13 pt leading; 
+% we prefer it a bit larger.
+\renewcommand{\opening}[1]{
+  \thispagestyle{firstpage}
+  % Lay out the header
+% cep
+  \vspace*{-0.5in}
+  \hspace{-\firstpageindent}
+%  \hspace{-0.3in}\culogo\par
+  \hspace{-0.0in}\culogo\par
+  \vspace{-0.95in}
+   \completeaddress\par
+   \vspace{2\parskip}
+  % Set the text font
+  \fontfamily{ptm}\fontsize{12}{14}\selectfont
+  \mbox{\@date}\\
+  \vspace{2\parskip}\\
+  {\raggedright \toname \\ \toaddress \par}%
+  \vspace{1.5\parskip}%
+  #1\par\nobreak}
+  % And the rest of the letter follows.
+
+% Set up signature at the end
+\renewcommand{\closing}[1]{\par\nobreak\vspace{2\parskip}%
+  \stopbreaks
+  \noindent
+  \parbox{\indentedwidth}{\raggedright
+       \ignorespaces #1\\[6\medskipamount]%
+       \ifx\@empty\fromsig
+           \fromname\\\mypos
+       \else \fromsig \fi\strut}%
+   \par}
+
+%%%% End of style file. %%%%

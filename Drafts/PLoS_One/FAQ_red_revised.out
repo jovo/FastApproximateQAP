@@ -1,0 +1,20 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Preliminaries}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Quadratic Assignment Problems}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Relaxed Quadratic Assignment Problem}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Graph Matching}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Graph Matching as a Quadratic Assignment Problem}{section.2}% 6
+\BOOKMARK [1][-]{section.3}{Fast Approximate QAP Algorithm}{}% 7
+\BOOKMARK [1][-]{section.4}{Results}{}% 8
+\BOOKMARK [2][-]{subsection.4.1}{Algorithm Complexity and leading constants}{section.4}% 9
+\BOOKMARK [2][-]{subsection.4.2}{QAP Benchmark Accuracy}{section.4}% 10
+\BOOKMARK [2][-]{subsection.4.3}{QAP Benchmark Efficiency}{section.4}% 11
+\BOOKMARK [2][-]{subsection.4.4}{QAP Benchmark Accuracy/Efficiency Trade-off}{section.4}% 12
+\BOOKMARK [2][-]{subsection.4.5}{QAP Directed Benchmarks}{section.4}% 13
+\BOOKMARK [2][-]{subsection.4.6}{Theoretical properties of FAQ}{section.4}% 14
+\BOOKMARK [2][-]{subsection.4.7}{Multiple Restarts}{section.4}% 15
+\BOOKMARK [2][-]{subsection.4.8}{Brain-Graph Matching}{section.4}% 16
+\BOOKMARK [1][-]{section.5}{Discussion}{}% 17
+\BOOKMARK [2][-]{subsection.5.1}{Related Work}{section.5}% 18
+\BOOKMARK [2][-]{subsection.5.2}{Future Work}{section.5}% 19
+\BOOKMARK [2][-]{subsection.5.3}{Concluding Thoughts}{section.5}% 20

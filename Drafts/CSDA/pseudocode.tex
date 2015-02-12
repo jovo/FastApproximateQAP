@@ -1,0 +1,112 @@
+\documentclass[preprint,11pt]{elsarticle}
+
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+% \usepackage{graphicx}
+% \usepackage{cite}
+\usepackage{algorithm,algorithmic}
+% \usepackage{times}
+% \usepackage{fancyhdr}
+% \usepackage[small]{titlesec}
+% \usepackage{color}
+% \usepackage{enumerate}
+
+
+
+% \pagestyle{fancy}
+% 
+% \oddsidemargin=0.0in %%this makes the odd side margin go to the default of 1inch
+% \evensidemargin=0.0in
+% \textwidth=6.5in
+% \headwidth=6.5in
+% \textheight=9in %%sets the textwidth to 6.5, which leaves 1 for the remaining right margin with 8 1/2X11inch paper
+% \headheight=12pt
+% \topmargin=-0.25in
+
+
+\usepackage{hyperref}
+\hypersetup{
+    linkcolor=red,          % color of internal links
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+\input{../../../../other/latex/latex_commands.tex}
+% \usepackage{longtable}
+
+\journal{Computational Statistics \& Data Analysis}
+
+\begin{document}
+
+	\begin{frontmatter}
+
+
+\title{Fast Approximate Quadratic Programming \\ for Large (Brain) Graph Matching}
+\author{Joshua T.~Vogelstein$^*$, John M.~Conroy, Louis J.~Podrazik, \\ Steven G.~Kratzer, Eric T.~Harley, 
+        Donniell E.~Fishkind, 
+		R.~Jacob~Vogelstein
+        and Carey E.~Priebe}
+
+\address{		J.T. Vogelstein, E.T. Harley, D.E. Fishkind, and C.E. Priebe are with the Department of Applied Mathematics and Statistics, Johns Hopkins University, Baltimore, MD 21218. 
+\\ J.M. Conroy, L.J. Podrazik and S.G. Kratzer are with Institute for Defense Analyses, Center for Computing Sciences, Bowie, MD 20708. 
+\\ R.J. Vogelstein is with the Johns Hopkins University Applied Physics Laboratory, Laurel, MD, 20723. \\ $^*$ corresponding author; current address: Department of Statistical Science, Duke University, Durham, NC 27708; current phone number: +1-443-858-9911; current email address: \url{jovo@stat.duke.edu} }
+
+% \author{Joshua T.~Vogelstein, John M.~Conroy, Louis J.~Podrazik, S/teven G.~Kratzer, Eric T.~Harley,
+%         Donniell E.~Fishkind, 
+% 		R.~Jacob~Vogelstein,
+%         and~Carey~E.~Priebe% <-this % stops a space
+% \IEEEcompsocitemizethanks{\IEEEcompsocthanksitem J.T. Vogelstein, E.T. Harley, D.E. Fishkind, and C.E. Priebe are with the Department
+% of Applied Mathematics and Statistics, Johns Hopkins University, Baltimore, MD 21218. 
+% %\protect\\
+% % note need leading \protect in front of \\ to get a newline within \thanks as
+% % \\ is fragile and will error, could use \hfil\break instead.
+% E-mail: \{joshuav,eric.harley,def,cep\}@jhu.edu, \{conroyjohnm,ljpodra,sgkratz\}@gmail.com, jacob.vogelstein@jhuapl.edu
+% \IEEEcompsocthanksitem J.M. Conroy, L.J. Podrazik and S.G. Kratzer are with Institute for Defense Analyses, Center for Computing Sciences, Bowie, MD 20708.
+% \IEEEcompsocthanksitem R.J. Vogelstein is with the Johns Hopkins University Applied Physics Laboratory, Laurel, MD, 20723.}% <-this % stops a space
+% \thanks{This work was partially supported by the Research Program in Applied Neuroscience.}}
+ 
+\begin{abstract}
+Quadratic assignment problems (QAPs) arise in a wide variety of domains, ranging from operations research to graph theory to computer vision to neuroscience.  In the age of big data, graph valued data is becoming more prominent, and with it, a desire to run algorithms on ever larger graphs.  Because QAP is \textbf{NP}-hard, exact algorithms are intractable.  Approximate algorithms necessarily employ an accuracy/efficiency trade-off. We developed a fast approximate quadratic assignment algorithm (\FAQ). \FAQ~ finds a local optima in (worst case) time cubic in the number of vertices, similar to other approximate QAP algorithms.  We demonstrate empirically that our algorithm is faster and achieves a lower objective value on over $80\%$ of the suite of QAP benchmarks, compared with the previous state-of-the-art.  Applying the algorithms to our motivating example, matching C.~elegans connectomes (brain-graphs), we find that \FAQ~ achieves the optimal performance in record time, whereas none of the others even find the optimum.
+\end{abstract}
+
+\begin{keyword}
+%% keywords here, in the form: keyword \sep keyword
+
+graph theory \sep neuroscience \sep nonlinear optimization
+
+%% MSC codes here, in the form: \MSC code \sep code
+%% or \MSC[2008] code \sep code (2000 is the default)
+
+\end{keyword}
+
+
+\end{frontmatter}
+
+
+
+
+\begin{algorithm}
+	\caption{\FAQ~ for finding a local optimum of rQAP} \label{alg:1}
+\begin{algorithmic}[1]
+	\REQUIRE graphs $A$ and $B$ as well as stopping criteria
+	\ENSURE $\wh{P}$, an estimated permutation matrix
+	\STATE Choose an initialization, $P^{(0)}=\mb{1}\mb{1}\T/n$ \label{step:init} %\COMMENT{although points in $\mc{D}$ would also be feasible}
+	\WHILE{stopping criteria not met} 
+	\STATE Compute the gradient of $f(P)=-tr(B\T P\T AP)$ at the current point:
+		$\nabla f (P^{(i)}) =  - A P^{(i)} B\T - A\T P^{(i)} B$.
+	\STATE Compute the direction $Q^{(i)}$ by solving \\  $\min_{P \in \mc{D}} f(P^{(i)}) + \nabla f(P^{(i)})\T(P - P^{(i)})$ via the Hungarian algorithm.
+		\STATE Compute the step size $\alpha^{(i)}$ by solving 
+					$\min_{\alpha \in [0,1]}$    $f(P^{(i)} + \alpha^{(i)} Q^{(i)})$ 
+			\STATE Update $P^{(i)}$ according to 
+				$P^{(i+1)} = P^{(i)} + \alpha^{(i)} Q^{(i)}$.
+	\ENDWHILE
+	\STATE Obtain $\wh{P}$ by solving 
+	$\min_{\PmcP}    -\langle P^{(i_{max})}, P \rangle$ 	via the Hungarian algorithm.
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+\end{document}
+
+
