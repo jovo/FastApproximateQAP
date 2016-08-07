@@ -41,6 +41,10 @@ function [f,myp,x,iter,fs,myps]=sfw(A,B,IMAX,x0)
 %
 [m,n]=size(A);
 stype=2;
+if ~exist('IMAX','var')
+    IMAX=30;
+end;
+
 if ~exist('x0','var')
     % If IMAX == 0.5 use the identity as the starting point, and perform
     % one iteration of FW with a step length of 1.
@@ -67,9 +71,7 @@ else
     x0=x0(:);
 end
 x=x0;
-if ~exist('IMAX','var')
-    IMAX=30;
-end;
+
 stoptol=1.0e-4;
 myp=[];
 iter=0; stop=0;
