@@ -1,4 +1,4 @@
-function [f0new, salpha] = lines(type, x,d,g,A,B)
+function [f0new, salpha] = lines(type, x,d,g,A,B,C,alpha)
 %function [f0new, salpha] = lines(type, x,d,g,A,B)
 % line search: 0=> salpha=1, 1=> search
 %
@@ -19,7 +19,7 @@ Debug=0;
 
 dxg  = d'*g;
 if(dxg > 0)
-    fprintf(1,'warning: Nonimproving Direction, <d,g> = %g\n', dxg);
+    %fprintf(1,'warning: Nonimproving Direction, <d,g> = %g\n', dxg);
     %d=-d;
 end
 
@@ -160,9 +160,9 @@ elseif (type==2)
     % derivative at alpha=0:
     b = g' * d;
     % constant term at alpha=0
-    c = fun(x,A,B);
+    c = fun(x,A,B,C,alpha);
     % get second order coeff
-    fun_vertex = fun(x+d,A,B);
+    fun_vertex = fun(x+d,A,B,C,alpha);
     a = fun_vertex - b - c;
     if( abs(a)<eps)
         %disp('function is linear');
@@ -170,7 +170,7 @@ elseif (type==2)
     else
         salpha =min(1,max(-b/(2*a),0));
     end;
-    fun_alpha = fun(x+salpha*d,A,B);
+    fun_alpha = fun(x+salpha*d,A,B,C,alpha);
     % check quadratic function
     qfun_alpha = a*salpha*salpha + b*salpha + c;
     if ((abs(a)>=eps)&&(abs(fun_alpha-qfun_alpha)>1000*abs(fun_alpha)*eps))
@@ -190,7 +190,7 @@ else
 end
 
 xt=x + salpha*d;
-f0new = fun(xt,A,B);
+f0new = fun(xt,A,B,C,alpha);
 
 % salpha, f0new
 % lmin= fmin('fun1dim',0,alpha_c,[0,1.e-6],x,d,T,O,n,m,scale)

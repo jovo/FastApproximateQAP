@@ -1,4 +1,4 @@
-function [f,myp,x,iter,fs,myps]=sfw(A,B,IMAX,x0)
+function [f,myp,Q,iter,fs,myps]=sfw(A,B,IMAX,x0,C,alpha)
 %function [f,p,x,iter]=sfw(A,B,IMAX,x0)'
 % Perform at most IMAX iterations of the Frank-Wolfe method to compute an
 % approximate solution to the quadratic assignment problem given the
@@ -25,11 +25,14 @@ function [f,myp,x,iter,fs,myps]=sfw(A,B,IMAX,x0)
 %     f=sum(sum(A.*B(p,p))), where
 %     p is the permutation found by FW after projecting the interior point
 %         to the boundary.
-%     x is the doubly stochastic matrix (interior point) computed by the FW
+%     Q is the doubly stochastic matrix (interior point) computed by the FW
 %       method
 %     iter is the number of iterations of FW performed.
 %     fs is the list of fs for each iteration
 %     myps is the list of myps for each iteration
+%     C is the matrix of node labellings (a priori information)
+%     alpha is the weight we give to structure vs labels i.e.
+%         f = (1-alpha) * tr ( A P B^T P^T) + alpha * tr( C^T P )
 %
 % Louis J. Podrazik circa 1996
 % Modified by John M. Conroy, 1996-2010
@@ -41,6 +44,10 @@ function [f,myp,x,iter,fs,myps]=sfw(A,B,IMAX,x0)
 %
 [m,n]=size(A);
 stype=2;
+if ~exist('IMAX','var')
+    IMAX=30;
+end;
+
 if ~exist('x0','var')
     % If IMAX == 0.5 use the identity as the starting point, and perform
     % one iteration of FW with a step length of 1.
@@ -67,16 +74,24 @@ else
     x0=x0(:);
 end
 x=x0;
-if ~exist('IMAX','var')
-    IMAX=30;
-end;
+
+if ~exist('C', 'var')
+    % Default no labels
+    C = zeros(m,n);
+end
+
+if ~exist('alpha', 'var')
+    % Default all weight given to structure
+    alpha = 0;
+end
+
 stoptol=1.0e-4;
 myp=[];
 iter=0; stop=0;
 myps=nan(ceil(IMAX),n);
 while ( (iter < IMAX) && (stop==0))
     % ---- fun+grad ------
-    [f0,g] = fungrad(x,A,B);
+    [f0,g] = fungrad(x,A,B,C,alpha);
     g=[g(1:n^2)+g(1+n^2:end);g(1:n^2)+g(1+n^2:end)]/2;
     % ---- projection ------
     [d,myp] = dsproj(x,g,m,n);
@@ -89,7 +104,7 @@ while ( (iter < IMAX) && (stop==0))
     % ---- line search  ------
     %plotline( T,O, x,d,g,n,m,50);
     if IMAX>0.5
-        [f0new, salpha] = lines(       stype, x,d,g,A,B);
+        [f0new, salpha] = lines(       stype, x,d,g,A,B,C,alpha);
     else
         salpha=1;  % Priebe's LAP approximation to a QAP
     end
