@@ -1,4 +1,4 @@
-function [f0] = fun(x,A,B)
+function [f0] = fun(x,A,B,C,alpha)
 % function [f0] = fun(x,A,B)
 %--------------------
 % Louis J. Podrazik circa 1996
@@ -11,5 +11,5 @@ function [f0] = fun(x,A,B)
 
 [m,n]=size(A);
 [P,Q]=unstack(x,m,n);
-f0=sum(sum(P*A*Q'.*B));
+f0 = 2*(1-alpha)*trace(P*A*Q'*B) + alpha * trace(C'*P);  % Labelled graph matching equation
 %f0=-f0; % MINIMIZATION
